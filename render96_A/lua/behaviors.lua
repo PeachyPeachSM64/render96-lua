@@ -54,10 +54,10 @@ local sThrownInteractions = o2oint.Interactions({
 })
 
 define_custom_obj_fields({
-    oBlinkState         = 'f32',
-    oBlinkTimer         = 'f32',
-    oFaceState          = 'f32',
-    oFaceTimer          = 'f32',
+    oSwitchState1       = 'f32',
+    oSwitchTimer1       = 'f32',
+    oSwitchState2       = 'f32',
+    oSwitchTimer2       = 'f32',
     oMrIBlinkIndex      = 'f32',
     oMrITracking        = 'f32',
     oMrILastAngle       = 'f32',
@@ -73,22 +73,22 @@ define_custom_obj_fields({
     oCelebrationStar    = 'f32'
 })
 
-function geo_switch_amp_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oFaceState return end
-function geo_switch_amp_glow_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oBlinkState return end
-function geo_switch_boo_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oFaceState return end
-function geo_switch_boo_big_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oFaceState return end
-function geo_switch_boo_king_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oFaceState return end
-function geo_switch_bubba_swim_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oFaceState return end
-function geo_switch_bully_eye_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oBlinkState return end
-function geo_switch_chain_chomp_face(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oFaceState return end
-function geo_switch_chillychief_eye_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oBlinkState return end
-function geo_switch_goomba_mouth_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oFaceState return end
-function geo_switch_goomba_eye_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oBlinkState return end
-function geo_switch_mr_i_face_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oFaceState return end
-function geo_switch_thwomp_face(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oFaceState return end
-function geo_switch_plant_face(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oFaceState return end
-function geo_switch_toad_hat(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oBlinkState return end
-function geo_switch_toad_vest(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oFaceState return end
+function geo_switch_amp_glow_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
+function geo_switch_amp_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState2 return end
+function geo_switch_boo_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState2 return end
+function geo_switch_boo_big_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState2 return end
+function geo_switch_boo_king_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState2 return end
+function geo_switch_bubba_swim_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState2 return end
+function geo_switch_bully_eye_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
+function geo_switch_chain_chomp_face(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState2 return end
+function geo_switch_chillychief_eye_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
+function geo_switch_goomba_mouth_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState2 return end
+function geo_switch_goomba_eye_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
+function geo_switch_mr_i_face_state(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState2 return end
+function geo_switch_thwomp_face(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState2 return end
+function geo_switch_plant_face(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState2 return end
+function geo_switch_toad_hat(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
+function geo_switch_toad_vest(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState2 return end
 
 ---@param o Object
 local function bhv_blargg_render96_init(o)
@@ -328,10 +328,10 @@ id_bhvRender96BreakableBox = hook_behavior(id_bhvBreakableBox, OBJ_LIST_SURFACE,
 
 ---@param o Object
 local function bhv_goomba_render96_init(o)
-    o.oFaceState = GOOMBA_FACE_CLOSE
-    o.oBlinkState = GOOMBA_EYE_OPEN
-    o.oBlinkTimer = 0
-    o.oFaceTimer = 0
+    o.oSwitchState2 = GOOMBA_FACE_CLOSE
+    o.oSwitchState1 = GOOMBA_EYE_OPEN
+    o.oSwitchTimer1 = 0
+    o.oSwitchTimer2 = 0
     o.oMusicFade = 0
 end
 
@@ -349,8 +349,8 @@ local function bhv_goomba_render96_throw_physics(o)
     cur_obj_update_floor_and_walls()
     cur_obj_move_standard(-78)
     sThrownInteractions:process_interactions(o)
-    o.oFaceState = GOOMBA_FACE_OPEN
-    o.oBlinkState = GOOMBA_EYE_DAZED
+    o.oSwitchState2 = GOOMBA_FACE_OPEN
+    o.oSwitchState1 = GOOMBA_EYE_DAZED
     o.oGravity = -2.5
     o.oFriction = 0.99
     o.oBuoyancy = 1.4
@@ -376,8 +376,8 @@ end
 ---@param o Object
 local function bhv_goomba_render96_held(o)
     if o.oHeldState == HELD_HELD then
-        o.oFaceState = GOOMBA_FACE_OPEN
-        o.oBlinkState = GOOMBA_EYE_DAZED
+        o.oSwitchState2 = GOOMBA_FACE_OPEN
+        o.oSwitchState1 = GOOMBA_EYE_DAZED
         o.header.gfx.node.flags = o.header.gfx.node.flags | GRAPH_RENDER_INVISIBLE
         cur_obj_become_intangible()
     elseif o.oHeldState == HELD_THROWN then
@@ -392,33 +392,33 @@ end
 
 ---@param o Object
 local function bhv_goomba_render96_loop(o)
-    o.oBlinkTimer = o.oBlinkTimer - 1
-    if o.oBlinkTimer <= 0 then
-        if o.oBlinkState == GOOMBA_EYE_OPEN then
-            o.oBlinkState = GOOMBA_EYE_CLOSE
-            o.oBlinkTimer = math.random(3, 8)
+    o.oSwitchTimer1 = o.oSwitchTimer1 - 1
+    if o.oSwitchTimer1 <= 0 then
+        if o.oSwitchState1 == GOOMBA_EYE_OPEN then
+            o.oSwitchState1 = GOOMBA_EYE_CLOSE
+            o.oSwitchTimer1 = math.random(3, 8)
         else
-            o.oBlinkState = GOOMBA_EYE_OPEN
-            o.oBlinkTimer = math.random(30, 100)
+            o.oSwitchState1 = GOOMBA_EYE_OPEN
+            o.oSwitchTimer1 = math.random(30, 100)
         end
     end
 
-    o.oFaceTimer = o.oFaceTimer - 1
-    if o.oFaceTimer <= 0 then
-        if o.oFaceState == GOOMBA_FACE_CLOSE then
-            o.oFaceState = GOOMBA_FACE_OPEN
-            o.oFaceTimer = math.random(10, 15)
+    o.oSwitchTimer2 = o.oSwitchTimer2 - 1
+    if o.oSwitchTimer2 <= 0 then
+        if o.oSwitchState2 == GOOMBA_FACE_CLOSE then
+            o.oSwitchState2 = GOOMBA_FACE_OPEN
+            o.oSwitchTimer2 = math.random(10, 15)
         else
-            o.oFaceState = GOOMBA_FACE_CLOSE
-            o.oFaceTimer = math.random(30, 100)
+            o.oSwitchState2 = GOOMBA_FACE_CLOSE
+            o.oSwitchTimer2 = math.random(30, 100)
         end
     end
 
     if o.oAction == GOOMBA_ACT_JUMP then
-        o.oBlinkState = GOOMBA_EYE_OPEN
-        o.oBlinkTimer = 0
-        o.oFaceState = GOOMBA_FACE_CLOSE
-        o.oFaceTimer = 0
+        o.oSwitchState1 = GOOMBA_EYE_OPEN
+        o.oSwitchTimer1 = 0
+        o.oSwitchState2 = GOOMBA_FACE_CLOSE
+        o.oSwitchTimer2 = 0
     end
 
     if get_character(m).type == CT_WARIO then
@@ -427,8 +427,8 @@ local function bhv_goomba_render96_loop(o)
                 set_mario_particle_flags(m, PARTICLE_HORIZONTAL_STAR, 0)
                 o.oInteractType = INTERACT_GRABBABLE
                 o.oAction = GOOMBA_ACT_STUN
-                o.oFaceState = GOOMBA_FACE_OPEN
-                o.oBlinkState = GOOMBA_EYE_DAZED
+                o.oSwitchState2 = GOOMBA_FACE_OPEN
+                o.oSwitchState1 = GOOMBA_EYE_DAZED
                 o.oTimer = 0
                 cur_obj_init_animation_with_accel_and_sound(0, 0) 
             end
@@ -441,8 +441,8 @@ local function bhv_goomba_render96_loop(o)
         if (o.oHeldState == HELD_FREE and o.oAction == GOOMBA_ACT_STUN and o.oTimer <= 150) then
             o.oGoombaTargetYaw = o.oGoombaTargetYaw + 0x1000
             cur_obj_rotate_yaw_toward(o.oGoombaTargetYaw, 0x1000)
-            o.oFaceState = GOOMBA_FACE_OPEN
-            o.oBlinkState = GOOMBA_EYE_DAZED
+            o.oSwitchState2 = GOOMBA_FACE_OPEN
+            o.oSwitchState1 = GOOMBA_EYE_DAZED
             if mario_check_object_grab(m) ~= 0 and (m.heldObj == nil) then
                 m.usedObj = o
                 mario_grab_used_object(m)
@@ -454,8 +454,8 @@ local function bhv_goomba_render96_loop(o)
         if (o.oHeldState == HELD_FREE and o.oAction == GOOMBA_ACT_STUN and o.oTimer > 150) then
             o.oInteractType = INTERACT_BOUNCE_TOP;
             o.oAction = GOOMBA_ACT_WALK;
-            o.oFaceState = GOOMBA_FACE_CLOSE
-            o.oBlinkState = GOOMBA_EYE_OPEN
+            o.oSwitchState2 = GOOMBA_FACE_CLOSE
+            o.oSwitchState1 = GOOMBA_EYE_OPEN
             cur_obj_init_animation_with_accel_and_sound(0, 1) 
             return
         end
@@ -468,7 +468,10 @@ local function bhv_goomba_render96_loop(o)
         if (m.action == ACT_HOLD_WATER_IDLE or m.action == ACT_HOLD_WATER_ACTION_END) and m.heldObj == o then mario_drop_held_object(m) end
     end
     if get_character(m).type ~= CT_WARIO then
-        if o.oAction == OBJ_ACT_SQUISHED then cur_obj_init_animation_with_accel_and_sound(0, 0) end
+        if o.oAction == OBJ_ACT_SQUISHED then 
+            o.oSwitchState2 = GOOMBA_FACE_CLOSE
+            o.oSwitchState1 = GOOMBA_EYE_CLOSE
+            cur_obj_init_animation_with_accel_and_sound(0, 0) end
     end
 end
 
@@ -564,7 +567,7 @@ id_bhvRender96KoopaShell = hook_behavior(id_bhvKoopaShell, OBJ_LIST_PUSHABLE, fa
 
 ---@param o Object
 local function bhv_thwomp_render96_init(o)
-    o.oFaceState = TWHOMP_FACE_BASE
+    o.oSwitchState2 = TWHOMP_FACE_BASE
     o.oThwompShakeTicks = 18
     o.oThwompPosMag = 10.0
     o.oThwompAngleMag = 0x120
@@ -608,9 +611,9 @@ end
 ---@param o Object
 local function bhv_thwomp_render96_loop(o)
     bhv_thwomp_render96_shake(o)
-    if o.oAction == 0 then o.oFaceState = TWHOMP_FACE_BASE end
-    if o.oAction == 1 then o.oFaceState = TWHOMP_FACE_ANGRY end
-    if o.oAction == 2 then o.oFaceState = TWHOMP_FACE_URGH end
+    if o.oAction == 0 then o.oSwitchState2 = TWHOMP_FACE_BASE end
+    if o.oAction == 1 then o.oSwitchState2 = TWHOMP_FACE_ANGRY end
+    if o.oAction == 2 then o.oSwitchState2 = TWHOMP_FACE_URGH end
 
     if m.action == ACT_WARIO_CHARGE and dist_between_objects(o, m.marioObj) <= 350 then
         cur_obj_play_sound_2(SOUND_OBJ_THWOMP)
@@ -1058,8 +1061,8 @@ local function  bhv_mr_i_render96_init(o)
     o.oAction           = MR_I_IDLE
 
     o.oMrISize          = 2
-    o.oFaceState     = MR_I_OPEN
-    o.oBlinkTimer         = 0
+    o.oSwitchState2     = MR_I_OPEN
+    o.oSwitchTimer1         = 0
     o.oMrIBlinkIndex    = 1
     o.oMrIDetectRadius  = 500
     o.oMrIDizzyTimer    = 0
@@ -1136,19 +1139,19 @@ local function bhv_mr_i_render96_attack(o, player, dist, angleToPlayer, angleDif
 
     o.oMrIFireTimer = o.oMrIFireTimer + 1
     if o.oMrIFireTimer >= 120 then
-        o.oBlinkTimer = o.oBlinkTimer - 1
-        if o.oBlinkTimer <= 0 then
+        o.oSwitchTimer1 = o.oSwitchTimer1 - 1
+        if o.oSwitchTimer1 <= 0 then
             o.oMrIBlinkIndex = o.oMrIBlinkIndex + 1
             if o.oMrIBlinkIndex > #sMrIBlinkStates then
                 o.oMrIBlinkIndex = 1
                 o.oMrIFireTimer = 0
             else
-                o.oFaceState = sMrIBlinkStates[o.oMrIBlinkIndex]
+                o.oSwitchState2 = sMrIBlinkStates[o.oMrIBlinkIndex]
             end
-            if o.oFaceState == MR_I_CLOSED then
+            if o.oSwitchState2 == MR_I_CLOSED then
                 bhv_mr_i_render96_fire(o, player)
             end
-            o.oBlinkTimer = 2
+            o.oSwitchTimer1 = 2
         end
     end
 
@@ -1200,20 +1203,20 @@ local function bhv_mr_i_render96_idle(o, player, dist, angleToPlayer, angleDiff)
     o.oFaceAngleYaw = (o.oFaceAngleYaw - 0x100) & 0xFFFF
     o.oFaceAnglePitch = 0
 
-    o.oBlinkTimer = o.oBlinkTimer - 1
-    if o.oBlinkTimer <= 0 then
+    o.oSwitchTimer1 = o.oSwitchTimer1 - 1
+    if o.oSwitchTimer1 <= 0 then
         o.oMrIBlinkIndex = o.oMrIBlinkIndex + 1
         if o.oMrIBlinkIndex > #sMrIBlinkStates then
             o.oMrIBlinkIndex = 1
-            o.oBlinkTimer = math.random(30, 100)
+            o.oSwitchTimer1 = math.random(30, 100)
         else
-            o.oFaceState = sMrIBlinkStates[o.oMrIBlinkIndex]
-            o.oBlinkTimer = 2
+            o.oSwitchState2 = sMrIBlinkStates[o.oMrIBlinkIndex]
+            o.oSwitchTimer1 = 2
         end
     end
 
     if dist < o.oMrIDetectRadius and angleDiff < FOV_THRESHOLD then
-        o.oFaceState = MR_I_OPEN 
+        o.oSwitchState2 = MR_I_OPEN 
         o.oAction = MR_I_ATTACK
         o.oMrIFireTimer = 0
     end
@@ -1240,14 +1243,14 @@ local function bhv_bully_render96_loop(o)
     if o.oAction == BULLY_ACT_PATROL then  
         smlua_anim_util_set_animation(o, "bully_run")
     end
-    o.oBlinkTimer = o.oBlinkTimer - 1
-    if o.oBlinkTimer <= 0 then
-        if o.oBlinkState == GOOMBA_EYE_OPEN then
-            o.oBlinkState = GOOMBA_EYE_CLOSE
-            o.oBlinkTimer = math.random(4, 10)
+    o.oSwitchTimer1 = o.oSwitchTimer1 - 1
+    if o.oSwitchTimer1 <= 0 then
+        if o.oSwitchState1 == GOOMBA_EYE_OPEN then
+            o.oSwitchState1 = GOOMBA_EYE_CLOSE
+            o.oSwitchTimer1 = math.random(4, 10)
         else
-            o.oBlinkState = GOOMBA_EYE_OPEN
-            o.oBlinkTimer = math.random(30, 100)
+            o.oSwitchState1 = GOOMBA_EYE_OPEN
+            o.oSwitchTimer1 = math.random(30, 100)
         end
     end
 end
@@ -1271,7 +1274,7 @@ sPiranhaPlantStates = { MR_I_OPEN, MR_I_ALMOST_OPEN, MR_I_HALF_OPEN, MR_I_ALMOST
 
 ---@param o Object
 local function bhv_piranha_plant_render96_init(o)
-    o.oFaceState = 10
+    o.oSwitchState2 = 10
 end
 
 ---@param o Object
@@ -1293,14 +1296,14 @@ local function bhv_piranha_plant_render96_loop(o)
                 break
             end
         end
-        o.oFaceState = faceState
+        o.oSwitchState2 = faceState
     end
 
     if o.oAction == PIRANHA_PLANT_ACT_STOPPED_BITING and frame >= 0 and frame <= 10 then
-        o.oFaceState = math.min(frame, 10)
+        o.oSwitchState2 = math.min(frame, 10)
     end
     if o.oAction == PIRANHA_PLANT_ACT_SLEEPING then
-        o.oFaceState = 10
+        o.oSwitchState2 = 10
     end
 end
 
@@ -1311,21 +1314,21 @@ local function bhv_fire_piranha_plant_render96_loop(o)
     local frame = o.header.gfx.animInfo.animFrame
     if o.oAction == FIRE_PIRANHA_PLANT_ACT_GROW then
         if frame < 46 then
-            o.oFaceState = 10
+            o.oSwitchState2 = 10
         elseif frame >= 46 and frame <= 66 then
-            o.oFaceState = frame - 56
+            o.oSwitchState2 = frame - 56
         else
-            o.oFaceState = 10
+            o.oSwitchState2 = 10
         end
     end
 
     if o.oAction == FIRE_PIRANHA_PLANT_ACT_HIDE then
         if frame < 10 then
-            o.oFaceState = 10
+            o.oSwitchState2 = 10
         elseif frame >= 10 and frame <= 30 then
-            o.oFaceState = frame - 20
+            o.oSwitchState2 = frame - 20
         else
-            o.oFaceState = 10
+            o.oSwitchState2 = 10
         end
     end
 end
@@ -1338,10 +1341,10 @@ local function bhv_chain_chomp_render96_loop(o)
 
     local sBiteFrames = { 0, 1, 2, 4, 6, 8, 6, 4, 2, 0, 2, 4, 6, 8, 6, 4, 2, 1, 0}
     if frame > 0 then
-        o.oFaceState = sBiteFrames[frame]
+        o.oSwitchState2 = sBiteFrames[frame]
     end
     if frame == -1 then
-        o.oFaceState = 0
+        o.oSwitchState2 = 0
     end
 end
 
@@ -1351,43 +1354,43 @@ id_bhvRender96ChainChomp = hook_behavior(id_bhvChainChomp, OBJ_LIST_GENACTOR, fa
 local function bhv_toad_render96_loop(o)
     -- Castle inside first toad
     if o.oBehParams == -2063597568 then
-      o.oFaceState = 0 --vest
-      o.oBlinkState = 0 --hat
+      o.oSwitchState2 = 0 --vest
+      o.oSwitchState1 = 0 --hat
     end
     -- WF room
     if o.oBehParams == -2030043136 then
-      o.oFaceState = 3
-      o.oBlinkState = 0
+      o.oSwitchState2 = 3
+      o.oSwitchState1 = 0
     end
     -- JRB room
     if o.oBehParams == -2046820352 then
-      o.oFaceState = 2
-      o.oBlinkState = 3
+      o.oSwitchState2 = 2
+      o.oSwitchState1 = 3
     end
     -- Castle inside second floor next to bobomb painting
     if o.oBehParams == -1996488704 then
-      o.oFaceState = 0
-      o.oBlinkState = 1
+      o.oSwitchState2 = 0
+      o.oSwitchState1 = 1
     end
     -- Castle inside third floor star
     if o.oBehParams == 1392508928 then
-      o.oFaceState = 4
-      o.oBlinkState = 4
+      o.oSwitchState2 = 4
+      o.oSwitchState1 = 4
     end
     -- Castle inside second floor star
     if o.oBehParams == 1275068416 then
-      o.oFaceState = 4
-      o.oBlinkState = 4
+      o.oSwitchState2 = 4
+      o.oSwitchState1 = 4
     end
     -- Basement green wall toad
     if o.oBehParams == -2013265920 then
-      o.oFaceState = 1
-      o.oBlinkState = 2
+      o.oSwitchState2 = 1
+      o.oSwitchState1 = 2
     end
     -- Basement star
     if o.oBehParams == 1375731712 then
-      o.oFaceState = 4
-      o.oBlinkState = 4
+      o.oSwitchState2 = 4
+      o.oSwitchState1 = 4
     end
 end
 
@@ -1396,8 +1399,8 @@ id_bhvRender96ToadMessage = hook_behavior(id_bhvToadMessage, OBJ_LIST_GENACTOR, 
 ---@param o Object
 local function bhv_boo_render96_init(o)
     o.oOpacity = 255
-    o.oFaceState = 0
-    o.oFaceTimer = 1
+    o.oSwitchState2 = 0
+    o.oSwitchTimer2 = 1
 end
 
 ---@param o Object
@@ -1405,21 +1408,21 @@ local function bhv_boo_render96_loop(o)
 
     local sBooScared = { 0, 1, 2, 3, 4, 4, 4}
     local sBooHunt = { 4, 4, 4, 3, 2, 1, 0}
-    if o.oOpacity < 255 and o.oFaceTimer < 7 then
-        o.oOpacity = 254 - (o.oFaceTimer * 15) 
-        o.oFaceState = sBooScared[o.oFaceTimer]
-        o.oFaceTimer = o.oFaceTimer + 1
-    elseif o.oOpacity >= 150 and o.oFaceTimer >= 7 and o.oFaceTimer < 14 then
-        o.oFaceState = sBooHunt[o.oFaceTimer - 6]
-        o.oFaceTimer = o.oFaceTimer + 1
-    elseif o.oOpacity == 255 and o.oFaceTimer == 14 then
-        o.oFaceState = 0
-        o.oFaceTimer = 1
-    elseif o.oOpacity == 40 and o.oFaceTimer == 14 then
-        o.oFaceState = 4
-        o.oFaceTimer = 7
-    elseif o.oOpacity == 40 and o.oFaceTimer == 7 then
-        o.oFaceState = 4
+    if o.oOpacity < 255 and o.oSwitchTimer2 < 7 then
+        o.oOpacity = 254 - (o.oSwitchTimer2 * 15) 
+        o.oSwitchState2 = sBooScared[o.oSwitchTimer2]
+        o.oSwitchTimer2 = o.oSwitchTimer2 + 1
+    elseif o.oOpacity >= 150 and o.oSwitchTimer2 >= 7 and o.oSwitchTimer2 < 14 then
+        o.oSwitchState2 = sBooHunt[o.oSwitchTimer2 - 6]
+        o.oSwitchTimer2 = o.oSwitchTimer2 + 1
+    elseif o.oOpacity == 255 and o.oSwitchTimer2 == 14 then
+        o.oSwitchState2 = 0
+        o.oSwitchTimer2 = 1
+    elseif o.oOpacity == 40 and o.oSwitchTimer2 == 14 then
+        o.oSwitchState2 = 4
+        o.oSwitchTimer2 = 7
+    elseif o.oOpacity == 40 and o.oSwitchTimer2 == 7 then
+        o.oSwitchState2 = 4
     end
 end
 
@@ -1433,15 +1436,15 @@ id_bhvRender96MerryGoRoundBigBoo = hook_behavior(id_bhvMerryGoRoundBigBoo, OBJ_L
 local function bhv_amp_render96_loop(o)
     if o.oAction == AMP_ACT_ATTACK_COOLDOWN and o.oTimer < 31 then
         if o.oTimer % 2 == 0 then
-            o.oFaceState = math.random(1, 2)
-            if o.oFaceState == 2 then o.oBlinkState = 0 else o.oBlinkState = 0 end
+            o.oSwitchState2 = math.random(1, 2)
+            if o.oSwitchState2 == 2 then o.oSwitchState1 = 0 else o.oSwitchState1 = 0 end
         end
     elseif o.oAction == AMP_ACT_ATTACK_COOLDOWN and o.oTimer < 90 then
-        o.oFaceState = 1
-        o.oBlinkState = 1
+        o.oSwitchState2 = 1
+        o.oSwitchState1 = 1
     else
-        o.oBlinkState = 0
-        o.oFaceState = 0
+        o.oSwitchState1 = 0
+        o.oSwitchState2 = 0
     end
 end
 
@@ -1452,10 +1455,10 @@ local function bhv_bubba_render96_loop(o)
 
     if o.oAnimState == 0 then
         local cycle = {1, 2, 0, 3, 4, 3, 0}
-        --o.oFaceState = cycle[(math.floor(o.oTimer / 4) % 3) + 1]
-        o.oFaceState = 0
+        --o.oSwitchState2 = cycle[(math.floor(o.oTimer / 4) % 3) + 1]
+        o.oSwitchState2 = 0
     elseif o.oAnimState == 1 then
-        o.oFaceState = 3
+        o.oSwitchState2 = 3
     end
 end
 
@@ -1568,28 +1571,3 @@ id_bhvRender96SpawnedStarNoLevelExit = hook_behavior(id_bhvSpawnedStarNoLevelExi
 id_bhvRender96HiddenStar = hook_behavior(id_bhvHiddenStar, OBJ_LIST_LEVEL, false, bhv_star_render96_init, nil)
 id_bhvRender96SpawnCoordStar = hook_behavior(id_bhvStarSpawnCoordinates, OBJ_LIST_LEVEL, false, bhv_star_render96_init, nil)
 id_bhvRender96CelebrationStar = hook_behavior(id_bhvCelebrationStar, OBJ_LIST_LEVEL, false, bhv_star_render96_init, nil)
-
-local sYoshiAnims = {
-    [0] = "yoshi_idle",
-    [1] = "yoshi_walk"
-}
-
---const struct Animation *const yoshi_seg5_anims_05024100[] = {
---    &yoshi_seg5_anim_050233A4,
---    &yoshi_seg5_anim_05023E4C,
---    &yoshi_seg5_anim_050240E8,
---    NULL,
---};
-
-local function bhv_yoshi_render96_loop(o)
-    local anim = sYoshiAnims[o.oAnimState]
-    --if cur_obj_check_if_at_animation_end() == 1 then
-    --    print("working?")
-    --    if anim then smlua_anim_util_set_animation(o, anim)
-    --end
-    --if o.oAction == YOSHI_ACT_WALK then
-    --    smlua_anim_util_set_animation(o, sYoshiAnims[0])
-    --end
-end
-
-id_bhvRender96Yoshi = hook_behavior(id_bhvYoshi, OBJ_LIST_LEVEL, false, nil, bhv_yoshi_render96_loop)

@@ -1473,18 +1473,19 @@ local function bhv_star_particle_loop(o)
     if star ~= nil then
         obj_set_pos(o, star.oPosX, star.oPosY, star.oPosZ)
     end
+    if obj_is_hidden(o.parentObj) ~= 0 then
+        cur_obj_hide()
+    else
+        cur_obj_unhide()
+    end
     if o.oCelebrationStar == 1 then 
         local scale = get_star_scale(o.oTimer)
         cur_obj_scale(scale) 
         o.header.gfx.node.flags = o.header.gfx.node.flags & ~GRAPH_RENDER_INVISIBLE
         o.header.gfx.node.flags = o.header.gfx.node.flags & ~GRAPH_RENDER_BILLBOARD
-        if o.oTimer >= 100 then
-            obj_mark_for_deletion(o)
-        end
     end
-    if obj_check_if_collided_with_object(o, gMarioStates[0].marioObj) ~= 0 then
-        o.header.gfx.node.flags = o.header.gfx.node.flags | GRAPH_RENDER_INVISIBLE
-        --o.parentObj.header.gfx.node.flags = o.parentObj.header.gfx.node.flags | GRAPH_RENDER_INVISIBLE
+    if o.parentObj.oTimer > 0 and o.parentObj.activeFlags == ACTIVE_FLAG_DEACTIVATED then
+        obj_mark_for_deletion(o)
     end
 end
 
@@ -1503,11 +1504,13 @@ local is_star_collected = function(o)
     return false
 end
 
+---@param o Object
 local function bhv_star_render96_init(o)
+    --if o.oInteractType ~= INTERACT_STAR_OR_KEY then return end
     if is_star_collected(o) == false or obj_has_behavior_id(o, id_bhvCelebrationStar) == 1 then
         spawn_non_sync_object(id_bhvRender96StarParticle, E_MODEL_STAR_PARTICLE, o.oPosX, o.oPosY, o.oPosZ, function(o2)
-        o2.parentObj = o
-    end)
+            o2.parentObj = o
+        end)
     elseif is_star_collected(o) == true then
         spawn_non_sync_object(id_bhvRender96StarParticle, E_MODEL_STAR_TRANSPARENT_PARTICLE, o.oPosX, o.oPosY, o.oPosZ, function(o2)
             o2.parentObj = o
@@ -1517,6 +1520,8 @@ end
 
 id_bhvRender96Star = hook_behavior(id_bhvStar, OBJ_LIST_LEVEL, false, bhv_star_render96_init, nil)
 id_bhvRender96SpawnedStar = hook_behavior(id_bhvSpawnedStar, OBJ_LIST_LEVEL, false, bhv_star_render96_init, nil)
+id_bhvRender96SpawnedStarNoLevelExit = hook_behavior(id_bhvSpawnedStarNoLevelExit, OBJ_LIST_LEVEL, false, bhv_star_render96_init, nil)
+id_bhvRender96HiddenStar = hook_behavior(id_bhvHiddenStar, OBJ_LIST_LEVEL, false, bhv_star_render96_init, nil)
 id_bhvRender96SpawnCoordStar = hook_behavior(id_bhvStarSpawnCoordinates, OBJ_LIST_LEVEL, false, bhv_star_render96_init, nil)
 id_bhvRender96CelebrationStar = hook_behavior(id_bhvCelebrationStar, OBJ_LIST_LEVEL, false, bhv_star_render96_init, nil)
 

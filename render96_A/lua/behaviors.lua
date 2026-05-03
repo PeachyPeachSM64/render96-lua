@@ -1263,9 +1263,6 @@ id_bhvRender96MrI = hook_behavior(nil, OBJ_LIST_GENACTOR, true, bhv_mr_i_render9
 
 ---@param o Object
 local function bhv_bully_render96_loop(o)
-    if o.oAction == BULLY_ACT_PATROL then  
-        smlua_anim_util_set_animation(o, "bully_run")
-    end
     o.oSwitchTimer1 = o.oSwitchTimer1 - 1
     if o.oSwitchTimer1 <= 0 then
         if o.oSwitchState1 == GOOMBA_EYE_OPEN then
@@ -1284,9 +1281,6 @@ id_bhvRender96SmallChillBully = hook_behavior(id_bhvSmallChillBully, OBJ_LIST_GE
 ---@param o Object
 local function bhv_big_bully_render96_init(o)
     cur_obj_scale(2)
-    if o.oAction == BULLY_ACT_PATROL then  
-        smlua_anim_util_set_animation(o, "bully_king_run")
-    end
 end
 
 id_bhvRender96BigBully = hook_behavior(id_bhvBigBully, OBJ_LIST_GENACTOR, false, bhv_big_bully_render96_init, bhv_bully_render96_loop)

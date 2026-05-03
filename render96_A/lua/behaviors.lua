@@ -68,6 +68,10 @@ define_custom_obj_fields({
     oThwompShakeTicks   = 'f32',
     oThwompPosMag       = 'f32',
     oThwompAngleMag     = 'f32',
+    oThwompPrevAction   = 'f32',
+    oThwompSquishTimer  = 'f32',
+    oThwompSquishDur    = 'f32',
+    oThwompBaseScale    = 'f32',
     oWarioHeadBool      = 'f32',
     oMusicFade          = 'f32',
     oCelebrationStar    = 'f32'
@@ -571,6 +575,11 @@ local function bhv_thwomp_render96_init(o)
     o.oThwompShakeTicks = 18
     o.oThwompPosMag = 10.0
     o.oThwompAngleMag = 0x120
+
+    o.oThwompPrevAction = o.oAction or 0
+    o.oThwompSquishTimer = 0
+    o.oThwompSquishDur = 0
+    o.oThwompBaseScale = o.header.gfx.scale.x
 end
 
 ---@param o Object
@@ -614,6 +623,20 @@ local function bhv_thwomp_render96_loop(o)
     if o.oAction == 0 then o.oSwitchState2 = TWHOMP_FACE_BASE end
     if o.oAction == 1 then o.oSwitchState2 = TWHOMP_FACE_ANGRY end
     if o.oAction == 2 then o.oSwitchState2 = TWHOMP_FACE_URGH end
+
+    local prevAction = o.oThwompPrevAction or o.oAction
+    if prevAction ~= 3 and o.oAction == 3 then
+        o.oThwompSquishTimer = 0
+        o.oThwompSquishDur = 15
+        o.oThwompBaseScale = o.header.gfx.scale.x
+    end
+
+    if (o.oThwompSquishDur or 0) > 0 and (o.oThwompSquishTimer or 0) <= o.oThwompSquishDur then
+        r96lib.squish_apply(o, o.oThwompSquishTimer, o.oThwompSquishDur, 0.25, -0.40, 0.25, o.oThwompBaseScale, nil)
+        o.oThwompSquishTimer = o.oThwompSquishTimer + 1
+    end
+
+    o.oThwompPrevAction = o.oAction
 
     if m.action == ACT_WARIO_CHARGE and dist_between_objects(o, m.marioObj) <= 350 then
         cur_obj_play_sound_2(SOUND_OBJ_THWOMP)

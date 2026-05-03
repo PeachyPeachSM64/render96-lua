@@ -106,6 +106,49 @@ function r96lib.spawn_object(modelId, bhvId, x, y, z, rx, ry, rz, func)
     return childObj
 end
 
+function r96lib.squish_apply(o, timer, duration, intensityX, intensityY, intensityZ, baseScale, sound)
+    if o == nil then return 0 end
+    if duration == nil or duration <= 0 then
+        return 0
+    end
+
+    timer = timer or 0
+    baseScale = baseScale or 1
+
+    intensityX = intensityX or 0
+    intensityY = intensityY or 0
+    intensityZ = intensityZ or 0
+
+    -- Normalize time into [0, 1]
+    local t = timer / duration
+    if t < 0 then t = 0 end
+    if t > 1 then t = 1 end
+
+    -- Smooth peak-at-middle curve:
+    -- I googled this and it works xD
+    local peak = math.sin(math.pi * t)
+
+    -- Play the sound once at the peak frame.
+    if sound ~= nil then
+        local mid = math.floor(duration * 0.5)
+        if timer == mid then
+            local audioStream = audio_stream_load(sound)
+            if audioStream ~= nil then
+                audio_stream_play(audioStream, false, 1)
+            end
+        end
+    end
+
+    -- Apply the scale intensity
+    local sx = baseScale * (1.0 + (intensityX * peak))
+    local sy = baseScale * (1.0 + (intensityY * peak))
+    local sz = baseScale * (1.0 + (intensityZ * peak))
+
+    vec3f_set(o.header.gfx.scale, sx, sy, sz)
+
+    return peak
+end
+
 function r96lib.spawn_object_param(cond, modelId, bhvId, bhvParam, x, y, z, rx, ry, rz, func)
     if cond == true then
     local childObj = spawn_non_sync_object(bhvId, modelId, 0, 0, 0, func)

@@ -672,6 +672,19 @@ id_bhvRender96TowerDoor = hook_behavior(id_bhvTowerDoor, OBJ_LIST_SURFACE, false
 
 ---@param o Object
 local function bhv_whomp_render96_loop(o)
+    local prevAction = o.oThwompPrevAction or o.oAction
+    if prevAction ~= 5 and o.oAction == 5 then
+        o.oThwompSquishTimer = 0
+        o.oThwompSquishDur = 5
+        o.oThwompBaseScale = o.header.gfx.scale.x
+    end
+
+    if (o.oThwompSquishDur or 0) > 0 and (o.oThwompSquishTimer or 0) <= o.oThwompSquishDur then
+        r96lib.squish_apply(o, o.oThwompSquishTimer, o.oThwompSquishDur, 0.15, 0.15, -0.3, o.oThwompBaseScale, nil)
+        o.oThwompSquishTimer = o.oThwompSquishTimer + 1
+    end
+
+    o.oThwompPrevAction = o.oAction
     if m.action == ACT_WARIO_CHARGE and dist_between_objects(o, m.marioObj) <= 200 then
         cur_obj_play_sound_2(SOUND_OBJ_THWOMP)
         spawn_mist_particles_variable(0, 0, 100.0)
@@ -685,8 +698,35 @@ local function bhv_whomp_render96_loop(o)
     end
 end
 
-id_bhvRender96SmallWhomp = hook_behavior(id_bhvSmallWhomp, OBJ_LIST_SURFACE, false, nil, bhv_whomp_render96_loop)
+---@param o Object
+local function bhv_whomp_render96_init(o)
+    o.oThwompPrevAction = o.oAction or 0
+    o.oThwompSquishTimer = 0
+    o.oThwompSquishDur = 0
+    o.oThwompBaseScale = o.header.gfx.scale.x
+end
 
+---@param o Object
+local function bhv_whomp_king_render96_loop(o)
+    local prevAction = o.oThwompPrevAction or o.oAction
+    if prevAction ~= 5 and o.oAction == 5 then
+        o.oThwompSquishTimer = 0
+        o.oThwompSquishDur = 5
+        o.oThwompBaseScale = o.header.gfx.scale.x
+    end
+
+    if (o.oThwompSquishDur or 0) > 0 and (o.oThwompSquishTimer or 0) <= o.oThwompSquishDur then
+        r96lib.squish_apply(o, o.oThwompSquishTimer, o.oThwompSquishDur, 0.15, 0.15, -0.3, o.oThwompBaseScale, nil)
+        o.oThwompSquishTimer = o.oThwompSquishTimer + 1
+    end
+
+    o.oThwompPrevAction = o.oAction
+end
+
+id_bhvRender96SmallWhomp = hook_behavior(id_bhvSmallWhomp, OBJ_LIST_SURFACE, false, bhv_whomp_render96_init, bhv_whomp_render96_loop)
+id_bhvRender96WhompKingBoss = hook_behavior(id_bhvWhompKingBoss, OBJ_LIST_SURFACE, false, bhv_whomp_render96_init, bhv_whomp_king_render96_loop)
+
+---@param o Object
 local function bhv_wario_head_init(o)
     -- set flags
     o.oFlags = (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)
@@ -1595,34 +1635,6 @@ id_bhvRender96SpawnedStarNoLevelExit = hook_behavior(id_bhvSpawnedStarNoLevelExi
 id_bhvRender96HiddenStar = hook_behavior(id_bhvHiddenStar, OBJ_LIST_LEVEL, false, bhv_star_render96_init, nil)
 id_bhvRender96SpawnCoordStar = hook_behavior(id_bhvStarSpawnCoordinates, OBJ_LIST_LEVEL, false, bhv_star_render96_init, nil)
 id_bhvRender96CelebrationStar = hook_behavior(id_bhvCelebrationStar, OBJ_LIST_LEVEL, false, bhv_star_render96_init, nil)
-
----@param o Object
-local function bhv_whomp_render96_init(o)
-    o.oThwompPrevAction = o.oAction or 0
-    o.oThwompSquishTimer = 0
-    o.oThwompSquishDur = 0
-    o.oThwompBaseScale = o.header.gfx.scale.x
-end
-
-local function bhv_whomp_render96_loop(o)
-    local prevAction = o.oThwompPrevAction or o.oAction
-    if prevAction ~= 5 and o.oAction == 5 then
-        o.oThwompSquishTimer = 0
-        o.oThwompSquishDur = 5
-        o.oThwompBaseScale = o.header.gfx.scale.x
-    end
-
-    if (o.oThwompSquishDur or 0) > 0 and (o.oThwompSquishTimer or 0) <= o.oThwompSquishDur then
-        r96lib.squish_apply(o, o.oThwompSquishTimer, o.oThwompSquishDur, -0.10, 0.15, 0.15, o.oThwompBaseScale, nil)
-        o.oThwompSquishTimer = o.oThwompSquishTimer + 1
-    end
-
-    o.oThwompPrevAction = o.oAction
-end
-
-id_bhvRender96SmallWhomp = hook_behavior(id_bhvSmallWhomp, OBJ_LIST_SURFACE, false, bhv_whomp_render96_init, bhv_whomp_render96_loop)
-id_bhvRender96WhompKingBoss = hook_behavior(id_bhvWhompKingBoss, OBJ_LIST_SURFACE, false, bhv_whomp_render96_init, bhv_whomp_render96_loop)
-
 
 ---@param o Object
 local function bhv_pokey_render96_init(o)

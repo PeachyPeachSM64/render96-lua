@@ -2,6 +2,7 @@
 -- description: A Mod Pack That Adds All Render96 Features To The Game
 -- author: \#ff3030\Render96DX Team
 
+require("lib/compatBhvs")
 o2oint = require("lib/o2oint")
 bloWarps = require("/lib/warps")
 UvScroll = require("/lib/uv-scroll")

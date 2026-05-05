@@ -1,5 +1,18 @@
--- name: Render96 Goomba Grab
--- description: Allows wario to stun and grab goombas
+---@param id BehaviorId|number
+---@param override boolean
+---@param init function?
+---@param loop function?
+local function hook_render96_behavior(id, override, init, loop, list, name)
+    if id ~= nil then
+        list = list or get_object_list_from_behavior(get_behavior_from_id(id))
+        name = name or get_behavior_name_from_id(id):gsub("id_bhv", "", 1):gsub("bhv", "", 1)
+    else
+        list = list or OBJ_LIST_LEVEL
+        name = name or "Unnamed"
+    end
+    return hook_behavior(id, list, override, init, loop, "bhvRender96" .. name)
+end
+
 local m = gMarioStates[0]
 
 local sThrownInteractions = o2oint.Interactions({
@@ -250,7 +263,7 @@ local function bhv_blargg_render96_loop(o)
     set_object_visibility(o, 3000)
 end
 
-id_bhvRender96Blargg = hook_behavior(nil, OBJ_LIST_LEVEL, false, bhv_blargg_render96_init, bhv_blargg_render96_loop)
+id_bhvRender96Blargg = hook_render96_behavior(nil, true, bhv_blargg_render96_init, bhv_blargg_render96_loop, OBJ_LIST_LEVEL, "Blargg")
 
 ---@param o Object
 local function bhv_blargg_friendly_render96_init(o)
@@ -319,7 +332,7 @@ local function bhv_blargg_friendly_render96_loop(o)
     o.oInteractStatus = 0
 end
 
-id_bhvRender96BlarggFriendly = hook_behavior(nil, OBJ_LIST_LEVEL, false, bhv_blargg_friendly_render96_init, bhv_blargg_friendly_render96_loop)
+id_bhvRender96BlarggFriendly = hook_render96_behavior(nil, false, bhv_blargg_friendly_render96_init, bhv_blargg_friendly_render96_loop, OBJ_LIST_LEVEL, "BlarggFriendly")
 
 local function bhv_breakable_box_render96_loop(o)
     if (m.action == ACT_WARIO_CHARGE and dist_between_objects(o, m.marioObj) <= 200) then
@@ -328,7 +341,7 @@ local function bhv_breakable_box_render96_loop(o)
     end
 end
 
-id_bhvRender96BreakableBox = hook_behavior(id_bhvBreakableBox, OBJ_LIST_SURFACE, false, nil, bhv_breakable_box_render96_loop)
+id_bhvRender96BreakableBox = hook_render96_behavior(id_bhvBreakableBox, false, nil, bhv_breakable_box_render96_loop)
 
 ---@param o Object
 local function bhv_goomba_render96_init(o)
@@ -470,7 +483,7 @@ local function bhv_goomba_render96_loop(o)
     end
 end
 
-id_bhvRender96Goomba = hook_behavior(id_bhvGoomba, OBJ_LIST_PUSHABLE, false, bhv_goomba_render96_init, bhv_goomba_render96_loop)
+id_bhvRender96Goomba = hook_render96_behavior(id_bhvGoomba, false, bhv_goomba_render96_init, bhv_goomba_render96_loop)
 
 ---@param o Object
 local function bhv_koopa_shell_render96_throw_physics(o)
@@ -558,7 +571,7 @@ local function bhv_koopa_shell_render96_loop(o)
     end
 end
 
-id_bhvRender96KoopaShell = hook_behavior(id_bhvKoopaShell, OBJ_LIST_PUSHABLE, false, nil, bhv_koopa_shell_render96_loop)
+id_bhvRender96KoopaShell = hook_render96_behavior(id_bhvKoopaShell, false, nil, bhv_koopa_shell_render96_loop)
 
 ---@param o Object
 local function bhv_thwomp_render96_init(o)
@@ -648,8 +661,8 @@ local function bhv_thwomp_render96_loop(o)
     end
 end
 
-id_bhvRender96Thwomp = hook_behavior(id_bhvThwomp, OBJ_LIST_SURFACE, false, bhv_thwomp_render96_init, bhv_thwomp_render96_loop)
-id_bhvRender96Thwomp2 = hook_behavior(id_bhvThwomp2, OBJ_LIST_SURFACE, false, bhv_thwomp_render96_init, bhv_thwomp_render96_loop)
+id_bhvRender96Thwomp = hook_render96_behavior(id_bhvThwomp, false, bhv_thwomp_render96_init, bhv_thwomp_render96_loop)
+id_bhvRender96Thwomp2 = hook_render96_behavior(id_bhvThwomp2, false, bhv_thwomp_render96_init, bhv_thwomp_render96_loop)
 
 ---@param o Object
 local function bhv_tower_door_render96_loop(o)
@@ -659,7 +672,7 @@ local function bhv_tower_door_render96_loop(o)
     end
 end
 
-id_bhvRender96TowerDoor = hook_behavior(id_bhvTowerDoor, OBJ_LIST_SURFACE, false, nil, bhv_tower_door_render96_loop)
+id_bhvRender96TowerDoor = hook_render96_behavior(id_bhvTowerDoor, false, nil, bhv_tower_door_render96_loop)
 
 ---@param o Object
 local function bhv_whomp_render96_loop(o)
@@ -714,8 +727,8 @@ local function bhv_whomp_king_render96_loop(o)
     o.oThwompPrevAction = o.oAction
 end
 
-id_bhvRender96SmallWhomp = hook_behavior(id_bhvSmallWhomp, OBJ_LIST_SURFACE, false, bhv_whomp_render96_init, bhv_whomp_render96_loop)
-id_bhvRender96WhompKingBoss = hook_behavior(id_bhvWhompKingBoss, OBJ_LIST_SURFACE, false, bhv_whomp_render96_init, bhv_whomp_king_render96_loop)
+id_bhvRender96SmallWhomp = hook_render96_behavior(id_bhvSmallWhomp, false, bhv_whomp_render96_init, bhv_whomp_render96_loop)
+id_bhvRender96WhompKingBoss = hook_render96_behavior(id_bhvWhompKingBoss, false, bhv_whomp_render96_init, bhv_whomp_king_render96_loop)
 
 ---@param o Object
 local function bhv_wario_head_init(o)
@@ -822,7 +835,7 @@ local function bhv_wario_head_loop(o)
    o.oInteractStatus = 0
 end
 
-id_bhvWarioHead = hook_behavior(nil, OBJ_LIST_SURFACE, false, bhv_wario_head_init, bhv_wario_head_loop)
+id_bhvWarioHead = hook_render96_behavior(nil, false, bhv_wario_head_init, bhv_wario_head_loop, OBJ_LIST_SURFACE, "WarioHead")
 
 ---@param o Object
 local function bhv_warp_pipe_render96_init(o)
@@ -843,7 +856,7 @@ local function bhv_warp_pipe_render96_red_loop(o)
     r96lib.audio_fade(o, BOO_PIPE_RED, 500, 1200, true)
 end
 
-id_bhvRender96WarpPipeRed = hook_behavior(nil, OBJ_LIST_SURFACE, false, bhv_warp_pipe_render96_init, bhv_warp_pipe_render96_red_loop)
+id_bhvRender96WarpPipeRed = hook_render96_behavior(nil, false, bhv_warp_pipe_render96_init, bhv_warp_pipe_render96_red_loop, OBJ_LIST_SURFACE, "WarpPipeRed")
 
 ---@param o Object
 local function bhv_warp_pipe_render96_green_loop(o)
@@ -852,7 +865,7 @@ local function bhv_warp_pipe_render96_green_loop(o)
     r96lib.audio_fade(o, BOO_PIPE_GREEN, 500, 1200, true)
 end
 
-id_bhvRender96WarpPipeGreen = hook_behavior(nil, OBJ_LIST_SURFACE, false, bhv_warp_pipe_render96_init, bhv_warp_pipe_render96_green_loop)
+id_bhvRender96WarpPipeGreen = hook_render96_behavior(nil, false, bhv_warp_pipe_render96_init, bhv_warp_pipe_render96_green_loop, OBJ_LIST_SURFACE, "WarpPipeGreen")
 
 ---@param o Object
 local function bhv_warp_pipe_render96_yellow_loop(o)
@@ -861,7 +874,7 @@ local function bhv_warp_pipe_render96_yellow_loop(o)
     r96lib.audio_fade(o, BOO_PIPE_YELLOW, 500, 1200, true)
 end
 
-id_bhvRender96WarpPipeYellow = hook_behavior(nil, OBJ_LIST_SURFACE, false, bhv_warp_pipe_render96_init, bhv_warp_pipe_render96_yellow_loop)
+id_bhvRender96WarpPipeYellow = hook_render96_behavior(nil, false, bhv_warp_pipe_render96_init, bhv_warp_pipe_render96_yellow_loop, OBJ_LIST_SURFACE, "WarpPipeYellow")
 
 ---@param o Object
 local function bhv_luigi_key_init(o)
@@ -897,7 +910,7 @@ local function bhv_luigi_key_loop(o)
     end
 end
 
-id_bhvLuigiKeys = hook_behavior(nil, OBJ_LIST_SURFACE, false, bhv_luigi_key_init, bhv_luigi_key_loop)
+id_bhvLuigiKeys = hook_render96_behavior(nil, false, bhv_luigi_key_init, bhv_luigi_key_loop, OBJ_LIST_SURFACE, "LuigiKeys")
 
 ---@param o Object
 local function bhv_six_golden_coin_init(o)
@@ -936,7 +949,7 @@ local function bhv_six_golden_coin_loop(o)
     end
 end
 
-id_bhvSixGoldenCoin = hook_behavior(nil, OBJ_LIST_SURFACE, false, bhv_six_golden_coin_init, bhv_six_golden_coin_loop)
+id_bhvSixGoldenCoin = hook_render96_behavior(nil, false, bhv_six_golden_coin_init, bhv_six_golden_coin_loop, OBJ_LIST_SURFACE, "SixGoldenCoin")
 
 ---@param o Object
 local function bhv_wario_coin_init(o)
@@ -974,7 +987,7 @@ function bhv_wario_coin_loop(o)
     end
 end
 
-id_bhvWarioCoins = hook_behavior(nil, OBJ_LIST_SURFACE, false, bhv_wario_coin_init, bhv_wario_coin_loop)
+id_bhvWarioCoins = hook_render96_behavior(nil, false, bhv_wario_coin_init, bhv_wario_coin_loop, OBJ_LIST_SURFACE, "WarioCoins")
 
 ---@param o Object
 local function bhv_mr_i_render96_particle_init(o)
@@ -1014,7 +1027,7 @@ local function bhv_mr_i_render96_particle_loop(o)
     o.oInteractStatus = 0
 end
 
-id_bhvRender96MrIParticle = hook_behavior(nil, OBJ_LIST_GENACTOR, false, bhv_mr_i_render96_particle_init, bhv_mr_i_render96_particle_loop)
+id_bhvRender96MrIParticle = hook_render96_behavior(nil, false, bhv_mr_i_render96_particle_init, bhv_mr_i_render96_particle_loop, OBJ_LIST_GENACTOR, "MrIParticle")
 
 ---@param o Object
 local function bhv_mr_i_render96_fire_particle_init(o)
@@ -1054,7 +1067,7 @@ local function bhv_mr_i_render96_fire_particle_loop(o)
     o.oInteractStatus = 0
 end
 
-id_bhvRender96MrIFireParticle = hook_behavior(nil, OBJ_LIST_GENACTOR, false, bhv_mr_i_render96_fire_particle_init, bhv_mr_i_render96_fire_particle_loop)
+id_bhvRender96MrIFireParticle = hook_render96_behavior(nil, false, bhv_mr_i_render96_fire_particle_init, bhv_mr_i_render96_fire_particle_loop, OBJ_LIST_GENACTOR, "MrIFireParticle")
 
 local DEATH_THRESHOLD = 4 * math.pi
 local FOV_THRESHOLD = degrees_to_sm64(30)
@@ -1263,7 +1276,7 @@ local function bhv_mr_i_render96_loop(o)
     o.oInteractStatus = 0
 end
 
-id_bhvRender96MrI = hook_behavior(nil, OBJ_LIST_GENACTOR, true, bhv_mr_i_render96_init, bhv_mr_i_render96_loop)
+id_bhvRender96MrI = hook_render96_behavior(nil, true, bhv_mr_i_render96_init, bhv_mr_i_render96_loop, OBJ_LIST_GENACTOR, "MrI")
 
 ---@param o Object
 local function bhv_bully_render96_loop(o)
@@ -1279,17 +1292,17 @@ local function bhv_bully_render96_loop(o)
     end
 end
 
-id_bhvRender96Bully = hook_behavior(id_bhvSmallBully, OBJ_LIST_GENACTOR, false, nil, bhv_bully_render96_loop)
-id_bhvRender96SmallChillBully = hook_behavior(id_bhvSmallChillBully, OBJ_LIST_GENACTOR, false, nil, bhv_bully_render96_loop)
+id_bhvRender96Bully = hook_render96_behavior(id_bhvSmallBully, false, nil, bhv_bully_render96_loop)
+id_bhvRender96SmallChillBully = hook_render96_behavior(id_bhvSmallChillBully, false, nil, bhv_bully_render96_loop)
 
 ---@param o Object
 local function bhv_big_bully_render96_init(o)
     cur_obj_scale(2)
 end
 
-id_bhvRender96BigBully = hook_behavior(id_bhvBigBully, OBJ_LIST_GENACTOR, false, bhv_big_bully_render96_init, bhv_bully_render96_loop)
-id_bhvRender96BigChillBully = hook_behavior(id_bhvBigChillBully, OBJ_LIST_GENACTOR, false, bhv_big_bully_render96_init, bhv_bully_render96_loop)
-id_bhvRender96BigBullyWithMinions = hook_behavior(id_bhvBigBullyWithMinions, OBJ_LIST_GENACTOR, false, bhv_big_bully_render96_init, bhv_bully_render96_loop)
+id_bhvRender96BigBully = hook_render96_behavior(id_bhvBigBully, false, bhv_big_bully_render96_init, bhv_bully_render96_loop)
+id_bhvRender96BigChillBully = hook_render96_behavior(id_bhvBigChillBully, false, bhv_big_bully_render96_init, bhv_bully_render96_loop)
+id_bhvRender96BigBullyWithMinions = hook_render96_behavior(id_bhvBigBullyWithMinions, false, bhv_big_bully_render96_init, bhv_bully_render96_loop)
 
 sPiranhaPlantStates = { MR_I_OPEN, MR_I_ALMOST_OPEN, MR_I_HALF_OPEN, MR_I_ALMOST_CLOSED, MR_I_CLOSED, MR_I_ALMOST_CLOSED, MR_I_HALF_OPEN, MR_I_ALMOST_OPEN, MR_I_OPEN }
 
@@ -1328,7 +1341,7 @@ local function bhv_piranha_plant_render96_loop(o)
     end
 end
 
-id_bhvRender96PiranhaPlant = hook_behavior(id_bhvPiranhaPlant, OBJ_LIST_GENACTOR, false, bhv_piranha_plant_render96_init, bhv_piranha_plant_render96_loop)
+id_bhvRender96PiranhaPlant = hook_render96_behavior(id_bhvPiranhaPlant, false, bhv_piranha_plant_render96_init, bhv_piranha_plant_render96_loop)
 
 ---@param o Object
 local function bhv_fire_piranha_plant_render96_loop(o)
@@ -1354,7 +1367,7 @@ local function bhv_fire_piranha_plant_render96_loop(o)
     end
 end
 
-id_bhvRender96FirePiranhaPlant = hook_behavior(id_bhvFirePiranhaPlant, OBJ_LIST_GENACTOR, false, bhv_piranha_plant_render96_init, bhv_fire_piranha_plant_render96_loop)
+id_bhvRender96FirePiranhaPlant = hook_render96_behavior(id_bhvFirePiranhaPlant, false, bhv_piranha_plant_render96_init, bhv_fire_piranha_plant_render96_loop)
 
 ---@param o Object
 local function bhv_chain_chomp_render96_loop(o)
@@ -1369,7 +1382,7 @@ local function bhv_chain_chomp_render96_loop(o)
     end
 end
 
-id_bhvRender96ChainChomp = hook_behavior(id_bhvChainChomp, OBJ_LIST_GENACTOR, false, nil, bhv_chain_chomp_render96_loop)
+id_bhvRender96ChainChomp = hook_render96_behavior(id_bhvChainChomp, false, nil, bhv_chain_chomp_render96_loop)
 
 ---@param o Object
 local function bhv_toad_render96_loop(o)
@@ -1415,7 +1428,7 @@ local function bhv_toad_render96_loop(o)
     end
 end
 
-id_bhvRender96ToadMessage = hook_behavior(id_bhvToadMessage, OBJ_LIST_GENACTOR, false, nil, bhv_toad_render96_loop)
+id_bhvRender96ToadMessage = hook_render96_behavior(id_bhvToadMessage, false, nil, bhv_toad_render96_loop)
 
 ---@param o Object
 local function bhv_boo_render96_init(o)
@@ -1447,12 +1460,12 @@ local function bhv_boo_render96_loop(o)
     end
 end
 
-id_bhvRender96GhostHuntBoo = hook_behavior(id_bhvGhostHuntBoo, OBJ_LIST_GENACTOR, false, bhv_boo_render96_init, bhv_boo_render96_loop)
-id_bhvRender96GhostHuntBigBoo = hook_behavior(id_bhvGhostHuntBigBoo, OBJ_LIST_GENACTOR, false, bhv_boo_render96_init, bhv_boo_render96_loop)
---id_bhvRender96BooInCastle = hook_behavior(id_bhvBooInCastle, OBJ_LIST_GENACTOR, false, bhv_boo_render96_init, bhv_boo_render96_loop)
-id_bhvRender96BooWithCage = hook_behavior(id_bhvBooWithCage, OBJ_LIST_GENACTOR, false, bhv_boo_render96_init, bhv_boo_render96_loop)
-id_bhvRender96BalconyBigBoo = hook_behavior(id_bhvBalconyBigBoo, OBJ_LIST_GENACTOR, false, bhv_boo_render96_init, bhv_boo_render96_loop)
-id_bhvRender96MerryGoRoundBigBoo = hook_behavior(id_bhvMerryGoRoundBigBoo, OBJ_LIST_GENACTOR, false, bhv_boo_render96_init, bhv_boo_render96_loop)
+id_bhvRender96GhostHuntBoo = hook_render96_behavior(id_bhvGhostHuntBoo, false, bhv_boo_render96_init, bhv_boo_render96_loop)
+id_bhvRender96GhostHuntBigBoo = hook_render96_behavior(id_bhvGhostHuntBigBoo, false, bhv_boo_render96_init, bhv_boo_render96_loop)
+--id_bhvRender96BooInCastle = hook_render96_behavior(id_bhvBooInCastle, false, bhv_boo_render96_init, bhv_boo_render96_loop)
+id_bhvRender96BooWithCage = hook_render96_behavior(id_bhvBooWithCage, false, bhv_boo_render96_init, bhv_boo_render96_loop)
+id_bhvRender96BalconyBigBoo = hook_render96_behavior(id_bhvBalconyBigBoo, false, bhv_boo_render96_init, bhv_boo_render96_loop)
+id_bhvRender96MerryGoRoundBigBoo = hook_render96_behavior(id_bhvMerryGoRoundBigBoo, false, bhv_boo_render96_init, bhv_boo_render96_loop)
 
 local function bhv_amp_render96_loop(o)
     if o.oAction == AMP_ACT_ATTACK_COOLDOWN and o.oTimer < 31 then
@@ -1469,8 +1482,8 @@ local function bhv_amp_render96_loop(o)
     end
 end
 
-id_bhvRender96CirclingAmp = hook_behavior(id_bhvCirclingAmp, OBJ_LIST_GENACTOR, false, nil, bhv_amp_render96_loop)
-id_bhvRender96HomingAmp = hook_behavior(id_bhvHomingAmp, OBJ_LIST_GENACTOR, false, nil, bhv_amp_render96_loop)
+id_bhvRender96CirclingAmp = hook_render96_behavior(id_bhvCirclingAmp, false, nil, bhv_amp_render96_loop)
+id_bhvRender96HomingAmp = hook_render96_behavior(id_bhvHomingAmp, false, nil, bhv_amp_render96_loop)
 
 local function bhv_bubba_render96_loop(o)
 
@@ -1483,7 +1496,7 @@ local function bhv_bubba_render96_loop(o)
     end
 end
 
-id_bhvRender96Bubba = hook_behavior(id_bhvBubba, OBJ_LIST_GENACTOR, false, nil, bhv_bubba_render96_loop)
+id_bhvRender96Bubba = hook_render96_behavior(id_bhvBubba, false, nil, bhv_bubba_render96_loop)
 
 local function bhv_1up_render96_init(o)
     o.header.gfx.node.flags = o.header.gfx.node.flags & ~GRAPH_RENDER_BILLBOARD
@@ -1493,13 +1506,13 @@ local function bhv_1up_render96_loop(o)
     o.oFaceAngleYaw = o.oMoveAngleYaw
 end
 
-id_bhvRender961Up = hook_behavior(id_bhv1Up, OBJ_LIST_LEVEL, false, bhv_1up_render96_init, bhv_1up_render96_loop)
-id_bhvRender961upWalking = hook_behavior(id_bhv1upWalking, OBJ_LIST_LEVEL, false, bhv_1up_render96_init, bhv_1up_render96_loop)
-id_bhvRender961upRunningAway = hook_behavior(id_bhv1upRunningAway, OBJ_LIST_LEVEL, false, bhv_1up_render96_init, bhv_1up_render96_loop)
-id_bhvRender961upSliding = hook_behavior(id_bhv1upSliding, OBJ_LIST_LEVEL, false, bhv_1up_render96_init, bhv_1up_render96_loop) -- MOVE MESH TO HITBOX
-id_bhvRender961upJumpOnApproach = hook_behavior(id_bhv1upJumpOnApproach, OBJ_LIST_LEVEL, false, bhv_1up_render96_init, bhv_1up_render96_loop)
-id_bhvRender96Hidden1up = hook_behavior(id_bhvHidden1up, OBJ_LIST_LEVEL, false, bhv_1up_render96_init, bhv_1up_render96_loop)
-id_bhvRender96Hidden1upInPole = hook_behavior(id_bhvHidden1upInPole, OBJ_LIST_LEVEL, false, bhv_1up_render96_init, bhv_1up_render96_loop)
+id_bhvRender961Up = hook_render96_behavior(id_bhv1Up, false, bhv_1up_render96_init, bhv_1up_render96_loop)
+id_bhvRender961upWalking = hook_render96_behavior(id_bhv1upWalking, false, bhv_1up_render96_init, bhv_1up_render96_loop)
+id_bhvRender961upRunningAway = hook_render96_behavior(id_bhv1upRunningAway, false, bhv_1up_render96_init, bhv_1up_render96_loop)
+id_bhvRender961upSliding = hook_render96_behavior(id_bhv1upSliding, false, bhv_1up_render96_init, bhv_1up_render96_loop) -- MOVE MESH TO HITBOX
+id_bhvRender961upJumpOnApproach = hook_render96_behavior(id_bhv1upJumpOnApproach, false, bhv_1up_render96_init, bhv_1up_render96_loop)
+id_bhvRender96Hidden1up = hook_render96_behavior(id_bhvHidden1up, false, bhv_1up_render96_init, bhv_1up_render96_loop)
+id_bhvRender96Hidden1upInPole = hook_render96_behavior(id_bhvHidden1upInPole, false, bhv_1up_render96_init, bhv_1up_render96_loop)
 
 local function bhv_star_particle_render96_init(o)
     o.header.gfx.node.flags = o.header.gfx.node.flags | GRAPH_RENDER_BILLBOARD
@@ -1557,7 +1570,7 @@ local function bhv_star_particle_loop(o)
     end
 end
 
-id_bhvRender96StarParticle = hook_behavior(nil, OBJ_LIST_LEVEL, false, bhv_star_particle_render96_init, bhv_star_particle_loop)
+id_bhvRender96StarParticle = hook_render96_behavior(nil, false, bhv_star_particle_render96_init, bhv_star_particle_loop, OBJ_LIST_LEVEL, "StarParticle")
 
 local is_star_collected = function(o)
     if o == nil then return nil end
@@ -1586,12 +1599,12 @@ local function bhv_star_render96_init(o)
     end
 end
 
-id_bhvRender96Star = hook_behavior(id_bhvStar, OBJ_LIST_LEVEL, false, bhv_star_render96_init, nil)
-id_bhvRender96SpawnedStar = hook_behavior(id_bhvSpawnedStar, OBJ_LIST_LEVEL, false, bhv_star_render96_init, nil)
-id_bhvRender96SpawnedStarNoLevelExit = hook_behavior(id_bhvSpawnedStarNoLevelExit, OBJ_LIST_LEVEL, false, bhv_star_render96_init, nil)
-id_bhvRender96HiddenStar = hook_behavior(id_bhvHiddenStar, OBJ_LIST_LEVEL, false, bhv_star_render96_init, nil)
-id_bhvRender96SpawnCoordStar = hook_behavior(id_bhvStarSpawnCoordinates, OBJ_LIST_LEVEL, false, bhv_star_render96_init, nil)
-id_bhvRender96CelebrationStar = hook_behavior(id_bhvCelebrationStar, OBJ_LIST_LEVEL, false, bhv_star_render96_init, nil)
+id_bhvRender96Star = hook_render96_behavior(id_bhvStar, false, bhv_star_render96_init, nil)
+id_bhvRender96SpawnedStar = hook_render96_behavior(id_bhvSpawnedStar, false, bhv_star_render96_init, nil)
+id_bhvRender96SpawnedStarNoLevelExit = hook_render96_behavior(id_bhvSpawnedStarNoLevelExit, false, bhv_star_render96_init, nil)
+id_bhvRender96HiddenStar = hook_render96_behavior(id_bhvHiddenStar, false, bhv_star_render96_init, nil)
+id_bhvRender96SpawnCoordStar = hook_render96_behavior(id_bhvStarSpawnCoordinates, false, bhv_star_render96_init, nil)
+id_bhvRender96CelebrationStar = hook_render96_behavior(id_bhvCelebrationStar, false, bhv_star_render96_init, nil)
 
 ---@param o Object
 local function bhv_pokey_render96_init(o)
@@ -1627,4 +1640,4 @@ local function bhv_tuxie_render96_loop(o)
     end
 end
 
-id_bhvRender96TuxiesMother = hook_behavior(id_bhvTuxiesMother, OBJ_LIST_SURFACE, false, nil, bhv_tuxie_render96_loop)
+id_bhvRender96TuxiesMother = hook_render96_behavior(id_bhvTuxiesMother, false, nil, bhv_tuxie_render96_loop)

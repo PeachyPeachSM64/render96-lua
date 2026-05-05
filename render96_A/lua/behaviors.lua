@@ -3,10 +3,9 @@
 ---@param init function?
 ---@param loop function?
 local function hook_render96_behavior(id, override, init, loop, list, name)
-    log_to_console(tostring(get_behavior_name_from_id(id)))
     if id ~= nil then
         list = list or get_object_list_from_behavior(get_behavior_from_id(id))
-        name = name or get_behavior_name_from_id(id):gsub("bhv", "", 1)
+        name = name or (get_behavior_name_from_id(id):gsub("bhv", "", 1))
     else
         list = list or OBJ_LIST_LEVEL
         name = name or "Unnamed"

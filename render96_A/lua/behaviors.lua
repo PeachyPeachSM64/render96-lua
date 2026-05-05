@@ -3,9 +3,10 @@
 ---@param init function?
 ---@param loop function?
 local function hook_render96_behavior(id, override, init, loop, list, name)
+    log_to_console(tostring(get_behavior_name_from_id(id)))
     if id ~= nil then
         list = list or get_object_list_from_behavior(get_behavior_from_id(id))
-        name = name or get_behavior_name_from_id(id):gsub("id_bhv", "", 1):gsub("bhv", "", 1)
+        name = name or get_behavior_name_from_id(id):gsub("bhv", "", 1)
     else
         list = list or OBJ_LIST_LEVEL
         name = name or "Unnamed"
@@ -1372,6 +1373,7 @@ id_bhvRender96FirePiranhaPlant = hook_render96_behavior(id_bhvFirePiranhaPlant, 
 ---@param o Object
 local function bhv_chain_chomp_render96_loop(o)
     local frame = o.header.gfx.animInfo.animFrame
+    djui_chat_message_create(get_active_mod().name)
 
     local sBiteFrames = { 0, 1, 2, 4, 6, 8, 6, 4, 2, 0, 2, 4, 6, 8, 6, 4, 2, 1, 0}
     if frame > 0 then

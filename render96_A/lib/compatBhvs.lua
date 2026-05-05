@@ -9,7 +9,7 @@ local og_get_behavior_name_from_id = get_behavior_name_from_id
 
 local function inject_bhvs()
     for id, hookInfo in pairs(hookedBhvs) do
-        og_hook_behavior(id, hookInfo.objectList, hookInfo.replaceBehavior, hookInfo.initFunction, hookInfo.loopFunction, hookInfo.behaviorName)
+        og_hook_behavior(id, hookInfo.objectList, hookInfo.replaceBehavior, hookInfo.initFunction, hookInfo.loopFunction, get_behavior_name_from_id(id))
     end
 end
 
@@ -25,7 +25,7 @@ end
 
 local function hook_behavior_local(behaviorId, objectList, replaceBehavior, initFunction, loopFunction, behaviorName)
     if not behaviorId then return end
-    namedBhvs[behaviorId] = og_get_behavior_name_from_id(behaviorId)
+    namedBhvs[behaviorId] = behaviorName or get_behavior_name_from_id(behaviorId)
 
     -- Create external-compatible init func
     local function initFunc(o)
@@ -69,7 +69,10 @@ local function hook_behavior_local(behaviorId, objectList, replaceBehavior, init
 end
 
 local function hook_behavior_remote(behaviorId, objectList, replaceBehavior, initFunction, loopFunction, behaviorName)
-    if appendBhvs[behaviorId] == nil then
+    namedBhvs[behaviorId] = behaviorName or get_behavior_name_from_id(behaviorId)
+    if hookedBhvs[behaviorId] == nil then
+        return hook_behavior_local(behaviorId, objectList, replaceBehavior, initFunction, loopFunction, behaviorName)
+    elseif appendBhvs[behaviorId] == nil then
         appendBhvs[behaviorId] = {
             init = initFunction,
             loop = loopFunction,
@@ -94,5 +97,6 @@ _G.hook_behavior = function(behaviorId, objectList, replaceBehavior, initFunctio
 end
 
 _G.get_behavior_name_from_id = function(id)
+    if id == nil then return end
     return namedBhvs[id] or og_get_behavior_name_from_id(id)
 end

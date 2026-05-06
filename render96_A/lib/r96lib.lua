@@ -73,11 +73,14 @@ end
 ---@param rangeMin number? The range in units at which audio is loudest (1)
 ---@param rangeMax number? The range in units at which audio is quietest (0)
 ---@param isMusic boolean? Wheather the audio is forced looped and the Doppler Effect is deactivated
-function r96lib.audio_fade(o, audioStream, rangeMin, rangeMax, isMusic)
+function r96lib.audio_fade(o, audioStream, rangeMin, rangeMax, isMusic, loopingStart, loopingEnd)
     if o == nil then return end
     if audioStream == nil or not audioStream.isStream then return end
     if not audio_stream_get_looping(audioStream) and isMusic then
         audio_stream_set_looping(audioStream, true)
+        if loopingEnd ~= nil then
+            audio_stream_set_loop_points(audioStream, loopingStart, loopingEnd)
+        end
     end
     if o.activeFlags == ACTIVE_FLAG_DEACTIVATED then
         audio_stream_set_position(audioStream, 0)

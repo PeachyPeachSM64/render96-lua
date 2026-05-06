@@ -1,3 +1,6 @@
+local o2oint = require("lib/o2oint")
+local r96lib = require("/lib/r96lib")
+
 ---@param id BehaviorId|number
 ---@param override boolean
 ---@param init function?
@@ -106,6 +109,8 @@ function geo_switch_thwomp_face(node, matStackIndex) cast_graph_node(node).selec
 function geo_switch_plant_face(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState2 return end
 function geo_switch_toad_hat(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
 function geo_switch_toad_vest(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState2 return end
+function geo_switch_tuxie_mother(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
+function geo_switch_tuxie(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
 
 ---@param o Object
 local function bhv_blargg_render96_init(o)
@@ -1520,18 +1525,6 @@ local function bhv_star_particle_render96_init(o)
     o.header.gfx.node.flags = o.header.gfx.node.flags & ~GRAPH_RENDER_INVISIBLE
     o.activeFlags = ACTIVE_FLAG_ACTIVE | ACTIVE_FLAG_INITIATED_TIME_STOP
     o.oFlags = o.oFlags | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
-
-        local sStarParticleHitbox = get_temp_object_hitbox()
-    sStarParticleHitbox.interactType      = INTERACT_STAR_OR_KEY
-    sStarParticleHitbox.downOffset        = 0
-    sStarParticleHitbox.damageOrCoinValue = 0
-    sStarParticleHitbox.health            = 0
-    sStarParticleHitbox.numLootCoins      = 0
-    sStarParticleHitbox.radius            = 80
-    sStarParticleHitbox.height            = 50
-    sStarParticleHitbox.hurtboxRadius     = 0
-    sStarParticleHitbox.hurtboxHeight     = 0
-    obj_set_hitbox(o, sStarParticleHitbox)
     o.oCelebrationStar = 0
     cur_obj_scale(3)
 end
@@ -1600,12 +1593,16 @@ local function bhv_star_render96_init(o)
     end
 end
 
-id_bhvRender96Star = hook_render96_behavior(id_bhvStar, false, bhv_star_render96_init, nil)
-id_bhvRender96SpawnedStar = hook_render96_behavior(id_bhvSpawnedStar, false, bhv_star_render96_init, nil)
-id_bhvRender96SpawnedStarNoLevelExit = hook_render96_behavior(id_bhvSpawnedStarNoLevelExit, false, bhv_star_render96_init, nil)
-id_bhvRender96HiddenStar = hook_render96_behavior(id_bhvHiddenStar, false, bhv_star_render96_init, nil)
-id_bhvRender96SpawnCoordStar = hook_render96_behavior(id_bhvStarSpawnCoordinates, false, bhv_star_render96_init, nil)
-id_bhvRender96CelebrationStar = hook_render96_behavior(id_bhvCelebrationStar, false, bhv_star_render96_init, nil)
+local function bhv_star_render96_loop(o)
+    r96lib.audio_fade(o, STAR_AMBIENT, 250, 800, true, 2258, 86840)
+end
+
+id_bhvRender96Star = hook_render96_behavior(id_bhvStar, false, bhv_star_render96_init, bhv_star_render96_loop)
+id_bhvRender96SpawnedStar = hook_render96_behavior(id_bhvSpawnedStar, false, bhv_star_render96_init, bhv_star_render96_loop)
+id_bhvRender96SpawnedStarNoLevelExit = hook_render96_behavior(id_bhvSpawnedStarNoLevelExit, false, bhv_star_render96_init, bhv_star_render96_loop)
+id_bhvRender96HiddenStar = hook_render96_behavior(id_bhvHiddenStar, false, bhv_star_render96_init, bhv_star_render96_loop)
+id_bhvRender96SpawnCoordStar = hook_render96_behavior(id_bhvStarSpawnCoordinates, false, bhv_star_render96_init, bhv_star_render96_loop)
+id_bhvRender96CelebrationStar = hook_render96_behavior(id_bhvCelebrationStar, false, bhv_star_render96_init, bhv_star_render96_loop)
 
 ---@param o Object
 local function bhv_pokey_render96_init(o)
@@ -1622,15 +1619,18 @@ id_bhvRender96Pokey = hook_behavior(id_bhvPokey, OBJ_LIST_SURFACE, false, bhv_po
 id_bhvRender96PokeyBodyPart = hook_behavior(id_bhvPokeyBodyPart, OBJ_LIST_SURFACE, false, bhv_pokey_render96_init, bhv_pokey_render96_loop)
 
 ---@param o Object
-local function bhv_tuxie_render96_loop(o)
+local function bhv_tuxie_mother_render96_loop(o)
     local player = nearest_player_to_object(o)
     local distanceToPlayer = dist_between_objects(o, player)
     local smallPenguin = obj_get_nearest_object_with_behavior_id(o, id_bhvUnused20E0)
-    if smallPenguin ~= nil and smallPenguin.oPosY < -4850 then o.oAction = 4 end
+    if smallPenguin ~= nil and smallPenguin.oPosY < -4850 then 
+        o.oAction = 4 
+        obj_mark_for_deletion(smallPenguin)
+        end
     if o.oAction == 4 then
         o.oForwardVel = 30.0
         cur_obj_rotate_yaw_toward(o.oAngleToMario, 0x1000)
-        cur_obj_init_animation_with_sound(3)
+        cur_obj_init_animation_with_accel_and_sound(0, 3)
         if distanceToPlayer < 300 then
             hurt_and_set_mario_action(m, ACT_QUICKSAND_DEATH, 0, 16)
             o.oAction = 2 
@@ -1639,6 +1639,30 @@ local function bhv_tuxie_render96_loop(o)
         --    o.oAction = 2 
         --end
     end
+    if o.oPosY < -4850 then
+        o.oPosX = 3450
+        o.oPosY = -4700
+        o.oPosZ = 4550
+    end
+
+    o.oSwitchTimer1 = o.oSwitchTimer1 + 1
+    local timer = o.oSwitchTimer1 % 50
+    o.oSwitchState1 = 0
+
+    if timer < 43 then
+        o.oSwitchState1 = 0
+    elseif timer < 45 then
+        o.oSwitchState1 = 1
+    elseif timer < 47 then
+        o.oSwitchState1 = 2
+    else
+        o.oSwitchState1 = 1
+    end
+    -- Angry eyes if chasing Mario
+    if o.oForwardVel > 5.0 then
+        o.oSwitchState1 = 3
+    end
+
 end
 
-id_bhvRender96TuxiesMother = hook_render96_behavior(id_bhvTuxiesMother, false, nil, bhv_tuxie_render96_loop)
+id_bhvRender96TuxiesMother = hook_behavior(id_bhvTuxiesMother, OBJ_LIST_SURFACE, false, nil, bhv_tuxie_mother_render96_loop)

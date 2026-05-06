@@ -3,8 +3,8 @@ ACT_MILK_GROW = allocate_mario_action(ACT_FLAG_STATIONARY | ACT_FLAG_IDLE | ACT_
 ACT_MILK_SHRINK = allocate_mario_action(ACT_FLAG_STATIONARY | ACT_FLAG_IDLE | ACT_FLAG_ALLOW_FIRST_PERSON | ACT_FLAG_PAUSE_EXIT)
 ACT_LUIGI_SCUTTLE_RUN = allocate_mario_action(ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION | ACT_GROUP_AIRBORNE)
 ACT_LUIGI_SCUTTLE_RUN_HOLD = allocate_mario_action(ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION | ACT_GROUP_AIRBORNE)
-ACT_LUIGI_BACKFLIP = allocate_mario_action(ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
-ACT_LUIGI_TWIRLING = allocate_mario_action(ACT_FLAG_AIR | ACT_FLAG_ATTACKING | ACT_FLAG_SWIMMING_OR_FLYING)
+ACT_LUIGI_BACKFLIP = allocate_mario_action(ACT_FLAG_AIR | ACT_FLAG_AIR | ACT_GROUP_AIRBORNE | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
+ACT_LUIGI_TWIRLING = allocate_mario_action(ACT_FLAG_AIR | ACT_GROUP_AIRBORNE | ACT_FLAG_ATTACKING | ACT_FLAG_SWIMMING_OR_FLYING)
 ACT_WARIO_CHARGE = allocate_mario_action(ACT_FLAG_MOVING | ACT_FLAG_ATTACKING)
 ACT_WARIO_TRIPLE_JUMP = allocate_mario_action(ACT_GROUP_AIRBORNE | ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION | ACT_FLAG_CONTROL_JUMP_HEIGHT)
 ACT_WARIO_HOLD_IDLE = allocate_mario_action(0x007 | ACT_FLAG_STATIONARY | ACT_FLAG_PAUSE_EXIT)
@@ -21,9 +21,11 @@ ACT_WARIO_SWING_FLING_HELD = allocate_mario_action(ACT_FLAG_STATIONARY | ACT_FLA
 ACT_WARIO_SWING_FLING_THROW = allocate_mario_action(ACT_FLAG_STATIONARY | ACT_FLAG_ATTACKING | ACT_FLAG_INVULNERABLE)
 
 -- Models
+E_MODEL_PIRANHA_PLANT_FIRE = smlua_model_util_get_id("piranha_plant_fire_geo")
 E_MODEL_BLARGG_FRIENDLY = smlua_model_util_get_id("blargg_friendly_geo")
 E_MODEL_PENGUIN_BABY = smlua_model_util_get_id("penguin_baby_geo")
 E_MODEL_PENGUIN_RACER = smlua_model_util_get_id("penguin_racer_geo")
+E_MODEL_PENGUIN_SL = smlua_model_util_get_id("penguin_sl_geo")
 E_MODEL_BOO_KING = smlua_model_util_get_id("boo_king_geo")
 E_MODEL_BOO_BIG = smlua_model_util_get_id("boo_big_geo")
 E_MODEL_BULLY_BIG = smlua_model_util_get_id("bully_big_geo")
@@ -61,6 +63,7 @@ gNumWarioCoins = select(2, r96lib.load_render96_data("wario_coin"):gsub("1", "")
 --gPlayerSyncTable[index]
 
 -- Audio
+STAR_AMBIENT = audio_stream_load("event_star_ambient.mp3")
 GOT_MILK_POWERUP = audio_stream_load("event_got_milk_powerup.mp3")
 GOT_MILK_SONG = audio_stream_load("event_got_milk.mp3")
 BOO_PIPE_RED = audio_stream_load("event_mario_musicbox.mp3")

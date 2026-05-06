@@ -2,24 +2,9 @@
 -- description: A Mod Pack That Adds All Render96 Features To The Game
 -- author: \#ff3030\Render96DX Team
 
-o2oint = require("lib/o2oint")
-bloWarps = require("/lib/warps")
-UvScroll = require("/lib/uv-scroll")
-require("/lib/r96lib")
-
--- Constants
-require('lua/constants')
-
--- Players
-require('lua/mario')
-require('lua/character_moveset')
-
--- Non players
-require('lua/behaviors')
-require('lua/extra_char_unlock')
-
-require('lua/got_milk')
-require('lua/mario_milk_run')
+local bloWarps = require("/lib/warps")
+local UvScroll = require("/lib/uv-scroll")
+local r96lib = require("/lib/r96lib")
 
 local charSelect = _G.charSelect
 
@@ -90,6 +75,8 @@ r96lib.addModelOverride(id_bhvSpindel,              E_MODEL_SPINDLE)
 
 r96lib.addModelOverride(id_bhvSmallPenguin,              E_MODEL_PENGUIN_BABY)
 r96lib.addModelOverride(id_bhvRacingPenguin,              E_MODEL_PENGUIN_RACER)
+r96lib.addModelOverride(id_bhvSLWalkingPenguin,              E_MODEL_PENGUIN_SL)
+r96lib.addModelOverride(id_bhvFirePiranhaPlant,              E_MODEL_PIRANHA_PLANT_FIRE)
 
 -- Enemies
 r96lib.addSpawn(LEVEL_LLL, 1, E_MODEL_BLARGG, id_bhvRender96Blargg, -6766, 0,  3033, 0, 0, 0)
@@ -171,7 +158,7 @@ local function mario_update(m)
    --   
    --end
    --if m.action == ACT_BACKFLIP then
-   --    warp_to_level(LEVEL_CCM, 1, 1)
+   --    warp_to_level(LEVEL_HMC, 1, 1)
    --end
     local mrI = obj_get_nearest_object_with_behavior_id(gMarioStates[0].marioObj, id_bhvMrI)
     if mrI ~= nil then

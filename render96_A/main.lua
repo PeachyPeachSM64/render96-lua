@@ -77,6 +77,7 @@ r96lib.addModelOverride(id_bhvSmallPenguin,              E_MODEL_PENGUIN_BABY)
 r96lib.addModelOverride(id_bhvRacingPenguin,              E_MODEL_PENGUIN_RACER)
 r96lib.addModelOverride(id_bhvSLWalkingPenguin,              E_MODEL_PENGUIN_SL)
 r96lib.addModelOverride(id_bhvFirePiranhaPlant,              E_MODEL_PIRANHA_PLANT_FIRE)
+r96lib.addModelOverride(id_bhvWhompKingBoss,              E_MODEL_WHOMP_KING)
 
 -- Enemies
 r96lib.addSpawn(LEVEL_LLL, 1, E_MODEL_BLARGG, id_bhvRender96Blargg, -6766, 0,  3033, 0, 0, 0)

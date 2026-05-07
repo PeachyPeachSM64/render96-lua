@@ -801,12 +801,88 @@ local function act_wario_swing_fling_held(m)
 end
 
 ---@param m MarioState
+local function act_wario_ground_pound(m)
+    local stepResult
+    local yOffset
+
+    if m.actionState == 0 then
+        if m.vel.y > 0.0 then
+            m.vel.y = 0.0
+        end
+
+        if m.actionTimer < 10 then
+            yOffset = 20 - 2 * m.actionTimer
+            if m.pos.y + yOffset + 160.0 < m.ceilHeight then
+                m.pos.y = m.pos.y + yOffset
+                m.peakHeight = m.pos.y
+                vec3f_copy(m.marioObj.header.gfx.pos, m.pos)
+            end
+        end
+
+        stepResult = perform_air_step(m, 0)
+        mario_set_forward_vel(m, 0.0)
+
+        if m.actionArg == 0 then
+            set_mario_animation(m, MARIO_ANIM_START_GROUND_POUND)
+        else
+            set_mario_animation(m, MARIO_ANIM_TRIPLE_JUMP_GROUND_POUND)
+        end
+
+        if m.actionTimer == 0 then
+            play_sound(SOUND_ACTION_THROW, m.marioObj.header.gfx.cameraToObject)
+            play_character_sound(m, CHAR_SOUND_GROUND_POUND_WAH)
+        end
+
+        m.actionTimer = m.actionTimer + 1
+
+        local anim = m.marioObj.header.gfx.animInfo.curAnim
+        if m.actionTimer >= anim.loopEnd + 4 or stepResult == AIR_STEP_LANDED then
+            m.actionState = 1
+        end
+
+    else
+        set_mario_animation(m, MARIO_ANIM_GROUND_POUND)
+
+        stepResult = perform_air_step(m, 0)
+
+        if stepResult == AIR_STEP_HIT_WALL then
+            mario_set_forward_vel(m, -16.0)
+            if m.vel.y > 0.0 then
+                m.vel.y = 0.0
+            end
+
+            m.particleFlags = m.particleFlags | PARTICLE_VERTICAL_STAR
+            set_mario_action(m, ACT_BACKWARD_AIR_KB, 0)
+        end
+    end
+
+    if stepResult == AIR_STEP_LANDED then
+        play_sound(SOUND_ACTION_UNK3C, m.marioObj.header.gfx.cameraToObject)
+
+        if should_get_stuck_in_ground(m) == 1 then
+            play_character_sound(m, CHAR_SOUND_ATTACKED)
+            m.particleFlags = m.particleFlags | PARTICLE_MIST_CIRCLE
+            set_mario_action(m, ACT_BUTT_STUCK_IN_GROUND, 0)
+
+        elseif check_fall_damage(m, ACT_HARD_BACKWARD_GROUND_KB) == 0 then
+            play_mario_heavy_landing_sound(m, SOUND_ACTION_TERRAIN_HEAVY_LANDING)
+            m.particleFlags = m.particleFlags | PARTICLE_MIST_CIRCLE | PARTICLE_HORIZONTAL_STAR
+            set_camera_shake_from_hit(SHAKE_LARGE_DAMAGE)
+            set_mario_action(m, ACT_GROUND_POUND_LAND, 0)
+        end
+    end
+
+    return 0
+end
+
+---@param m MarioState
 ---@param incomingAct integer
 local function wario_before_actions(m, incomingAct)
     if (incomingAct == ACT_DIVE and m.vel.y == 20) then return ACT_WARIO_CHARGE end
     if (incomingAct == ACT_TRIPLE_JUMP) then return ACT_WARIO_TRIPLE_JUMP end 
     if (incomingAct == ACT_HOLD_JUMP) then return ACT_WARIO_HOLD_JUMP end
     if (incomingAct == ACT_HOLD_FREEFALL) then return ACT_WARIO_HOLD_FREEFALL end
+    if (incomingAct == ACT_GROUND_POUND) then return ACT_WARIO_GROUND_POUND end
 end
 
 ---@param m MarioState
@@ -831,6 +907,7 @@ hook_mario_action(ACT_WARIO_PILE_DRIVER_LAND, act_wario_pile_driver_land)
 hook_mario_action(ACT_WARIO_SWING_FLING_START, act_wario_swing_fling_start)
 hook_mario_action(ACT_WARIO_SWING_FLING_HELD, act_wario_swing_fling_held)
 hook_mario_action(ACT_WARIO_SWING_FLING_THROW, act_wario_swing_fling_throw)
+hook_mario_action(ACT_WARIO_GROUND_POUND, act_wario_ground_pound)
 
 
 

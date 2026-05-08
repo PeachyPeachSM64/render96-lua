@@ -47,11 +47,9 @@ function geo_switch_bubba_body(node, matStackIndex) cast_graph_node(node).select
 function geo_function_chuckya_spin(node, matStackIndex) 
     local o = geo_get_current_object()
     local rotN = cast_graph_node(node.next) ---@type GraphNodeRotation
-    local rotX = (coss((o.oTimer & 7) << 13) + 1.0) * 6144.0
-    rotN.rotation.x = rotX
-    rotN.rotation.y = rotX
-    rotN.rotation.z = rotX
-    print(rotN.rotation.x)
+    local rot = (o.oTimer * 0x2000) & 0xFFFF
+    rotN.rotation.x = rot
+
     return
 end
 

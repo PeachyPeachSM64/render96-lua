@@ -110,6 +110,27 @@ function geo_switch_plant_face(node, matStackIndex) cast_graph_node(node).select
 function geo_switch_toad_hat(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
 function geo_switch_toad_vest(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState2 return end
 function geo_switch_tuxie_mother(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
+function geo_switch_bubba_body(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
+
+function geo_function_chuckya_spin(node, matStackIndex) 
+    local o = geo_get_current_object()
+    local rotN = cast_graph_node(node.next) ---@type GraphNodeRotation
+    local rot = (o.oTimer * 0x2000) & 0xFFFF
+    rotN.rotation.x = rot
+
+    return
+end
+
+function geo_function_scuttle_body(node, matStackIndex) 
+    local o = geo_get_current_object()
+    local rotN = cast_graph_node(node.next) ---@type GraphNodeRotation
+    local rot = (o.oTimer * 0x200) & 0xFFFF
+    rotN.rotation.x = rot
+    rotN.rotation.y = rot
+    rotN.rotation.z = rot
+
+    return
+end
 
 ---@param o Object
 local function bhv_blargg_render96_init(o)
@@ -1528,18 +1549,21 @@ end
 id_bhvRender96CirclingAmp = hook_render96_behavior(id_bhvCirclingAmp, false, nil, bhv_amp_render96_loop)
 id_bhvRender96HomingAmp = hook_render96_behavior(id_bhvHomingAmp, false, nil, bhv_amp_render96_loop)
 
-local function bhv_bubba_render96_loop(o)
-
-    if o.oAnimState == 0 then
-        local cycle = {1, 2, 0, 3, 4, 3, 0}
-        --o.oSwitchState2 = cycle[(math.floor(o.oTimer / 4) % 3) + 1]
-        o.oSwitchState2 = 0
-    elseif o.oAnimState == 1 then
-        o.oSwitchState2 = 3
-    end
+---@param o Object
+local function bhv_bubba_render96_init(o)
+    smlua_anim_util_set_animation(o, "bubba_swim")
+    --o.oAnimations = gObjectAnimations.bub_seg6_anims_06012354
+    
 end
 
-id_bhvRender96Bubba = hook_render96_behavior(id_bhvBubba, false, nil, bhv_bubba_render96_loop)
+local function bhv_bubba_render96_loop(o)
+    o.oSwitchState1 = o.oAnimState
+end
+
+id_bhvRender96Bubba = hook_render96_behavior(id_bhvBubba, false, bhv_bubba_render96_init, bhv_bubba_render96_loop)
+
+
+
 
 local function bhv_1up_render96_init(o)
     o.header.gfx.node.flags = o.header.gfx.node.flags & ~GRAPH_RENDER_BILLBOARD

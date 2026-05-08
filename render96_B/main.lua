@@ -42,3 +42,26 @@ function geo_switch_plant_face(node, matStackIndex) cast_graph_node(node).select
 function geo_switch_toad_hat(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
 function geo_switch_toad_vest(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState2 return end
 function geo_switch_tuxie_mother(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
+function geo_switch_bubba_body(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
+
+function geo_function_chuckya_spin(node, matStackIndex) 
+    local o = geo_get_current_object()
+    local rotN = cast_graph_node(node.next) ---@type GraphNodeRotation
+    local rotX = (coss((o.oTimer & 7) << 13) + 1.0) * 6144.0
+    rotN.rotation.x = rotX
+    rotN.rotation.y = rotX
+    rotN.rotation.z = rotX
+    print(rotN.rotation.x)
+    return
+end
+
+function geo_function_scuttle_body(node, matStackIndex) 
+    local o = geo_get_current_object()
+    local rotN = cast_graph_node(node.next) ---@type GraphNodeRotation
+    local rot = (o.oTimer * 0x200) & 0xFFFF
+    rotN.rotation.x = rot
+    rotN.rotation.y = rot
+    rotN.rotation.z = rot
+
+    return
+end

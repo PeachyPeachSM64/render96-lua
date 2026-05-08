@@ -194,6 +194,13 @@ function r96lib.addModelOverride(bhv, model)
     })
 end
 
+    table.insert(sModelOverrides, {
+        bhv   = bhv,
+        model = model,
+        param = param,
+    })
+end
+
 local function update()
     local level  = networkPlayers[0].currLevelNum
     local area   = networkPlayers[0].currAreaIndex
@@ -203,6 +210,16 @@ local function update()
         local o = obj_get_first_with_behavior_id(entry.bhv)
         if o then
             while o ~= nil do
+            obj_set_model_extended(o, entry.model)
+            o = obj_get_next_with_same_behavior_id(o)
+            end
+        end
+    end
+
+    for _, entry in ipairs(sModelOverrides) do
+        local o = obj_get_first_with_behavior_id(entry.bhv)
+        if o then
+            while o ~= nil and entry.param == o.oBehParams do
             obj_set_model_extended(o, entry.model)
             o = obj_get_next_with_same_behavior_id(o)
             end

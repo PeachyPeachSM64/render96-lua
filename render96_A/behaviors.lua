@@ -1756,11 +1756,11 @@ end
 local function pulse_ramp_bobomb(o, t, timer)
     -- timer goes 1-150, pulse starts slow and speeds up
     -- frequency scales from 0.02 at timer=1 to 0.4 at timer=150
-    local freq = 0.02 + (timer / 150) * 0.3
-    local s = (math.sin(t * freq) * 0.5 + 0.5)
-    o.oColorR = 13 + (150 - 13) * s
-    o.oColorG = 29 + (0 - 29) * s
-    o.oColorB = 52 + (0 - 52) * s
+    local freq = 0.02 + (t / 150) * 0.3
+    local s = (math.sin((t * freq) - math.pi*0.5) * 0.5 + 0.5)
+    o.oColorR = math.lerp(13, 150, s)
+    o.oColorG = math.lerp(29, 0, s)
+    o.oColorB = math.lerp(52, 0, s)
 end
 
 ---@param o Object

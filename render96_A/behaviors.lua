@@ -1856,7 +1856,6 @@ end
 
 ---@param o Object
 local function bhv_bobomb_render96_loop(o)
-    pulse_ramp_bobomb(o, o.oBobombFuseTimer, 150)
     if o.oBobombFuseTimer == 0 then 
         o.oSwitchState1 = 1
     else 

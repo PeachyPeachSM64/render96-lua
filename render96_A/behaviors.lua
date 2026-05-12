@@ -114,6 +114,9 @@ function geo_switch_toad_hat(node, matStackIndex) cast_graph_node(node).selected
 function geo_switch_toad_vest(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState2 return end
 function geo_switch_tuxie_mother(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
 function geo_switch_bubba_body(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
+function geo_switch_whomp_king(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
+
+function geo_switch_bobomb_angry(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
 
 function geo_function_chuckya_spin(node, matStackIndex) 
     local o = geo_get_current_object()
@@ -134,6 +137,91 @@ function geo_function_scuttle_body(node, matStackIndex)
 
     return
 end
+
+function geo_color_update(node, matStackIndex)
+
+end
+
+function geo_function_scuttle_body_color(node, matStackIndex)
+    local o = geo_get_current_object()
+    if o == nil then return end
+    local id = tostring(o._pointer)
+    local gfx_name = "scuttle_dl_" .. id
+    local gfx_mat_name = "scuttle_mat_" .. id
+
+    local gfx = gfx_get_from_name(gfx_name)
+    if gfx == nil then
+        local orig_dl = gfx_get_from_name("scuttlebug_scuttle_body_dl_mesh_layer_1")
+        local len = gfx_get_length(orig_dl)
+        gfx = gfx_create(gfx_name, len)
+        gfx_copy(gfx, orig_dl, len)
+    end
+
+    local gfx_mat = gfx_get_from_name(gfx_mat_name)
+    if gfx_mat == nil then
+        local orig_mat = gfx_get_from_name("mat_scuttlebug_scuttlebug_body")
+        local len = gfx_get_length(orig_mat)
+        gfx_mat = gfx_create(gfx_mat_name, len)
+        gfx_copy(gfx_mat, orig_mat, len)
+    end
+
+    local cmd_prim = gfx_get_command(gfx_mat, 7)
+    gfx_set_command(cmd_prim, "gsDPSetPrimColor(0, 0, %i, %i, %i, 255)", o.oColorR, o.oColorG, o.oColorB)
+
+    local cmd0 = gfx_get_command(gfx, 0)
+    gfx_set_command(cmd0, "gsSPDisplayList(%g)", gfx_mat)
+
+
+    cast_graph_node(node.next).displayList = gfx
+end
+
+function geo_function_bobomb_angry(node, matStackIndex)
+    local o = geo_get_current_object()
+    if o == nil then return end
+    local id = tostring(o._pointer)
+    local gfx_name = "bobomb_angry_dl_" .. id
+    local gfx_mat_name = "bobomb_angry_mat_" .. id
+
+    local gfx = gfx_get_from_name(gfx_name)
+    if gfx == nil then
+        local orig_dl = gfx_get_from_name("black_bobomb_000_displaylist_mesh_layer_1")
+        local len = gfx_get_length(orig_dl)
+        gfx = gfx_create(gfx_name, len)
+        gfx_copy(gfx, orig_dl, len)
+    end
+
+    local gfx_mat = gfx_get_from_name(gfx_mat_name)
+    if gfx_mat == nil then
+        local orig_mat = gfx_get_from_name("mat_black_bobomb_bobomb_blue")
+        local len = gfx_get_length(orig_mat)
+        gfx_mat = gfx_create(gfx_mat_name, len)
+        gfx_copy(gfx_mat, orig_mat, len)
+    end
+
+    local cmd_prim = gfx_get_command(gfx_mat, 8)
+    gfx_set_command(cmd_prim, "gsDPSetPrimColor(0, 0, %i, %i, %i, 255)", o.oColorR, o.oColorG, o.oColorB)
+
+    local cmd0 = gfx_get_command(gfx, 0)
+    gfx_set_command(cmd0, "gsSPDisplayList(%g)", gfx_mat)
+
+
+    cast_graph_node(node.next).displayList = gfx
+end
+
+local function on_object_unload(o)
+    local id = tostring(o._pointer)
+    local dl = gfx_get_from_name("bobomb_angry_dl_" .. id)
+    if dl then gfx_delete(dl) end
+    local mat = gfx_get_from_name("bobomb_angry_mat_" .. id)
+    if mat then gfx_delete(mat) end
+    local mat = gfx_get_from_name("scuttle_dl_" .. id)
+    if mat then gfx_delete(mat) end
+    local mat = gfx_get_from_name("scuttle_mat_" .. id)
+    if mat then gfx_delete(mat) end
+end
+
+hook_event(HOOK_ON_OBJECT_UNLOAD, on_object_unload)
+hook_event(HOOK_ON_LEVEL_INIT, function() gfx_delete_all() end)
 
 ---@param o Object
 local function bhv_blargg_render96_init(o)
@@ -762,6 +850,9 @@ local function bhv_whomp_king_render96_loop(o)
         o.oThwompSquishTimer = o.oThwompSquishTimer + 1
     end
 
+    if o.oHealth == 3 then o.oSwitchState1 = 0 end
+    if o.oHealth == 2 then o.oSwitchState1 = 1 end
+    if o.oHealth == 1 then o.oSwitchState1 = 2 end
     o.oThwompPrevAction = o.oAction
 end
 
@@ -1766,6 +1857,42 @@ end
 ---@param o Object
 local function bhv_bobomb_render96_loop(o)
     pulse_ramp_bobomb(o, o.oBobombFuseTimer, 150)
+    if o.oBobombFuseTimer == 0 then 
+        o.oSwitchState1 = 1
+    else 
+        o.oSwitchState1 = 0
+        pulse_ramp_bobomb(o, o.oBobombFuseTimer, 150)
+    end
+
 end
 
 id_bhvRender96Bobomb = hook_render96_behavior(id_bhvBobomb, false, nil, bhv_bobomb_render96_loop, OBJ_LIST_SURFACE)
+
+local CYCLE_COLORS = {
+    {r = 0x40, g = 0x21, b = 0x3B}, -- pink
+    {r = 0x44, g = 0x35, b = 0x00}, -- yellow
+    {r = 0x00, g = 0x00, b = 0x00}, -- black
+}
+
+local function pulse_cycle(o, framesPerColor)
+    framesPerColor = framesPerColor or 30
+    local totalFrames = #CYCLE_COLORS * framesPerColor
+    local frame = o.oTimer % totalFrames
+    local colorIndex = math.floor(frame / framesPerColor) + 1
+    local nextIndex = (colorIndex % #CYCLE_COLORS) + 1
+    local lerpT = (frame % framesPerColor) / framesPerColor
+
+    local c1 = CYCLE_COLORS[colorIndex]
+    local c2 = CYCLE_COLORS[nextIndex]
+
+    o.oColorR = math.floor(c1.r + (c2.r - c1.r) * lerpT)
+    o.oColorB = math.floor(c1.g + (c2.g - c1.g) * lerpT)
+    o.oColorG = math.floor(c1.b + (c2.b - c1.b) * lerpT)
+end
+
+---@param o Object
+local function bhv_scuttlebug_render96_loop(o)
+    pulse_cycle(o, 50)
+end
+
+id_bhvRender96Scuttlebug = hook_render96_behavior(id_bhvScuttlebug, false, nil, bhv_scuttlebug_render96_loop, OBJ_LIST_SURFACE)

@@ -204,27 +204,65 @@ function r96lib.addModelParamOverride(bhv, param, model)
     })
 end
 
+function r96lib.addModelLevelOverride(bhv, model, level, area, acts)
+
+    local actMask = ACT_ALL
+    if type(acts) == "number" then
+        actMask = act_bit(acts)
+    elseif type(acts) == "table" then
+        actMask = 0
+        for _, a in ipairs(acts) do
+            actMask = actMask | act_bit(a)
+        end
+    end
+
+    table.insert(sModelOverrides, {
+        bhv     = bhv,
+        model   = model,
+        level   = level,
+        area    = area,
+        actMask = actMask,
+    })
+end
+
 local function update()
     local level  = networkPlayers[0].currLevelNum
     local area   = networkPlayers[0].currAreaIndex
     local actNum = networkPlayers[0].currActNum
 
+    -- Loop 1: addModelOverride
     for _, entry in ipairs(sModelOverrides) do
-        local o = obj_get_first_with_behavior_id(entry.bhv)
-        if o then
+        if not entry.level and not entry.param then
+            local o = obj_get_first_with_behavior_id(entry.bhv)
             while o ~= nil do
-            obj_set_model_extended(o, entry.model)
-            o = obj_get_next_with_same_behavior_id(o)
+                obj_set_model_extended(o, entry.model)
+                o = obj_get_next_with_same_behavior_id(o)
             end
         end
     end
 
+    -- Loop 2: addModelParamOverride
     for _, entry in ipairs(sModelOverrides) do
-        local o = obj_get_first_with_behavior_id(entry.bhv)
-        if o then
-            while o ~= nil and entry.param == o.oBehParams do
-            obj_set_model_extended(o, entry.model)
-            o = obj_get_next_with_same_behavior_id(o)
+        if entry.param and not entry.level then
+            local o = obj_get_first_with_behavior_id(entry.bhv)
+            while o ~= nil do
+                if entry.param == o.oBehParams then
+                    obj_set_model_extended(o, entry.model)
+                end
+                o = obj_get_next_with_same_behavior_id(o)
+            end
+        end
+    end
+
+    -- Loop 3: addModelLevelOverride
+    for _, entry in ipairs(sModelOverrides) do
+        if entry.level and entry.level == level
+        and entry.area  and entry.area  == area
+        and entry.actMask and act_matches(entry.actMask, actNum) then
+            local o = obj_get_first_with_behavior_id(entry.bhv)
+            while o ~= nil do
+                obj_set_model_extended(o, entry.model)
+                o = obj_get_next_with_same_behavior_id(o)
             end
         end
     end

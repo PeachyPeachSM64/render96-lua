@@ -15,22 +15,29 @@ end
 -- Warps
 
 -- Models
-r96lib.addModelOverride(id_bhvBalconyBigBoo,            E_MODEL_BOO_BIG)
-r96lib.addModelOverride(id_bhvMerryGoRoundBigBoo,       E_MODEL_BOO_BIG)
-r96lib.addModelOverride(id_bhvBooWithCage,             E_MODEL_BOO_BIG)
-r96lib.addModelOverride(id_bhvGhostHuntBigBoo,      E_MODEL_BOO_KING)
-r96lib.addModelOverride(id_bhvBooInCastle,          E_MODEL_BOO_KING)
-r96lib.addModelOverride(id_bhvBigBullyWithMinions,  E_MODEL_BULLY_BIG)
-r96lib.addModelOverride(id_bhvGrindel,              E_MODEL_GRINDLE)
-r96lib.addModelOverride(id_bhvHorizontalGrindel,    E_MODEL_GRINDLE)
-r96lib.addModelOverride(id_bhvSpindel,            E_MODEL_SPINDLE)
-r96lib.addModelOverride(id_bhvSmallPenguin,              E_MODEL_PENGUIN_BABY)
-r96lib.addModelOverride(id_bhvRacingPenguin,              E_MODEL_PENGUIN_RACER)
-r96lib.addModelOverride(id_bhvSLWalkingPenguin,              E_MODEL_PENGUIN_SL)
-r96lib.addModelOverride(id_bhvFirePiranhaPlant,              E_MODEL_PIRANHA_PLANT_FIRE)
-r96lib.addModelOverride(id_bhvWhompKingBoss,              E_MODEL_WHOMP_KING)
-r96lib.addModelParamOverride(id_bhvKoopa, 0x01020000,             E_MODEL_KOOPA_QUICK_BOB)
-r96lib.addModelParamOverride(id_bhvKoopa, 0x02030000,             E_MODEL_KOOPA_QUICK_BOB)
+r96lib.addModelOverride(id_bhvBalconyBigBoo,       E_MODEL_BOO_BIG)
+r96lib.addModelOverride(id_bhvMerryGoRoundBigBoo,  E_MODEL_BOO_BIG)
+r96lib.addModelOverride(id_bhvBooWithCage,         E_MODEL_BOO_BIG)
+r96lib.addModelOverride(id_bhvGhostHuntBigBoo,     E_MODEL_BOO_KING)
+r96lib.addModelOverride(id_bhvBooInCastle,         E_MODEL_BOO_KING)
+r96lib.addModelOverride(id_bhvBigBullyWithMinions, E_MODEL_BULLY_BIG)
+r96lib.addModelOverride(id_bhvGrindel,             E_MODEL_GRINDLE)
+r96lib.addModelOverride(id_bhvHorizontalGrindel,   E_MODEL_GRINDLE)
+r96lib.addModelOverride(id_bhvSpindel,             E_MODEL_SPINDLE)
+r96lib.addModelOverride(id_bhvSmallPenguin,        E_MODEL_PENGUIN_BABY)
+r96lib.addModelOverride(id_bhvRacingPenguin,       E_MODEL_PENGUIN_RACER)
+r96lib.addModelOverride(id_bhvSLWalkingPenguin,    E_MODEL_PENGUIN_SL)
+r96lib.addModelOverride(id_bhvFirePiranhaPlant,    E_MODEL_PIRANHA_PLANT_FIRE)
+r96lib.addModelOverride(id_bhvWhompKingBoss,       E_MODEL_WHOMP_KING)
+
+r96lib.addModelParamOverride(id_bhvKoopa, 0x01020000, E_MODEL_KOOPA_QUICK_BOB)
+r96lib.addModelParamOverride(id_bhvKoopa, 0x02030000, E_MODEL_KOOPA_QUICK_BOB)
+
+r96lib.addModelLevelOverride(id_bhvGoomba, E_MODEL_GOOMBA_SSL, LEVEL_SSL, 1, nil)
+r96lib.addModelLevelOverride(id_bhvGoomba, E_MODEL_GOOMBA_UNDERGROUND, LEVEL_SSL, 2, nil)
+r96lib.addModelLevelOverride(id_bhvGoomba, E_MODEL_GOOMBA_BOXART, LEVEL_BITDW, 1, nil)
+r96lib.addModelLevelOverride(id_bhvGoomba, E_MODEL_GOOMBA_BOXART, LEVEL_BITFS, 1, nil)
+r96lib.addModelLevelOverride(id_bhvGoomba, E_MODEL_GOOMBA_BOXART, LEVEL_BITS, 1, nil)
 
 -- Enemies
 r96lib.addSpawn(LEVEL_LLL, 1, E_MODEL_BLARGG, id_bhvRender96Blargg, -6766, 0,  3033, 0, 0, 0)
@@ -52,15 +59,14 @@ r96lib.addSpawn(LEVEL_HMC, 1, E_MODEL_MR_I, id_bhvRender96MrI,  4740, 1060,  468
 r96lib.addSpawn(LEVEL_HMC, 1, E_MODEL_MR_I, id_bhvRender96MrI,  6700, 1020,  6820, 0, 0, 0)
 
 -- Extra
-r96lib.addSpawn(LEVEL_BOB, 1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys,    7141,  2030, -6711, 0, 0, 0, nil, function(o) obj_beh_params2(o, 0) end)
-r96lib.addSpawn(LEVEL_WF, 1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys,     -356,  3584,   -21, 0, 0, 0, {2, 3, 4, 5, 6}, function(o) obj_beh_params2(o, 1) end)
-r96lib.addSpawn(LEVEL_JRB, 1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys,    7134, -3322,  2169, 0, 0, 0, {2}, function(o) obj_beh_params2(o, 2) end)
-r96lib.addSpawn(LEVEL_CCM, 2, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys,   -5539, -4812, -6637, 0, 0, 0, nil, function(o) obj_beh_params2(o, 3) end)
-r96lib.addSpawn(LEVEL_BBH, 1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys,   -1595,  2560,  1657, 0, 0, 0, nil, function(o) obj_beh_params2(o, 4) end)
-r96lib.addSpawn(LEVEL_SA, 1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys,     -318,  -160,   -38, 0, 0, 0, nil, function(o) obj_beh_params2(o, 5) end)
-r96lib.addSpawn(LEVEL_PSS, 1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys,    6094,  6144, -4145, 0, 0, 0, nil, function(o) obj_beh_params2(o, 6) end)
-r96lib.addSpawn(LEVEL_BITDW, 1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -4560,  1126,  -179, 0, 0, 0, nil, function(o) obj_beh_params2(o, 7) end)
-
+r96lib.addSpawn(LEVEL_BOB,   1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, 7141,  2030,  -6711, 0, 0, 0, nil, function(o) obj_beh_params2(o, 0) end)
+r96lib.addSpawn(LEVEL_WF,    1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -356,  3584,  -21,   0, 0, 0, {2, 3, 4, 5, 6}, function(o) obj_beh_params2(o, 1) end)
+r96lib.addSpawn(LEVEL_JRB,   1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, 7134,  -3322, 2169,  0, 0, 0, {2}, function(o) obj_beh_params2(o, 2) end)
+r96lib.addSpawn(LEVEL_CCM,   2, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -5539, -4812, -6637, 0, 0, 0, nil, function(o) obj_beh_params2(o, 3) end)
+r96lib.addSpawn(LEVEL_BBH,   1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -1595, 2560,  1657,  0, 0, 0, nil, function(o) obj_beh_params2(o, 4) end)
+r96lib.addSpawn(LEVEL_SA,    1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -318,  -160,  -38,   0, 0, 0, nil, function(o) obj_beh_params2(o, 5) end)
+r96lib.addSpawn(LEVEL_PSS,   1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, 6094,  6144,  -4145, 0, 0, 0, nil, function(o) obj_beh_params2(o, 6) end)
+r96lib.addSpawn(LEVEL_BITDW, 1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -4560, 1126,  -179,  0, 0, 0, nil, function(o) obj_beh_params2(o, 7) end)
 
 -- Scroll the uvs to the right
 local function uv_scroll_right(input_vtx, original_uv, current_uv)

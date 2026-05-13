@@ -155,8 +155,8 @@ end
 function geo_function_bobomb_angry(node, matStackIndex)
     r96lib.gfxColorPatch(node, matStackIndex, {
         prefix    = "bobomb_angry",
-        origDl    = "black_bobomb_000_displaylist_mesh_layer_1",
-        origMat   = "mat_black_bobomb_bobomb_blue",
+        origDl    = "black_bobomb_body_mesh_layer_1_mat_override_bobomb_blue2_0",
+        origMat   = "mat_black_bobomb_bobomb_blue2",
         primIndex = 8,
     })
 end
@@ -1470,45 +1470,32 @@ id_bhvRender96ChainChomp = hook_render96_behavior(id_bhvChainChomp, false, nil, 
 
 ---@param o Object
 local function bhv_toad_render96_loop(o)
-    -- Castle inside first toad
-    if o.oBehParams == -2063597568 then
-      o.oSwitchState2 = 0 --vest
-      o.oSwitchState1 = 0 --hat
-    end
-    -- WF room
-    if o.oBehParams == -2030043136 then
-      o.oSwitchState2 = 3
-      o.oSwitchState1 = 0
-    end
-    -- JRB room
-    if o.oBehParams == -2046820352 then
-      o.oSwitchState2 = 2
-      o.oSwitchState1 = 3
-    end
-    -- Castle inside second floor next to bobomb painting
-    if o.oBehParams == -1996488704 then
-      o.oSwitchState2 = 0
-      o.oSwitchState1 = 1
-    end
-    -- Castle inside third floor star
-    if o.oBehParams == 1392508928 then
-      o.oSwitchState2 = 4
-      o.oSwitchState1 = 4
-    end
-    -- Castle inside second floor star
-    if o.oBehParams == 1275068416 then
-      o.oSwitchState2 = 4
-      o.oSwitchState1 = 4
-    end
-    -- Basement green wall toad
-    if o.oBehParams == -2013265920 then
-      o.oSwitchState2 = 1
-      o.oSwitchState1 = 2
-    end
-    -- Basement star
-    if o.oBehParams == 1375731712 then
-      o.oSwitchState2 = 4
-      o.oSwitchState1 = 4
+    local dialogId = (o.oBehParams >> 24) & 0xFF
+
+    if dialogId == 133 then     -- castle inside first toad
+        o.oSwitchState2 = 0     -- vest
+        o.oSwitchState1 = 0     -- hat
+    elseif dialogId == 135 then -- WF room
+        o.oSwitchState2 = 3
+        o.oSwitchState1 = 0
+    elseif dialogId == 134 then -- JRB room
+        o.oSwitchState2 = 2
+        o.oSwitchState1 = 3
+    elseif dialogId == 137 then -- castle inside second floor next to bobomb painting
+        o.oSwitchState2 = 0
+        o.oSwitchState1 = 1
+    elseif dialogId == 83 then -- castle inside third floor star
+        o.oSwitchState2 = 4
+        o.oSwitchState1 = 4
+    elseif dialogId == 76 then -- castle inside second floor star
+        o.oSwitchState2 = 4
+        o.oSwitchState1 = 4
+    elseif dialogId == 136 then -- basement green wall toad
+        o.oSwitchState2 = 1
+        o.oSwitchState1 = 2
+    elseif dialogId == 82 then -- basement star
+        o.oSwitchState2 = 4
+        o.oSwitchState1 = 4
     end
 end
 
@@ -1560,7 +1547,6 @@ end
 
 id_bhvRender96GhostHuntBoo = hook_render96_behavior(id_bhvGhostHuntBoo, false, bhv_boo_render96_init, bhv_boo_render96_loop)
 id_bhvRender96GhostHuntBigBoo = hook_render96_behavior(id_bhvGhostHuntBigBoo, false, bhv_boo_render96_init, bhv_boo_render96_loop)
---id_bhvRender96BooInCastle = hook_render96_behavior(id_bhvBooInCastle, false, bhv_boo_render96_init, bhv_boo_render96_loop)
 id_bhvRender96BooWithCage = hook_render96_behavior(id_bhvBooWithCage, false, bhv_boo_render96_init, bhv_boo_render96_loop)
 id_bhvRender96BalconyBigBoo = hook_render96_behavior(id_bhvBalconyBigBoo, false, bhv_boo_render96_init, bhv_boo_render96_loop)
 id_bhvRender96MerryGoRoundBigBoo = hook_render96_behavior(id_bhvMerryGoRoundBigBoo, false, bhv_boo_render96_init, bhv_boo_render96_loop)
@@ -1595,9 +1581,6 @@ local function bhv_bubba_render96_loop(o)
 end
 
 id_bhvRender96Bubba = hook_render96_behavior(id_bhvBubba, false, bhv_bubba_render96_init, bhv_bubba_render96_loop)
-
-
-
 
 local function bhv_1up_render96_init(o)
     o.header.gfx.node.flags = o.header.gfx.node.flags & ~GRAPH_RENDER_BILLBOARD
@@ -1768,16 +1751,24 @@ local COLORS_BOBOMB = {
 }
 
 ---@param o Object
+local function bhv_bobomb_render96_init(o)
+    o.oColorR = 13
+    o.oColorG = 29
+    o.oColorB = 52
+end
+
+---@param o Object
 local function bhv_bobomb_render96_loop(o)
     if o.oBobombFuseTimer == 0 then 
-        o.oSwitchState1 = 1
-    else 
         o.oSwitchState1 = 0
+
+    else 
+        o.oSwitchState1 = 1
         r96lib.pulse_ramp(o, COLORS_BOBOMB, o.oBobombFuseTimer, 150)
     end
 end
 
-id_bhvRender96Bobomb = hook_render96_behavior(id_bhvBobomb, false, nil, bhv_bobomb_render96_loop, OBJ_LIST_DESTRUCTIVE)
+id_bhvRender96Bobomb = hook_render96_behavior(id_bhvBobomb, false, bhv_bobomb_render96_init, bhv_bobomb_render96_loop, OBJ_LIST_DESTRUCTIVE)
 
 local COLORS_KINGBOBOMB = {
     {r = 24, g = 24, b = 42},
@@ -1785,12 +1776,19 @@ local COLORS_KINGBOBOMB = {
 }
 
 ---@param o Object
+local function bhv_king_bobomb_render96_init(o)
+    o.oColorR = 24
+    o.oColorG = 24
+    o.oColorB = 42
+end
+
+---@param o Object
 local function bhv_king_bobomb_render96_loop(o)
     if o.oHealth == 2 then r96lib.pulse_rapid(o, COLORS_KINGBOBOMB, o.oTimer, 0.1) end
     if o.oHealth == 1 then r96lib.pulse_rapid(o, COLORS_KINGBOBOMB, o.oTimer, 0.3) end
 end
 
-id_bhvRender96KingBobomb = hook_render96_behavior(id_bhvKingBobomb, false, nil, bhv_king_bobomb_render96_loop, OBJ_LIST_GENACTOR)
+id_bhvRender96KingBobomb = hook_render96_behavior(id_bhvKingBobomb, false, bhv_king_bobomb_render96_init, bhv_king_bobomb_render96_loop, OBJ_LIST_GENACTOR)
 
 local COLORS_SCUTTLE = {
     {r = 0x40, g = 0x21, b = 0x3B},

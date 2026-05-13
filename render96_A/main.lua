@@ -4,13 +4,7 @@
 
 local UvScroll = require("/lib/uv-scroll")
 local r96lib = require("/lib/r96lib")
-
 local charSelect = _G.charSelect
-
-
-local function obj_beh_params2(o, val)
-    o.oBehParams2ndByte = val
-end
 
 -- Warps
 
@@ -52,21 +46,21 @@ r96lib.addSpawn(LEVEL_LLL, 1, E_MODEL_BLARGG_FRIENDLY, id_bhvRender96BlarggFrien
 r96lib.addSpawn(LEVEL_BBH, 1, E_MODEL_MR_I, id_bhvRender96MrI, -2369, -204,  5184, 0, 0, 0, false)
 r96lib.addSpawn(LEVEL_BBH, 1, E_MODEL_MR_I, id_bhvRender96MrI,   480,   10,  -653, 0, 0, 0, false)
 r96lib.addSpawn(LEVEL_BBH, 1, E_MODEL_MR_I, id_bhvRender96MrI,  1640,  840,  -733, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_BBH, 1, E_MODEL_MR_I, id_bhvRender96MrI,   923, 1741,  -332, 0, 0, 0, false, nil, function(o) obj_beh_params2(o, 0x05010000) end)
+r96lib.addSpawn(LEVEL_BBH, 1, E_MODEL_MR_I, id_bhvRender96MrI,   923, 1741,  -332, 0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 0x05010000 end)
 r96lib.addSpawn(LEVEL_LLL, 1, E_MODEL_MR_I, id_bhvRender96MrI, -3199,  307,  3456, 0, 0, 0, false)
 r96lib.addSpawn(LEVEL_LLL, 1, E_MODEL_MR_I, id_bhvRender96MrI,  6673,  154, -3060, 0, 0, 0, false)
 r96lib.addSpawn(LEVEL_HMC, 1, E_MODEL_MR_I, id_bhvRender96MrI,  4740, 1060,  4680, 0, 0, 0, false)
 r96lib.addSpawn(LEVEL_HMC, 1, E_MODEL_MR_I, id_bhvRender96MrI,  6700, 1020,  6820, 0, 0, 0, false)
 r96lib.addSpawn(LEVEL_BITS, 1, E_MODEL_MARTY, id_bhvThwomp,  -5247, -1330,  -787, 0, 0, 0, true, nil, function(o) o.oBehParams = 1 end)
 -- Extra
-r96lib.addSpawn(LEVEL_BOB,   1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, 7141,  2030,  -6711, 0, 0, 0, false, nil, function(o) obj_beh_params2(o, 0) end)
-r96lib.addSpawn(LEVEL_WF,    1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -356,  3584,  -21,   0, 0, 0, false, {2, 3, 4, 5, 6}, function(o) obj_beh_params2(o, 1) end)
-r96lib.addSpawn(LEVEL_JRB,   1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, 7134,  -3322, 2169,  0, 0, 0, false, {2}, function(o) obj_beh_params2(o, 2) end)
-r96lib.addSpawn(LEVEL_CCM,   2, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -5539, -4812, -6637, 0, 0, 0, false, nil, function(o) obj_beh_params2(o, 3) end)
-r96lib.addSpawn(LEVEL_BBH,   1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -1595, 2560,  1657,  0, 0, 0, false, nil, function(o) obj_beh_params2(o, 4) end)
-r96lib.addSpawn(LEVEL_SA,    1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -318,  -160,  -38,   0, 0, 0, false, nil, function(o) obj_beh_params2(o, 5) end)
-r96lib.addSpawn(LEVEL_PSS,   1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, 6094,  6144,  -4145, 0, 0, 0, false, nil, function(o) obj_beh_params2(o, 6) end)
-r96lib.addSpawn(LEVEL_BITDW, 1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -4560, 1126,  -179,  0, 0, 0, false, nil, function(o) obj_beh_params2(o, 7) end)
+r96lib.addSpawn(LEVEL_BOB,   1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, 7141,  2030,  -6711, 0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 0 end)
+r96lib.addSpawn(LEVEL_WF,    1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -356,  3584,  -21,   0, 0, 0, false, {2, 3, 4, 5, 6}, function(o) o.oBehParams2ndByte = 1 end)
+r96lib.addSpawn(LEVEL_JRB,   1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, 7134,  -3322, 2169,  0, 0, 0, false, {2}, function(o) o.oBehParams2ndByte = 2 end)
+r96lib.addSpawn(LEVEL_CCM,   2, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -5539, -4812, -6637, 0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 3 end)
+r96lib.addSpawn(LEVEL_BBH,   1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -1595, 2560,  1657,  0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 4 end)
+r96lib.addSpawn(LEVEL_SA,    1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -318,  -160,  -38,   0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 5 end)
+r96lib.addSpawn(LEVEL_PSS,   1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, 6094,  6144,  -4145, 0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 6 end)
+r96lib.addSpawn(LEVEL_BITDW, 1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -4560, 1126,  -179,  0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 7 end)
 
 -- Scroll the uvs to the right
 local function uv_scroll_right(input_vtx, original_uv, current_uv)
@@ -78,6 +72,21 @@ local function uv_scroll_right(input_vtx, original_uv, current_uv)
 end
 
 UvScroll.hook_scrolling_function('star_particle_001_displaylist_mesh_layer_5_tri_1', uv_scroll_right)
+
+local function entity_cleanup()
+local cloud = obj_get_nearest_object_with_behavior_id(gMarioStates[0].marioObj, id_bhvCloud)
+    if cloud ~= nil then
+        print(cloud.oPosX, cloud.oPosY, cloud.oPosZ)
+        obj_mark_for_deletion(cloud)
+    end
+    local mrI = obj_get_nearest_object_with_behavior_id(gMarioStates[0].marioObj, id_bhvMrI)
+    if mrI ~= nil then
+        --print(mrI.oPosX, mrI.oPosY, mrI.oPosZ)
+        obj_mark_for_deletion(mrI)
+    end
+end
+
+hook_event(HOOK_ON_OBJECT_LOAD, entity_cleanup)
 
 
 function wario_head_spawner()
@@ -115,18 +124,11 @@ hook_event(HOOK_MARIO_UPDATE, squishtest)
 local function mario_update(m)
    --if m.playerIndex ~= 0 then return end
    --if m.controller.buttonPressed & X_BUTTON ~= 0 then
-   -- spawn_non_sync_object(id_bhvRender96Star, E_MODEL_STAR, m.pos.x + 200, m.pos.y, m.pos.z, nil)
-   --   
+   -- spawn_non_sync_object(id_bhv1Up, E_MODEL_SPINY, m.pos.x + 200, m.pos.y, m.pos.z, nil)
    --end
    --if m.action == ACT_BACKFLIP then
-   --    warp_to_level(LEVEL_HMC, 1, 1)
+   --    warp_to_level(LEVEL_RR, 1, 1)
    --end
-    local mrI = obj_get_nearest_object_with_behavior_id(gMarioStates[0].marioObj, id_bhvMrI)
-    if mrI ~= nil then
-        --print(mrI.oPosX, mrI.oPosY, mrI.oPosZ)
-        obj_mark_for_deletion(mrI)
-        return
-    end
 end
 
 hook_event(HOOK_MARIO_UPDATE, mario_update)

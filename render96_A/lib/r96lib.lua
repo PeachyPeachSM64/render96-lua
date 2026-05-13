@@ -219,7 +219,6 @@ local function make_key(level, area, actNum, index)
 end
 
 local function on_level_init()
-    -- Clear spawn tracking on every level load so objects respawn fresh
     sSpawnedObjects = {}
     gfx_delete_all()
 end
@@ -391,41 +390,42 @@ function r96lib.gfxColorPatch(node, matStackIndex, opts)
     sGfxColorPatches[prefix] = true
 
     local id       = tostring(o._pointer)
-    local dl_name  = prefix .. "_dl_"  .. id
     local mat_name = prefix .. "_mat_" .. id
-
-    local gfx = gfx_get_from_name(dl_name)
-    if gfx == nil then
-        local orig = gfx_get_from_name(origDl)
-        local len  = gfx_get_length(orig)
-        gfx = gfx_create(dl_name, len)
-        gfx_copy(gfx, orig, len)
-    end
 
     local gfx_mat = gfx_get_from_name(mat_name)
     if gfx_mat == nil then
         local orig = gfx_get_from_name(origMat)
-        local len  = gfx_get_length(orig)
+        if orig == nil then return end
+        local len = gfx_get_length(orig)
         gfx_mat = gfx_create(mat_name, len)
         gfx_copy(gfx_mat, orig, len)
+
+        --print("original: " .. origMat)
+        --for i = 0, len - 1 do
+        --    local cmd = gfx_get_command(orig, i)
+        --    print(i, "op:", gfx_get_op(cmd), string.format("w0:0x%08X w1:0x%08X", cmd.w0, cmd.w1))
+        --end
+        --print("clone: " .. mat_name)
+        --for i = 0, len - 1 do
+        --    local cmd = gfx_get_command(gfx_mat, i)
+        --    print(i, "op:", gfx_get_op(cmd), string.format("w0:0x%08X w1:0x%08X", cmd.w0, cmd.w1))
+        --end
     end
 
     local cmd_prim = gfx_get_command(gfx_mat, primIndex)
     gfx_set_command(cmd_prim, "gsDPSetPrimColor(0, 0, %i, %i, %i, 255)",
         o.oColorR, o.oColorG, o.oColorB)
 
-    local cmd0 = gfx_get_command(gfx, 0)
-    gfx_set_command(cmd0, "gsSPDisplayList(%g)", gfx_mat)
-
-    cast_graph_node(node.next).displayList = gfx
+    local matdisplayList = cast_graph_node(node.next) ---@type GraphNodeDisplayList
+    if matdisplayList == nil or matdisplayList.displayList == nil then return end
+    local cmd_display_list = gfx_get_command(matdisplayList.displayList, 0)
+    gfx_set_command(cmd_display_list, "gsSPDisplayList(%g)", gfx_mat)
 end
 
 -- Internal: free all cloned GFX resources for a single object when it unloads.
 local function on_object_unload(o)
     local id = tostring(o._pointer)
     for prefix, _ in pairs(sGfxColorPatches) do
-        local dl  = gfx_get_from_name(prefix .. "_dl_"  .. id)
-        if dl  then gfx_delete(dl)  end
         local mat = gfx_get_from_name(prefix .. "_mat_" .. id)
         if mat then gfx_delete(mat) end
     end

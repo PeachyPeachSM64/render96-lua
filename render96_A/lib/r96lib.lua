@@ -383,7 +383,6 @@ function r96lib.gfxColorPatch(node, matStackIndex, opts)
     if o == nil then return end
 
     local prefix    = opts.prefix
-    local origDl    = opts.origDl
     local origMat   = opts.origMat
     local primIndex = opts.primIndex
 

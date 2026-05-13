@@ -112,7 +112,6 @@ function geo_switch_toad_vest(node, matStackIndex) cast_graph_node(node).selecte
 function geo_switch_tuxie_mother(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
 function geo_switch_bubba_body(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
 function geo_switch_whomp_king(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
-
 function geo_switch_bobomb_angry(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
 
 function geo_function_chuckya_spin(node, matStackIndex) 
@@ -648,6 +647,9 @@ local function bhv_thwomp_render96_init(o)
     o.oThwompPrevAction = o.oAction or 0
     o.oThwompSquishTimer = 0
     o.oThwompSquishDur = 0
+    if o.oBehParams == 1 then
+        obj_scale(o, 1.75)
+    end
     o.oThwompBaseScale = o.header.gfx.scale.x
 end
 
@@ -1798,7 +1800,7 @@ local COLORS_SCUTTLE = {
 
 ---@param o Object
 local function bhv_scuttlebug_render96_loop(o)
-    r96lib.pulse_ramp(o, COLORS_SCUTTLE, 50)
+    r96lib.pulse_cycle(o, COLORS_SCUTTLE, 50)
 end
 
 id_bhvRender96Scuttlebug = hook_render96_behavior(id_bhvScuttlebug, false, nil, bhv_scuttlebug_render96_loop, OBJ_LIST_SURFACE)

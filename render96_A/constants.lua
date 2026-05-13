@@ -24,7 +24,7 @@ ACT_WARIO_GROUND_POUND = allocate_mario_action(ACT_GROUP_AIRBORNE |ACT_FLAG_AIR 
 -- Models
 E_MODEL_GOOMBA_SSL = smlua_model_util_get_id("goomba_ssl_geo")
 E_MODEL_GOOMBA_BOXART = smlua_model_util_get_id("goomba_boxart_geo")
-
+E_MODEL_MARTY = smlua_model_util_get_id("marty_geo")
 E_MODEL_GOOMBA_UNDERGROUND = smlua_model_util_get_id("goomba_underground_geo")
 E_MODEL_KOOPA_QUICK_BOB = smlua_model_util_get_id("koopa_quick_bob_geo")
 E_MODEL_WHOMP_KING = smlua_model_util_get_id("whomp_king_geo")

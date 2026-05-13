@@ -261,6 +261,49 @@ function r96lib.addModelLevelOverride(bhv, model, level, area, acts)
     })
 end
 
+---@param o Object
+---@param colors table
+---@param framesPerColor number?
+function r96lib.pulse_cycle(o, colors, framesPerColor)
+    local frame = o.oTimer % (#colors * framesPerColor)
+    local i = math.floor(frame / framesPerColor) + 1
+    local c1, c2 = colors[i], colors[(i % #colors) + 1]
+    local t = (frame % framesPerColor) / framesPerColor
+    o.oColorR = math.lerp(c1.r, c2.r, t)
+    o.oColorG = math.lerp(c1.g, c2.g, t)
+    o.oColorB = math.lerp(c1.b, c2.b, t)
+end
+
+---@param o Object
+---@param colors table
+---@param t number
+---@param timeMax number?
+function r96lib.pulse_ramp(o, colors, t, timeMax)
+    local freq = 0.02 + (t / timeMax) * 0.3
+    local s = math.sin((t * freq) - math.pi * 0.5) * 0.5 + 0.5
+    local c1, c2 = colors[1], colors[2]
+    o.oColorR = math.lerp(c1.r, c2.r, s)
+    o.oColorG = math.lerp(c1.g, c2.g, s)
+    o.oColorB = math.lerp(c1.b, c2.b, s)
+    if t >= timeMax then
+        o.oColorR = c1.r
+        o.oColorG = c1.g
+        o.oColorB = c1.b
+    end
+end
+
+---@param o Object
+---@param colors table
+---@param t number
+---@param speed number?
+function r96lib.pulse_rapid(o, colors, t, speed)
+    local s = math.sin(t * speed) * 0.5 + 0.5
+    local c1, c2 = colors[1], colors[2]
+    o.oColorR = math.lerp(c1.r, c2.r, s)
+    o.oColorG = math.lerp(c1.g, c2.g, s)
+    o.oColorB = math.lerp(c1.b, c2.b, s)
+end
+
 local function update()
     -- Also update audio teehee
     update_obj_audio()
@@ -305,16 +348,21 @@ local function update()
             end
         end
     end
+end
 
+local function on_sync_valid()
+    local level  = networkPlayers[0].currLevelNum
+    local area   = networkPlayers[0].currAreaIndex
+    local actNum = networkPlayers[0].currActNum
     local entries = sSpawnTable[level] and sSpawnTable[level][area]
     if not entries then return end
-
     for i, entry in ipairs(entries) do
         if act_matches(entry.actMask, actNum) then
             local key = make_key(level, area, actNum, i)
             if not sSpawnedObjects[key] then
                 sSpawnedObjects[key] = true
-                spawn_non_sync_object(entry.bhv, entry.model,
+                local spawnFn = entry.isSync and spawn_sync_object or spawn_non_sync_object
+                spawnFn(entry.bhv, entry.model,
                     entry.x, entry.y, entry.z,
                     function(o)
                         obj_set_angle(o, entry.rx, entry.ry, entry.rz)
@@ -382,49 +430,7 @@ local function on_object_unload(o)
     end
 end
 
----@param o Object
----@param colors table
----@param framesPerColor number?
-function r96lib.pulse_cycle(o, colors, framesPerColor)
-    local frame = o.oTimer % (#colors * framesPerColor)
-    local i = math.floor(frame / framesPerColor) + 1
-    local c1, c2 = colors[i], colors[(i % #colors) + 1]
-    local t = (frame % framesPerColor) / framesPerColor
-    o.oColorR = math.lerp(c1.r, c2.r, t)
-    o.oColorG = math.lerp(c1.g, c2.g, t)
-    o.oColorB = math.lerp(c1.b, c2.b, t)
-end
-
----@param o Object
----@param colors table
----@param t number
----@param timeMax number?
-function r96lib.pulse_ramp(o, colors, t, timeMax)
-    local freq = 0.02 + (t / timeMax) * 0.3
-    local s = math.sin((t * freq) - math.pi * 0.5) * 0.5 + 0.5
-    local c1, c2 = colors[1], colors[2]
-    o.oColorR = math.lerp(c1.r, c2.r, s)
-    o.oColorG = math.lerp(c1.g, c2.g, s)
-    o.oColorB = math.lerp(c1.b, c2.b, s)
-    if t >= timeMax then
-        o.oColorR = c1.r
-        o.oColorG = c1.g
-        o.oColorB = c1.b
-    end
-end
-
----@param o Object
----@param colors table
----@param t number
----@param speed number?
-function r96lib.pulse_rapid(o, colors, t, speed)
-    local s = math.sin(t * speed) * 0.5 + 0.5
-    local c1, c2 = colors[1], colors[2]
-    o.oColorR = math.lerp(c1.r, c2.r, s)
-    o.oColorG = math.lerp(c1.g, c2.g, s)
-    o.oColorB = math.lerp(c1.b, c2.b, s)
-end
-
+hook_event(HOOK_ON_SYNC_VALID, on_sync_valid)
 hook_event(HOOK_ON_OBJECT_UNLOAD, on_object_unload)
 hook_event(HOOK_ON_LEVEL_INIT, on_level_init)
 hook_event(HOOK_UPDATE, update)

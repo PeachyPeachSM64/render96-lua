@@ -2,7 +2,6 @@
 -- description: A Mod Pack That Adds All Render96 Features To The Game
 -- author: \#ff3030\Render96DX Team
 
-local UvScroll = require("/lib/uv-scroll")
 local r96lib = require("/lib/r96lib")
 local charSelect = _G.charSelect
 
@@ -23,6 +22,7 @@ r96lib.addModelOverride(id_bhvRacingPenguin,       E_MODEL_PENGUIN_RACER)
 r96lib.addModelOverride(id_bhvSLWalkingPenguin,    E_MODEL_PENGUIN_SL)
 r96lib.addModelOverride(id_bhvFirePiranhaPlant,    E_MODEL_PIRANHA_PLANT_FIRE)
 r96lib.addModelOverride(id_bhvWhompKingBoss,       E_MODEL_WHOMP_KING)
+r96lib.addModelOverride(id_bhvSignOnWall,          E_MODEL_SIGN_ON_WALL)
 
 r96lib.addModelParamOverride(id_bhvKoopa, 0x01020000, E_MODEL_KOOPA_QUICK_BOB)
 r96lib.addModelParamOverride(id_bhvKoopa, 0x02030000, E_MODEL_KOOPA_QUICK_BOB)
@@ -34,24 +34,25 @@ r96lib.addModelLevelOverride(id_bhvGoomba, E_MODEL_GOOMBA_BOXART, LEVEL_BITFS, 1
 r96lib.addModelLevelOverride(id_bhvGoomba, E_MODEL_GOOMBA_BOXART, LEVEL_BITS, 1, nil)
 
 -- Enemies
-r96lib.addSpawn(LEVEL_LLL, 1, E_MODEL_BLARGG, id_bhvRender96Blargg, -6766, 0,  3033, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_LLL, 1, E_MODEL_BLARGG, id_bhvRender96Blargg, -6018, 0, -5512, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_LLL, 1, E_MODEL_BLARGG, id_bhvRender96Blargg, -2151, 0, -5254, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_LLL, 1, E_MODEL_BLARGG, id_bhvRender96Blargg,  2012, 0, -3440, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_LLL, 1, E_MODEL_BLARGG, id_bhvRender96Blargg,  7408, 0, -4223, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_LLL, 1, E_MODEL_BLARGG, id_bhvRender96Blargg,  6318, 0,   752, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_LLL, 1, E_MODEL_BLARGG, id_bhvRender96Blargg,  5647, 0,  3426, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_LLL, 1, E_MODEL_BLARGG, id_bhvRender96Blargg, -5315, 0,  7493, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_LLL, 1, E_MODEL_BLARGG_FRIENDLY, id_bhvRender96BlarggFriendly, -2070, 0, 6177, 0, 0, 0, 0, {5, 6})
-r96lib.addSpawn(LEVEL_BBH, 1, E_MODEL_MR_I, id_bhvRender96MrI, -2369, -204,  5184, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_BBH, 1, E_MODEL_MR_I, id_bhvRender96MrI,   480,   10,  -653, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_BBH, 1, E_MODEL_MR_I, id_bhvRender96MrI,  1640,  840,  -733, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_BBH, 1, E_MODEL_MR_I, id_bhvRender96MrI,   923, 1741,  -332, 0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 0x05010000 end)
-r96lib.addSpawn(LEVEL_LLL, 1, E_MODEL_MR_I, id_bhvRender96MrI, -3199,  307,  3456, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_LLL, 1, E_MODEL_MR_I, id_bhvRender96MrI,  6673,  154, -3060, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_HMC, 1, E_MODEL_MR_I, id_bhvRender96MrI,  4740, 1060,  4680, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_HMC, 1, E_MODEL_MR_I, id_bhvRender96MrI,  6700, 1020,  6820, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_BITS, 1, E_MODEL_MARTY, id_bhvThwomp,  -5247, -1330,  -787, 0, 0, 0, true, nil, function(o) o.oBehParams = 1 end)
+r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_BLARGG, id_bhvRender96Blargg, -6766, 0,  3033, 0, 0, 0, false)
+r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_BLARGG, id_bhvRender96Blargg, -6018, 0, -5512, 0, 0, 0, false)
+r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_BLARGG, id_bhvRender96Blargg, -2151, 0, -5254, 0, 0, 0, false)
+r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_BLARGG, id_bhvRender96Blargg,  2012, 0, -3440, 0, 0, 0, false)
+r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_BLARGG, id_bhvRender96Blargg,  7408, 0, -4223, 0, 0, 0, false)
+r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_BLARGG, id_bhvRender96Blargg,  6318, 0,   752, 0, 0, 0, false)
+r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_BLARGG, id_bhvRender96Blargg,  5647, 0,  3426, 0, 0, 0, false)
+r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_BLARGG, id_bhvRender96Blargg, -5315, 0,  7493, 0, 0, 0, false)
+r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_BLARGG_FRIENDLY, id_bhvRender96BlarggFriendly, -2070, 0, 6177, 0, 0, 0, 0, {5, 6})
+r96lib.addSpawn(LEVEL_BBH,  1, E_MODEL_MR_I, id_bhvRender96MrI, -2369, -204,  5184, 0, 0, 0, false)
+r96lib.addSpawn(LEVEL_BBH,  1, E_MODEL_MR_I, id_bhvRender96MrI,   480,   10,  -653, 0, 0, 0, false)
+r96lib.addSpawn(LEVEL_BBH,  1, E_MODEL_MR_I, id_bhvRender96MrI,  1640,  840,  -733, 0, 0, 0, false)
+r96lib.addSpawn(LEVEL_BBH,  1, E_MODEL_MR_I, id_bhvRender96MrI,   923, 1741,  -332, 0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 0x05010000 end)
+r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_MR_I, id_bhvRender96MrI, -3199,  307,  3456, 0, 0, 0, false)
+r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_MR_I, id_bhvRender96MrI,  6673,  154, -3060, 0, 0, 0, false)
+r96lib.addSpawn(LEVEL_HMC,  1, E_MODEL_MR_I, id_bhvRender96MrI,  4740, 1060,  4680, 0, 0, 0, false)
+r96lib.addSpawn(LEVEL_HMC,  1, E_MODEL_MR_I, id_bhvRender96MrI,  6700, 1020,  6820, 0, 0, 0, false)
+r96lib.addSpawn(LEVEL_BITS, 1, E_MODEL_MARTY, id_bhvThwomp,     -5247, -1330,  -787, 0, 0, 0, true, nil, function(o) o.oBehParams = 1 end)
+
 -- Extra
 r96lib.addSpawn(LEVEL_BOB,   1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, 7141,  2030,  -6711, 0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 0 end)
 r96lib.addSpawn(LEVEL_WF,    1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -356,  3584,  -21,   0, 0, 0, false, {2, 3, 4, 5, 6}, function(o) o.oBehParams2ndByte = 1 end)
@@ -61,17 +62,6 @@ r96lib.addSpawn(LEVEL_BBH,   1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -1595, 2560,
 r96lib.addSpawn(LEVEL_SA,    1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -318,  -160,  -38,   0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 5 end)
 r96lib.addSpawn(LEVEL_PSS,   1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, 6094,  6144,  -4145, 0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 6 end)
 r96lib.addSpawn(LEVEL_BITDW, 1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -4560, 1126,  -179,  0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 7 end)
-
--- Scroll the uvs to the right
-local function uv_scroll_right(input_vtx, original_uv, current_uv)
-    -- adjustable constants
-    local speed = 10
-
-    -- move the UVs to the right
-    current_uv[1] = current_uv[1] + speed
-end
-
-UvScroll.hook_scrolling_function('star_particle_001_displaylist_mesh_layer_5_tri_1', uv_scroll_right)
 
 local function entity_cleanup()
 local cloud = obj_get_nearest_object_with_behavior_id(gMarioStates[0].marioObj, id_bhvCloud)
@@ -87,7 +77,6 @@ local cloud = obj_get_nearest_object_with_behavior_id(gMarioStates[0].marioObj, 
 end
 
 hook_event(HOOK_ON_OBJECT_LOAD, entity_cleanup)
-
 
 function wario_head_spawner()
     local levelNum = gNetworkPlayers[0].currLevelNum

@@ -375,10 +375,9 @@ end
 
 local sGfxColorPatches = {}
 
----@param node       GraphNode
----@param matStackIndex number
+---@param node GraphNode
 ---@param opts table
-function r96lib.gfxColorPatch(node, matStackIndex, opts)
+function r96lib.gfxColorPatch(node, opts)
     local o = geo_get_current_object()
     if o == nil then return end
 
@@ -421,12 +420,171 @@ function r96lib.gfxColorPatch(node, matStackIndex, opts)
     gfx_set_command(cmd_display_list, "gsSPDisplayList(%g)", gfx_mat)
 end
 
+---@param opts table
+function r96lib.gfxColorPatchBowserRainbow(opts)
+    local o = geo_get_current_object()
+    if o == nil then return end
+
+    local prefix = opts.prefix
+    sGfxColorPatches[prefix] = true
+
+    local id = tostring(o._pointer)
+
+    for _, matEntry in ipairs(opts.materials) do
+        local origMat    = matEntry.origMat
+        local primIndex = matEntry.primIndex
+        local dlEntries  = matEntry.dls
+
+        local mat_name = prefix .. "_mat_" .. origMat .. "_" .. id
+        local gfx_mat = gfx_get_from_name(mat_name)
+        if gfx_mat == nil then
+            local orig = gfx_get_from_name(origMat)
+            local len = gfx_get_length(orig)
+            gfx_mat = gfx_create(mat_name, len)
+            gfx_copy(gfx_mat, orig, len)
+
+            print("original: " .. origMat)
+            for i = 0, len - 1 do
+                local cmd = gfx_get_command(orig, i)
+                print(i, "op:", gfx_get_op(cmd), string.format("w0:0x%08X w1:0x%08X", cmd.w0, cmd.w1))
+            end
+            print("clone: " .. mat_name)
+            for i = 0, len - 1 do
+                local cmd = gfx_get_command(gfx_mat, i)
+                print(i, "op:", gfx_get_op(cmd), string.format("w0:0x%08X w1:0x%08X", cmd.w0, cmd.w1))
+            end
+        end
+
+        local cmd_prim = gfx_get_command(gfx_mat, primIndex)
+        gfx_set_command(cmd_prim, "gsDPSetPrimColor(0, 0, %i, %i, %i, 255)",
+            o.oColorR, o.oColorG, o.oColorB)
+
+        -- Redirect all DLs that use this material
+        for _, dlEntry in ipairs(dlEntries) do
+            local dl_name  = dlEntry.name
+            local cmdIndexes = dlEntry.cmdIndexes
+
+            local gfx = gfx_get_from_name(dl_name)
+
+            for _, cmdIndex in ipairs(cmdIndexes) do
+                local cmd = gfx_get_command(gfx, cmdIndex)
+                gfx_set_command(cmd, "gsSPDisplayList(%g)", gfx_mat)
+            end
+        end
+    end
+end
+
 -- Internal: free all cloned GFX resources for a single object when it unloads.
 local function on_object_unload(o)
     local id = tostring(o._pointer)
     for prefix, _ in pairs(sGfxColorPatches) do
         local mat = gfx_get_from_name(prefix .. "_mat_" .. id)
         if mat then gfx_delete(mat) end
+    end
+end
+
+
+---@param o Object
+---@param opts table
+local function npcThrownDeath(o, opts)
+    spawn_mist_particles()
+    obj_spawn_yellow_coins(o, o.oNumLootCoins)
+    create_sound_spawner(SOUND_OBJ_STOMPED)
+    if opts.audio then
+        audio_stream_stop(opts.audio)
+    end
+    o.activeFlags = ACTIVE_FLAG_DEACTIVATED
+    obj_mark_for_deletion(o)
+end
+
+local function npcThrownPhysics(o, opts)
+    cur_obj_update_floor_and_walls()
+    cur_obj_move_standard(-78)
+
+    local interactions = opts.interactions or nil
+    if interactions ~= nil then
+        interactions:process_interactions(o)
+    end
+    local enemy = opts.enemy or false
+    if enemy == true then
+        o.oGravity    = opts.gravity    or -2.5
+        o.oFriction   = opts.friction   or 0.99
+        o.oBuoyancy   = opts.buoyancy   or 1.4
+        o.oForwardVel = opts.forwardVel or 40.0
+
+        if (o.oMoveFlags & OBJ_MOVE_LANDED)        ~= 0
+        or (o.oMoveFlags & OBJ_MOVE_HIT_WALL)      ~= 0
+        or (o.oMoveFlags & OBJ_MOVE_MASK_IN_WATER) ~= 0 then
+            npcThrownDeath(o, opts)
+            return
+        end
+
+        if (o.oMoveFlags & OBJ_MOVE_ABOVE_LAVA) ~= 0 then
+            o.activeFlags = ACTIVE_FLAG_DEACTIVATED
+            obj_mark_for_deletion(o)
+            return
+        end
+        if opts.audio then
+            r96lib.audio_fade(o, opts.audio, nil, nil, false)
+        end
+    end
+
+    if enemy == false then
+        spawn_non_sync_object(id_bhvSparkleSpawn, E_MODEL_NONE, o.oPosX, o.oPosY, o.oPosZ, nil)
+        o.oFaceAngleYaw = o.oFaceAngleYaw + 0x1000
+        o.oGravity = -2.5
+        o.oFriction = 0.99
+        o.oBuoyancy = 1.4
+
+        if o.oTimer < 150 then o.oForwardVel = 50.0
+        elseif o.oTimer < 300 and o.oTimer > 150 then o.oForwardVel = 35.0
+        elseif o.oTimer < 450 and o.oTimer > 300 then o.oForwardVel = 20.0
+        elseif o.oTimer >= 550 then o.oForwardVel = 0.0 end
+
+        if (o.oMoveFlags & OBJ_MOVE_HIT_EDGE) ~= 0 or o.oMoveFlags & OBJ_MOVE_HIT_WALL ~= 0 then
+            o.oMoveAngleYaw = obj_angle_to_object(o, nearest_player_to_object(o))
+            return
+        end
+
+        if opts.audio and o.oForwardVel > 5 then
+            r96lib.audio_fade(o, opts.audio, nil, nil, false)
+        end
+    end
+end
+
+local function npcHeld(o)
+    if o.oHeldState == HELD_HELD then
+        o.header.gfx.node.flags = o.header.gfx.node.flags | GRAPH_RENDER_INVISIBLE
+        cur_obj_become_intangible()
+    elseif o.oHeldState == HELD_THROWN then
+        cur_obj_become_tangible()
+        o.header.gfx.node.flags = o.header.gfx.node.flags & ~GRAPH_RENDER_INVISIBLE
+        o.oVelY = 20.0
+        o.oHeldState = HELD_FREE
+    end
+end
+
+function r96lib.npcGrabHandler(o, opts)
+    npcHeld(o)
+
+    if m.heldObj == o then
+        o.oHeldState = HELD_HELD
+        o.oAction = 50
+    end
+
+    if m.heldObj ~= o and o.oAction == 50 and o.oHeldState == HELD_HELD then
+        o.oHeldState = HELD_THROWN
+        o.oTimer = 0
+    end
+
+    if m.heldObj ~= o and o.oAction == 50 and o.oHeldState == HELD_FREE then
+        npcThrownPhysics(o, opts)
+        return
+    end
+
+    if (m.action == ACT_HOLD_WATER_IDLE or m.action == ACT_HOLD_WATER_ACTION_END)
+    and m.heldObj == o then
+        mario_drop_held_object(m)
     end
 end
 

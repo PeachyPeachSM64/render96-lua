@@ -1,5 +1,6 @@
 local o2oint = require("lib/o2oint")
 local r96lib = require("/lib/r96lib")
+local UvScroll = require("/lib/uv-scroll")
 require("constants")
 
 ---@param id BehaviorId|number
@@ -134,8 +135,49 @@ function geo_function_scuttle_body(node, matStackIndex)
     return
 end
 
+function geo_function_eyerok(node, matStackIndex) 
+    local o = geo_get_current_object()
+    if o == nil then return end
+    
+    local model = obj_get_model_id_extended(o)
+
+    local player = nearest_player_to_object(o)
+    if player == nil then return end
+
+    local rotN = cast_graph_node(node.next) ---@type GraphNodeRotation
+
+    -- Get the angle from object to player
+    local angleToPlayerYaw   = obj_angle_to_object(o, player)
+    local angleToPlayerPitch = obj_pitch_to_object(o, player)
+
+    local limitYaw   = 0x2000 -- 45 degrees
+    local limitPitch = 0x2000 -- ~22 degrees
+
+    -- Calculate yaw relative to object's current facing
+    local yaw = angleToPlayerYaw - o.oFaceAngleYaw
+    -- Normalize to -32768..32767
+    if yaw >  32767 then yaw = yaw - 65536 end
+    if yaw < -32768 then yaw = yaw + 65536 end
+
+    local pitch = angleToPlayerPitch
+    if pitch >  32767 then pitch = pitch - 65536 end
+    if pitch < -32768 then pitch = pitch + 65536 end
+
+    yaw = math.max(-limitYaw, math.min(limitYaw, yaw))
+    pitch = math.max(-limitPitch, math.min(limitPitch, pitch))
+
+        -- Mirror if left hand
+    if model == E_MODEL_EYEROK_LEFT_HAND then
+        yaw = -yaw
+    end
+
+    rotN.rotation.x = yaw   & 0xFFFF
+    rotN.rotation.y = 0
+    rotN.rotation.z = pitch & 0xFFFF
+end
+
 function geo_function_kingbob_pulse(node, matStackIndex)
-    r96lib.gfxColorPatch(node, matStackIndex, {
+    r96lib.gfxColorPatch(node, {
         prefix    = "kingbob",
         origDl    = "king_bobomb_004_offset_mesh_layer_1",
         origMat   = "mat_king_bobomb_king_bobomb_body",
@@ -144,7 +186,7 @@ function geo_function_kingbob_pulse(node, matStackIndex)
 end
 
 function geo_function_scuttle_body_color(node, matStackIndex)
-    r96lib.gfxColorPatch(node, matStackIndex, {
+    r96lib.gfxColorPatch(node, {
         prefix    = "scuttle",
         origDl    = "scuttlebug_scuttle_body_dl_mesh_layer_1",
         origMat   = "mat_scuttlebug_scuttlebug_body",
@@ -153,13 +195,87 @@ function geo_function_scuttle_body_color(node, matStackIndex)
 end
 
 function geo_function_bobomb_angry(node, matStackIndex)
-    r96lib.gfxColorPatch(node, matStackIndex, {
+    r96lib.gfxColorPatch(node, {
         prefix    = "bobomb_angry",
         origDl    = "black_bobomb_body_mesh_layer_1_mat_override_bobomb_blue2_0",
         origMat   = "mat_black_bobomb_bobomb_blue2",
         primIndex = 8,
     })
 end
+
+function geo_function_bowser_color(node, matStackIndex)
+
+    r96lib.gfxColorPatchBowserRainbow({
+        prefix = "bowser",
+        materials = {
+            {
+                origMat     = "mat_bowser_mouth",
+                primIndex = 7,
+                dls = {
+                    { name = "bowser_head_mesh_layer_1", cmdIndexes = {3} },
+                    { name = "bowser_jaw_skinned_mesh_layer_1", cmdIndexes = {0} },
+                    { name = "bowser_jaw_mesh_layer_1", cmdIndexes = {0, 6} },
+                    { name = "bowser_jaw_lower_skinned_mesh_layer_1", cmdIndexes = {0}},
+                    { name = "bowser_jaw_lower_mesh_layer_1", cmdIndexes = {0, 7}},
+                },
+            },
+        },
+    })
+end
+
+function geo_function_bowser_tail(node, matStackIndex)
+
+end
+
+
+function geo_function_bowser_hair(node, matStackIndex)
+
+end
+
+function geo_function_bowser_right_hand(node, matStackIndex)
+
+end
+
+function geo_function_bowser_left_hand(node, matStackIndex)
+
+end
+
+-- Scroll the uvs to the right
+local function uv_scroll_right(input_vtx, original_uv, current_uv)
+    -- adjustable constants
+    local speed = 10
+
+    -- move the UVs to the right
+    current_uv[1] = current_uv[1] + speed
+end
+
+UvScroll.hook_scrolling_function('star_particle_001_displaylist_mesh_layer_5_tri_1', uv_scroll_right)
+
+-- Scroll the uvs in a circular motion
+local function uv_scroll_spin(input_vtx, original_uv, current_uv)
+    local speed    = 1
+    local center_u = 500 -- center of rotation in UV space
+    local center_v = 500
+    local offset_u = 0   -- post-rotation translation (right/left)
+    local offset_v = 0   -- post-rotation translation (up/down)
+
+    -- offset from chosen center
+    local rel_u = original_uv[1] - center_u
+    local rel_v = original_uv[2] - center_v
+
+    -- equation for circular motion
+    local t          = get_global_timer() * speed
+    local orig_theta = math.atan2(rel_v, rel_u)
+    local orig_dist  = math.sqrt(rel_u * rel_u + rel_v * rel_v)
+
+    current_uv[1] = center_u + orig_dist * math.cos(orig_theta + t) + offset_u
+    current_uv[2] = center_v + orig_dist * math.sin(orig_theta + t) + offset_v
+end
+
+UvScroll.hook_scrolling_function('goomba_eyes_dazed_switch_eyes_dazed_mesh_layer_1_tri_1', uv_scroll_spin)
+UvScroll.hook_scrolling_function('goomba_underground_eyes_dazed_switch_eyes_dazed_mesh_layer_1_tri_1', uv_scroll_spin)
+UvScroll.hook_scrolling_function('goomba_boxart_eyes_dazed_switch_eyes_dazed_mesh_layer_1_tri_2', uv_scroll_spin)
+
 
 ---@param o Object
 local function bhv_blargg_render96_init(o)
@@ -420,49 +536,16 @@ local function bhv_goomba_render96_death(o)
     spawn_mist_particles()
     obj_spawn_yellow_coins(o, o.oNumLootCoins)
     create_sound_spawner(SOUND_OBJ_STOMPED)
-    audio_stream_stop(GOOMBA_SCREAM)
     o.activeFlags = ACTIVE_FLAG_DEACTIVATED
     obj_mark_for_deletion(o)
 end
 
----@param o Object
-local function bhv_goomba_render96_throw_physics(o)
-    cur_obj_update_floor_and_walls()
-    cur_obj_move_standard(-78)
-    sThrownInteractions:process_interactions(o)
-    o.oSwitchState2 = GOOMBA_FACE_OPEN
-    o.oSwitchState1 = GOOMBA_EYE_DAZED
-    o.oGravity = -2.5
-    o.oFriction = 0.99
-    o.oBuoyancy = 1.4
-    o.oForwardVel = 40.0
-    if (o.oMoveFlags & OBJ_MOVE_LANDED) ~= 0 or (o.oMoveFlags & OBJ_MOVE_HIT_WALL) ~= 0 or (o.oMoveFlags & OBJ_MOVE_MASK_IN_WATER) ~= 0 then 
-        bhv_goomba_render96_death(o) return end
+local GOOMBA_OPTS = {
+    audio = GOOMBA_SCREAM,
+    interactions = sThrownInteractions,
+    enemy = true
+}
 
-    if (o.oMoveFlags & OBJ_MOVE_ABOVE_LAVA) ~= 0 then
-        o.activeFlags = ACTIVE_FLAG_DEACTIVATED
-        obj_mark_for_deletion(o)
-        return
-    end
-    r96lib.audio_fade(o, GOOMBA_SCREAM, nil, nil, false)
-end
-
----@param o Object
-local function bhv_goomba_render96_held(o)
-    if o.oHeldState == HELD_HELD then
-        o.oSwitchState2 = GOOMBA_FACE_OPEN
-        o.oSwitchState1 = GOOMBA_EYE_DAZED
-        o.header.gfx.node.flags = o.header.gfx.node.flags | GRAPH_RENDER_INVISIBLE
-        cur_obj_become_intangible()
-    elseif o.oHeldState == HELD_THROWN then
-        cur_obj_become_tangible()
-        o.header.gfx.node.flags = o.header.gfx.node.flags & ~GRAPH_RENDER_INVISIBLE
-        o.oVelY = 20.0
-        o.oHeldState = HELD_FREE
-    end
-end
-
----@param o Object
 local function bhv_goomba_render96_loop(o)
     o.oSwitchTimer1 = o.oSwitchTimer1 - 1
     if o.oSwitchTimer1 <= 0 then
@@ -521,7 +604,14 @@ local function bhv_goomba_render96_loop(o)
                 o.oAction = GOOMBA_ACT_GRAB
             end
         end
-    
+        
+        r96lib.npcGrabHandler(o, GOOMBA_OPTS)
+
+        if o.oHeldState == HELD_HELD then
+            o.oSwitchState2 = GOOMBA_FACE_OPEN
+            o.oSwitchState1 = GOOMBA_EYE_DAZED
+        end
+
         --If not picked up after some time, go back to walking
         if (o.oHeldState == HELD_FREE and o.oAction == GOOMBA_ACT_STUN and o.oTimer > 150) then
             o.oInteractType = INTERACT_BOUNCE_TOP;
@@ -531,78 +621,22 @@ local function bhv_goomba_render96_loop(o)
             cur_obj_init_animation_with_accel_and_sound(0, 1) 
             return
         end
-    
-        bhv_goomba_render96_held(o)
-    
-        if m.heldObj ~= o and o.oAction == GOOMBA_ACT_GRAB and o.oHeldState == HELD_FREE then bhv_goomba_render96_throw_physics(o) end
-        if m.heldObj ~= o and o.oAction == GOOMBA_ACT_GRAB and o.oHeldState == HELD_HELD then o.oHeldState = HELD_THROWN end
-        if m.heldObj == o then o.oHeldState = HELD_HELD end
-        if (m.action == ACT_HOLD_WATER_IDLE or m.action == ACT_HOLD_WATER_ACTION_END) and m.heldObj == o then mario_drop_held_object(m) end
-    end
-    if get_character(m).type ~= CT_WARIO then
-        if o.oAction == OBJ_ACT_SQUISHED then 
-            o.oSwitchState2 = GOOMBA_FACE_CLOSE
-            o.oSwitchState1 = GOOMBA_EYE_CLOSE
-            cur_obj_init_animation_with_accel_and_sound(0, 0) end
     end
 end
 
 id_bhvRender96Goomba = hook_render96_behavior(id_bhvGoomba, false, bhv_goomba_render96_init, bhv_goomba_render96_loop)
 
----@param o Object
-local function bhv_koopa_shell_render96_throw_physics(o)
-    cur_obj_update_floor_and_walls()
-    cur_obj_move_standard(-78)
-    sThrownInteractions:process_interactions(o)
-
-    spawn_non_sync_object(id_bhvSparkleSpawn, E_MODEL_NONE, o.oPosX, o.oPosY, o.oPosZ, nil)
-
-    o.oFaceAngleYaw = o.oFaceAngleYaw + 0x1000
-    o.oGravity = -2.5
-    o.oFriction = 0.99
-    o.oBuoyancy = 1.4
-
-    if o.oTimer < 150 then o.oForwardVel = 50.0
-    elseif o.oTimer < 300 and o.oTimer > 150 then o.oForwardVel = 35.0
-    elseif o.oTimer < 450 and o.oTimer > 300 then o.oForwardVel = 20.0
-    elseif o.oTimer >= 550 then o.oForwardVel = 0.0 end
-
-    if (o.oMoveFlags & OBJ_MOVE_HIT_EDGE) ~= 0 or o.oMoveFlags & OBJ_MOVE_HIT_WALL ~= 0 then
-        o.oMoveAngleYaw = obj_angle_to_object(o, nearest_player_to_object(o))
-        return
-    end
-    
-    if (o.oMoveFlags & OBJ_MOVE_ABOVE_LAVA) ~= 0 then
-        o.activeFlags = ACTIVE_FLAG_DEACTIVATED
-        obj_mark_for_deletion(o)
-        return
-    end
-end
-
----@param o Object
-local function bhv_koopa_shell_render96_held(o)
-    if o.oHeldState == HELD_HELD then
-        o.header.gfx.node.flags = o.header.gfx.node.flags | GRAPH_RENDER_INVISIBLE
-        cur_obj_become_intangible()
-        o.oTimer = 0
-        if gMarioStates[0].heldObj ~= nil then
-            spawn_non_sync_object(id_bhvSparkleSpawn, E_MODEL_NONE, gMarioStates[0].marioObj.oPosX, gMarioStates[0].marioObj.oPosY + 100, gMarioStates[0].marioObj.oPosZ, nil)
-        end
-    elseif o.oHeldState == HELD_THROWN then
-        cur_obj_become_tangible()
-        o.header.gfx.node.flags = o.header.gfx.node.flags & ~GRAPH_RENDER_INVISIBLE
-        o.oVelY = 20.0
-        o.oHeldState = HELD_FREE
-    end
-end
+local SHELL_OPTS = {
+    audio = SHELL_THROW,
+    interactions = sThrownInteractions,
+}
 
 ---@param o Object
 local function bhv_koopa_shell_render96_loop(o)
     if get_character(m).type == CT_WARIO then
         o.oInteractType = INTERACT_GRABBABLE
         if mario_check_object_grab(m) ~= 0 and (m.heldObj == nil) then
-            --mario_grab_used_object(m)
-            o.oAction = KOOPA_SHELL_ACT_GRAB
+            o.oAction = 50
         end
     
         koopa = obj_get_nearest_object_with_behavior_id(o, id_bhvKoopa)
@@ -613,13 +647,17 @@ local function bhv_koopa_shell_render96_loop(o)
             koopa.activeFlags = ACTIVE_FLAG_DEACTIVATED
             obj_mark_for_deletion(koopa)
         end
-    
-        bhv_koopa_shell_render96_held(o)
 
-        if m.heldObj ~= o and o.oAction == KOOPA_SHELL_ACT_GRAB and o.oHeldState == HELD_FREE then bhv_koopa_shell_render96_throw_physics(o) end
-        if m.heldObj ~= o and o.oAction == KOOPA_SHELL_ACT_GRAB and o.oHeldState == HELD_HELD then o.oHeldState = HELD_THROWN end
-        if m.heldObj == o then o.oHeldState = HELD_HELD end
+        r96lib.npcGrabHandler(o, SHELL_OPTS)
+
+        if o.oHeldState == HELD_HELD then
+            if gMarioStates[0].heldObj ~= nil then
+                spawn_non_sync_object(id_bhvSparkleSpawn, E_MODEL_NONE, gMarioStates[0].marioObj.oPosX, gMarioStates[0].marioObj.oPosY + 100, gMarioStates[0].marioObj.oPosZ, nil)
+            end
+        end
+    
         if o.oHeldState == HELD_FREE and (m.action == ACT_WARIO_CHARGE or m.action == ACT_JUMP_KICK) and dist_between_objects(o, m.marioObj) <= 200 then
+            o.oAction = 50
             o.oMoveAngleYaw = m.faceAngle.y
             o.oForwardVel = 50.0
             o.oVelY = 20.0
@@ -651,6 +689,7 @@ local function bhv_thwomp_render96_init(o)
         obj_scale(o, 1.75)
     end
     o.oThwompBaseScale = o.header.gfx.scale.x
+    o.collisionData = smlua_collision_util_get("thwomp_collision")
 end
 
 ---@param o Object
@@ -1802,3 +1841,10 @@ local function bhv_scuttlebug_render96_loop(o)
 end
 
 id_bhvRender96Scuttlebug = hook_render96_behavior(id_bhvScuttlebug, false, nil, bhv_scuttlebug_render96_loop, OBJ_LIST_SURFACE)
+
+---@param o Object
+local function bhv_bowser_render96_loop(o)
+    r96lib.pulse_cycle(o, COLORS_BOBOMB, 50)
+end
+
+id_bhvRender96Bowser = hook_render96_behavior(id_bhvBowser, false, nil, bhv_bowser_render96_loop, OBJ_LIST_GENACTOR)

@@ -54,6 +54,7 @@ E_MODEL_WARP_PIPE_BOO_GREEN_LOCKED = smlua_model_util_get_id("warp_pipe_boo_gree
 E_MODEL_WARP_PIPE_BOO_GREEN_UNLOCKED = smlua_model_util_get_id("warp_pipe_boo_green_unlocked_geo")
 E_MODEL_WARP_PIPE_BOO_YELLOW_LOCKED = smlua_model_util_get_id("warp_pipe_boo_yellow_locked_geo")
 E_MODEL_WARP_PIPE_BOO_YELLOW_UNLOCKED = smlua_model_util_get_id("warp_pipe_boo_yellow_unlocked_geo")
+E_MODEL_SIGN_ON_WALL = smlua_model_util_get_id("sign_on_wall_geo")
 
 -- Levels
 LEVEL_INNER_WORKINGS = level_register("level_inner_workings_entry", COURSE_NONE, "Inner Workings", "inner_workings", 28000, 0x28, 0x28, 0x28)
@@ -77,6 +78,7 @@ BOO_PIPE_RED = audio_stream_load("event_mario_musicbox.mp3")
 BOO_PIPE_GREEN = audio_stream_load("event_luigi_musicbox.mp3")
 BOO_PIPE_YELLOW = audio_stream_load("event_wario_musicbox.mp3")
 GOOMBA_SCREAM = audio_stream_load("event_goomba_scream.mp3")
+SHELL_THROW = audio_stream_load("event_shell_thrown.ogg")
 
 -- oAction states
 GOOMBA_ACT_STUN = 3

@@ -333,7 +333,7 @@ UvScroll.hook_scrolling_function('star_particle_001_displaylist_mesh_layer_5_tri
 
 -- Scroll the uvs in a circular motion
 local function uv_scroll_spin(input_vtx, original_uv, current_uv)
-    local speed    = 1
+    local speed    = 0.5
     local center_u = 500 -- center of rotation in UV space
     local center_v = 500
     local offset_u = 0   -- post-rotation translation (right/left)
@@ -638,22 +638,12 @@ local function bhv_goomba_render96_loop(o)
         end
     end
 
-    o.oSwitchTimer2 = o.oSwitchTimer2 - 1
-    if o.oSwitchTimer2 <= 0 then
-        if o.oSwitchState2 == GOOMBA_FACE_CLOSE then
-            o.oSwitchState2 = GOOMBA_FACE_OPEN
-            o.oSwitchTimer2 = math.random(10, 15)
-        else
-            o.oSwitchState2 = GOOMBA_FACE_CLOSE
-            o.oSwitchTimer2 = math.random(30, 100)
-        end
-    end
-
+    o.oSwitchState2 = GOOMBA_FACE_CLOSE
+    
     if o.oAction == GOOMBA_ACT_JUMP then
         o.oSwitchState1 = GOOMBA_EYE_OPEN
         o.oSwitchTimer1 = 0
-        o.oSwitchState2 = GOOMBA_FACE_CLOSE
-        o.oSwitchTimer2 = 0
+        o.oSwitchState2 = GOOMBA_FACE_OPEN
     end
 
     if get_character(m).type == CT_WARIO then
@@ -1963,7 +1953,6 @@ id_bhvRender96Tree = hook_render96_behavior(id_bhvTree, false, nil, bhv_tree_ren
 ---@param o Object
 local function bhv_cloudpart_render96_init(o)
     if obj_has_model_extended(o, E_MODEL_MIST) ~= 0 then
-        print(o.oPosX, o.oPosY, o.oPosZ)
         obj_mark_for_deletion(o)
     end
 end

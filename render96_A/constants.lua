@@ -55,6 +55,9 @@ E_MODEL_STAR_DOOR = smlua_model_util_get_id("star_door_geo")
 E_MODEL_TOXBOX = smlua_model_util_get_id("toxbox_geo")
 E_MODEL_CAP_SWITCH_BASE_HD = smlua_model_util_get_id("cap_switch_base_geo")
 E_MODEL_FIRE_SPITTER = smlua_model_util_get_id("fire_spitter_geo")
+E_MODEL_GREEN_COIN = smlua_model_util_get_id("green_coin_geo")
+E_MODEL_GREEN_COIN_NO_SHADOW = smlua_model_util_get_id("green_coin_no_shadow_geo")
+E_MODEL_MANTA = smlua_model_util_get_id("manta_geo")
 
 -- Levels
 LEVEL_INNER_WORKINGS = level_register("level_inner_workings_entry", COURSE_NONE, "Inner Workings", "inner_workings", 28000, 0x28, 0x28, 0x28)

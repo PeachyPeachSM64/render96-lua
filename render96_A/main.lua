@@ -27,6 +27,7 @@ r96lib.addModelOverride(id_bhvStarDoor,            E_MODEL_STAR_DOOR)
 r96lib.addModelOverride(id_bhvToxBox,              E_MODEL_TOXBOX)
 r96lib.addModelOverride(id_bhvCapSwitchBase,       E_MODEL_CAP_SWITCH_BASE_HD)
 r96lib.addModelOverride(id_bhvFireSpitter,         E_MODEL_FIRE_SPITTER)
+r96lib.addModelOverride(id_bhvMantaRay,            E_MODEL_MANTA)
 
 r96lib.addModelParamOverride(id_bhvKoopa, 0x01020000, E_MODEL_KOOPA_QUICK_BOB)
 r96lib.addModelParamOverride(id_bhvKoopa, 0x02030000, E_MODEL_KOOPA_QUICK_BOB)

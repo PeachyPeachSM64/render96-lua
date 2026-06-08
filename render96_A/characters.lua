@@ -2,9 +2,9 @@ local r96lib = require("/lib/r96lib")
 require("constants")
 
 -- Config Character Select to add Vanilla models
-local E_MODEL_R96_MARIO = smlua_model_util_get_id("r96_mario_geo")
-_G.charSelect.character_add_costume(CT_MARIO, "Vanilla Mario", nil, nil, nil, E_MODEL_MARIO)
-_G.charSelect.character_edit(CT_MARIO, nil, nil, "Render96", nil, E_MODEL_R96_MARIO)
+--local E_MODEL_R96_MARIO = smlua_model_util_get_id("r96_mario_geo")
+--_G.charSelect.character_add_costume(CT_MARIO, "Vanilla Mario", nil, nil, nil, E_MODEL_MARIO)
+--_G.charSelect.character_edit(CT_MARIO, nil, nil, "Render96", nil, E_MODEL_R96_MARIO)
 
 --[[
 local E_MODEL_R96_WARIO = smlua_model_util_get_id("r96_wario_geo")
@@ -45,8 +45,16 @@ local function act_wario_charge(m)
     sWarioChargeCount = sWarioChargeCount + 1
 
     if sWarioChargeCount < 60 then
+        local sYaw = r96lib.convert_s16(m.intendedYaw - m.faceAngle.y)
+        sYaw = math.max(-0x300, math.min(0x300, sYaw))
+        m.intendedYaw = m.faceAngle.y + sYaw
+
         update_shell_speed(m)
-        set_character_anim_with_accel(m, CHAR_ANIM_RUNNING_UNUSED, 0x000C0000)
+        queue_rumble_data_mario(m, 5, 80)
+
+        if m.forwardVel < 28.0 then m.forwardVel = m.forwardVel + 1.5 end
+
+        set_character_anim_with_accel(m, CHAR_ANIM_RUNNING_UNUSED, 0x000E0000)
         play_step_sound(m, 9, 45)
 
         local step = perform_ground_step(m)
@@ -63,10 +71,9 @@ local function act_wario_charge(m)
                 m.marioObj.header.gfx.cameraToObject)
 
             set_mario_particle_flags(m, PARTICLE_VERTICAL_STAR, 0)
-            set_mario_action(m, ACT_BACKWARD_GROUND_KB, 0)
+            set_mario_action(m, ACT_BRAKING_STOP, 0)
 
         elseif step == GROUND_STEP_NONE then
-            m.flags = m.flags | MARIO_KICKING
             set_mario_particle_flags(m, PARTICLE_DUST, 0)
         end
 
@@ -94,7 +101,7 @@ local function act_wario_triple_jump(m)
         m.actionState = m.actionState + 1
         m.vel.y = 72
     end
-    common_air_action_step(m, ACT_TRIPLE_JUMP_LAND, CHAR_ANIM_FORWARD_SPINNING, 0);
+    common_air_action_step(m, ACT_TRIPLE_JUMP_LAND, CHAR_ANIM_FORWARD_SPINNING, 0)
     if (m.marioObj.header.gfx.animInfo.animFrame == 1) then
         play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
     end
@@ -355,8 +362,8 @@ local function act_wario_hold_heavy_walking(m)
         if m.forwardVel > 10.0 then mario_set_forward_vel(m, 10.0) end
     end
 
-    set_character_anim_with_accel(m, CHAR_ANIM_WALK_WITH_HEAVY_OBJ, 0x40000);
-    play_step_sound(m, 26, 79);
+    set_character_anim_with_accel(m, CHAR_ANIM_WALK_WITH_HEAVY_OBJ, 0x40000)
+    play_step_sound(m, 26, 79)
 
     return false
 end
@@ -408,25 +415,25 @@ end
 ---@param m MarioState
 local function act_wario_hold_freefall(m)
     if (m.actionArg == 0) then
-        animation = CHAR_ANIM_FALL_WITH_LIGHT_OBJ;
+        animation = CHAR_ANIM_FALL_WITH_LIGHT_OBJ
     else
-        animation = CHAR_ANIM_FALL_FROM_SLIDING_WITH_LIGHT_OBJ;
+        animation = CHAR_ANIM_FALL_FROM_SLIDING_WITH_LIGHT_OBJ
     end
 
     if (m.marioObj.oInteractStatus & INT_STATUS_MARIO_DROP_OBJECT) then
-        return drop_and_set_mario_action(m, ACT_FREEFALL, 0);
+        return drop_and_set_mario_action(m, ACT_FREEFALL, 0)
     end
 
     if ((m.input & INPUT_B_PRESSED) and not(m.heldObj ~= nil and m.heldObj.oInteractionSubtype & INT_SUBTYPE_HOLDABLE_NPC)) then
-        return set_mario_action(m, ACT_AIR_THROW, 0);
+        return set_mario_action(m, ACT_AIR_THROW, 0)
     end
 
     if (m.input & INPUT_Z_PRESSED) then
         return set_mario_action(m, ACT_WARIO_PILE_DRIVER, 0)
     end
 
-    common_air_action_step(m, ACT_HOLD_FREEFALL_LAND, animation, AIR_STEP_CHECK_LEDGE_GRAB);
-    return false;
+    common_air_action_step(m, ACT_HOLD_FREEFALL_LAND, animation, AIR_STEP_CHECK_LEDGE_GRAB)
+    return false
 end
 
 ---@param m MarioState
@@ -685,7 +692,7 @@ local function wario_current_actions(m)
     if (m.action == ACT_HOLD_HEAVY_WALKING) then return set_mario_action(m, ACT_WARIO_HOLD_HEAVY_WALKING, 0) end
 end
 
-hook_mario_action(ACT_WARIO_CHARGE, act_wario_charge)
+hook_mario_action(ACT_WARIO_CHARGE, act_wario_charge, INT_FAST_ATTACK_OR_SHELL)
 hook_mario_action(ACT_WARIO_TRIPLE_JUMP, act_wario_triple_jump)
 hook_mario_action(ACT_WARIO_HOLD_IDLE, act_wario_hold_idle)
 hook_mario_action(ACT_WARIO_HOLD_HEAVY_IDLE, act_wario_hold_heavy_idle)
@@ -705,12 +712,8 @@ hook_mario_action(ACT_WARIO_GROUND_POUND, act_wario_ground_pound, INT_GROUND_POU
 
 local sScuttleTimer = 0
 
-local sScuttleVel = 4
-
 local sScuttleRun = {
     [ACT_JUMP] = true,
-    [ACT_DOUBLE_JUMP] = true,
-    [ACT_TRIPLE_JUMP] = true
 }
 
 ---@param m MarioState
@@ -720,15 +723,15 @@ local function act_luigi_twirling(m)
     local startTwirlYaw = m.twirlYaw
     local yawVelTarget
 
-    if (m.input & INPUT_Z_DOWN) ~= 0 then 
+    if (m.input & INPUT_Z_DOWN) ~= 0 then
         m.vel.y = -40
     else 
-        if m.vel.y < -2.5 then m.vel.y = -2.5 end
+        if m.vel.y < -6.0 then m.vel.y = -6.0 end
     end
 
-    yawVelTarget = 0x3000
+    yawVelTarget = 0x2000
 
-    m.angleVel.y = approach_s32(m.angleVel.y, yawVelTarget, 0x400, 0x400)
+    m.angleVel.y = approach_s32(m.angleVel.y, yawVelTarget, 0x200, 0x200)
     m.twirlYaw = m.twirlYaw + m.angleVel.y
 
     if m.heldObj ~= nil then
@@ -775,56 +778,79 @@ local function act_luigi_backflip(m)
     return false
 end
 
+local sMoveAngle = 0
+
+---@param m MarioState
+local function scuttle_physics(m)
+    sScuttleTimer = sScuttleTimer + 1
+    if sScuttleTimer == 1 then
+        m.vel.y = 15
+    elseif sScuttleTimer <= 45 then
+        m.vel.y = 15 * 0.01 * sScuttleTimer
+        if m.vel.y < -3 then
+            m.vel.y = -3
+        end
+    else
+        local gravity = (45 - sScuttleTimer )
+        m.vel.y = 15 * 0.1 * gravity
+    end
+    --print("timer " .. sScuttleTimer .. "vel " .. m.vel.y)
+    if (m.input & INPUT_NONZERO_ANALOG) ~= 0 then
+        if sMoveAngle == 0 then
+            sMoveAngle = m.faceAngle.y
+        end
+
+        sMoveAngle = m.intendedYaw - approach_s32( r96lib.convert_s16(m.intendedYaw - sMoveAngle), 0, 0x400, 0x400)
+        m.forwardVel = approach_f32(m.forwardVel, m.intendedMag * 0.4, 3.0, 3.0)
+    else
+        m.forwardVel = approach_f32(m.forwardVel, 0, 2.0, 2.0)
+    end
+
+    if m.forwardVel > 20.0 then
+        mario_set_forward_vel(m, 20.0)
+    elseif m.forwardVel < -20.0 then
+        mario_set_forward_vel(m, -20.0)
+    end
+
+    m.vel.x = m.forwardVel * sins(m.intendedYaw)
+    m.vel.z = m.forwardVel * coss(m.intendedYaw)
+
+    m.slideVelX = m.vel.x
+    m.slideVelZ = m.vel.z
+end
+
 ---@param m MarioState
 local function act_scuttle_run(m)
-    if (m.input & INPUT_A_DOWN) == 0 or (sScuttleTimer > 50) then
+    if (m.input & INPUT_A_DOWN) == 0 or m.vel.y < -25 then
         return set_mario_action(m, ACT_FREEFALL, 0)
     end
 
-    set_character_anim_with_accel(m, CHAR_ANIM_RUNNING, 0x90000) -- Sets the animation
-
-    sScuttleTimer = sScuttleTimer + 1
-    if sScuttleTimer % 10 == 0 then
-        sScuttleVel = sScuttleVel - 1
-    end
-
-    m.vel.y = m.vel.y + sScuttleVel
-    if m.vel.y < -20 then m.vel.y = -20 end
-    if (m.forwardVel > 32.0) then mario_set_forward_vel(m, 32.0) end
-    if (m.forwardVel < -32.0) then mario_set_forward_vel(m, -32.0) end
+    set_character_anim_with_accel(m, CHAR_ANIM_RUNNING, 0x100000)
+    scuttle_physics(m)
 
     local landed = perform_air_step(m, AIR_STEP_LANDED | AIR_STEP_CHECK_LEDGE_GRAB | AIR_STEP_CHECK_HANG)
     if landed == AIR_STEP_LANDED then set_mario_action(m, ACT_JUMP_LAND, 0) end
     if landed == AIR_STEP_GRABBED_LEDGE then
-        set_character_animation(m, CHAR_ANIM_IDLE_ON_LEDGE);
-        drop_and_set_mario_action(m, ACT_LEDGE_GRAB, 0);
+        set_character_animation(m, CHAR_ANIM_IDLE_ON_LEDGE)
+        drop_and_set_mario_action(m, ACT_LEDGE_GRAB, 0)
     end
     if landed == AIR_STEP_GRABBED_CEILING then set_mario_action(m, ACT_START_HANGING, 0) end
 end
 
 ---@param m MarioState
 local function act_scuttle_run_hold(m)
-    if (m.input & INPUT_A_DOWN) == 0 or (sScuttleTimer > 50) then
+    if (m.input & INPUT_A_DOWN) == 0 or m.vel.y < -25 then
         return set_mario_action(m, ACT_HOLD_FREEFALL, 0)
     end
 
-    set_character_anim_with_accel(m, CHAR_ANIM_RUN_WITH_LIGHT_OBJ, 0x90000) -- Sets the animation
-
-    sScuttleTimer = sScuttleTimer + 1
-    if sScuttleTimer % 20 == 0 then
-        sScuttleVel = sScuttleVel - 1
-    end
-
-    m.vel.y = m.vel.y + sScuttleVel
-    if m.vel.y < -20 then m.vel.y = -20 end
-    if m.forwardVel > 32.0 then mario_set_forward_vel(m, 32.0) end
-    if m.forwardVel < -32.0 then mario_set_forward_vel(m, -32.0) end
+    set_character_anim_with_accel(m, CHAR_ANIM_RUN_WITH_LIGHT_OBJ, 0x100000)
+    scuttle_physics(m)
 
     local landed = perform_air_step(m, AIR_STEP_LANDED | AIR_STEP_CHECK_LEDGE_GRAB)
     if landed == AIR_STEP_LANDED then set_mario_action(m, ACT_HOLD_JUMP_LAND, 0) end
     if landed == AIR_STEP_GRABBED_LEDGE then
-        set_character_animation(m, CHAR_ANIM_IDLE_ON_LEDGE);
-        drop_and_set_mario_action(m, ACT_LEDGE_GRAB, 0);
+        set_character_animation(m, CHAR_ANIM_IDLE_ON_LEDGE)
+        drop_and_set_mario_action(m, ACT_LEDGE_GRAB, 0)
     end
 end
 
@@ -856,7 +882,6 @@ local function luigi_update(m)
         if sScuttleRun[m.action] then set_mario_action(m, ACT_LUIGI_SCUTTLE_RUN, 0)
         elseif m.action == ACT_HOLD_JUMP then set_mario_action(m, ACT_LUIGI_SCUTTLE_RUN_HOLD, 0) end
         sScuttleTimer = 0
-        sScuttleVel = 4
     end
 
     if m.action == ACT_BACKFLIP then set_mario_action(m, ACT_LUIGI_BACKFLIP, 0) end
@@ -1022,7 +1047,6 @@ end
 hook_event(HOOK_ON_SET_MARIO_ACTION, function(m)
     if m.action == ACT_YOSHI_RIDE_JUMP then m.vel.y = 50 end
 end)
-
 
 hook_mario_action(ACT_YOSHI_RIDE_IDLE,    act_yoshi_ride_idle )
 hook_mario_action(ACT_YOSHI_RIDE_WALK,    act_yoshi_ride_walk )

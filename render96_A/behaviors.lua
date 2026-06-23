@@ -2308,13 +2308,15 @@ local function bhv_star_render96_init(o)
 end
 
 local function bhv_star_render96_loop(o)
-    r96lib.audio_fade(o, STAR_AMBIENT, nil, nil, true, 2258, 86840)
+    if m.action ~= ACT_CREDITS_CUTSCENE then
+        r96lib.audio_fade(o, STAR_AMBIENT, nil, nil, true, 2258, 86840)
+    end
 end
 
 id_bhvRender96Star = hook_render96_behavior(id_bhvStar, false, bhv_star_render96_init, bhv_star_render96_loop)
 id_bhvRender96SpawnedStar = hook_render96_behavior(id_bhvSpawnedStar, false, bhv_star_render96_init, bhv_star_render96_loop)
 id_bhvRender96SpawnedStarNoLevelExit = hook_render96_behavior(id_bhvSpawnedStarNoLevelExit, false, bhv_star_render96_init, bhv_star_render96_loop)
-id_bhvRender96HiddenStar = hook_render96_behavior(id_bhvHiddenStar, false, bhv_star_render96_init, bhv_star_render96_loop)
+--id_bhvRender96HiddenStar = hook_render96_behavior(id_bhvHiddenStar, false, bhv_star_render96_init, bhv_star_render96_loop)
 id_bhvRender96SpawnCoordStar = hook_render96_behavior(id_bhvStarSpawnCoordinates, false, bhv_star_render96_init, bhv_star_render96_loop)
 id_bhvRender96CelebrationStar = hook_render96_behavior(id_bhvCelebrationStar, false, bhv_star_render96_init)
 

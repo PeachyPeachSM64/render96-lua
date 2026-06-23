@@ -2323,7 +2323,6 @@ id_bhvRender96CelebrationStar = hook_render96_behavior(id_bhvCelebrationStar, fa
 ---@param o Object
 local function bhv_pokey_render96_init(o)
     o.header.gfx.node.flags = o.header.gfx.node.flags & ~GRAPH_RENDER_BILLBOARD
-
 end
 
 local function bhv_pokey_render96_loop(o)

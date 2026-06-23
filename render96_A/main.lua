@@ -5,7 +5,7 @@
 local r96lib = require("/lib/r96lib")
 charSelect = _G.charSelect
 
---gLevelValues.entryLevel = SPECIAL_WARP_TITLE
+gLevelValues.entryLevel = SPECIAL_WARP_TITLE
 --gLevelValues.entryLevel = LEVEL_ENDING
 
 -- Models
@@ -141,7 +141,15 @@ r96lib.addSpawn(LEVEL_COTMC, 1, E_MODEL_WARIO_TREE_COIN,    id_bhvSixGoldenCoin,
 local TEX_BOO_KEY    = get_texture_info("texture_hud_boo_key")
 local TEX_WARIO_COIN = get_texture_info("texture_hud_wario_coin")
 
+local function in_ending_cutscene()
+    local act = gMarioStates[0].action
+    return act == ACT_END_PEACH_CUTSCENE
+        or act == ACT_CREDITS_CUTSCENE
+        or act == ACT_END_WAVING_CUTSCENE
+end
+
 local function render_hud_keys()
+    if in_ending_cutscene() then return end
     if gNumLuigiKeys <= 0 or gNumLuigiKeys >= 8 then return end
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_color(255, 255, 255, 255)
@@ -152,6 +160,7 @@ local function render_hud_keys()
 end
 
 local function render_hud_wario_coins()
+    if in_ending_cutscene() then return end
     if gNumWarioCoins <= 0 or gNumWarioCoins >= 6 then return end
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_color(255, 255, 255, 255)

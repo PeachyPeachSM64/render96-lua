@@ -722,6 +722,21 @@ local function wario_swing_fling_spin(m)
     end
 end
 
+local sSkipBehaviors = {
+    id_bhvMips,
+    id_bhvUkiki,
+    id_bhvBreakableBoxSmall,
+    id_bhvSmallPenguin,
+    id_bhvUnused20E0,
+}
+
+local function is_skipped_behavior(o)
+    for _, bhv in ipairs(sSkipBehaviors) do
+        if obj_has_behavior_id(o, bhv) == 1 then return true end
+    end
+    return false
+end
+
 ---@param m MarioState
 local function act_wario_swing_fling_held(m)
     local spin
@@ -779,7 +794,7 @@ local function act_wario_swing_fling_held(m)
 
         wario_swing_fling_spin(m)
         sWarioSpinCount = sWarioSpinCount + 1
-        if sWarioSpinCount % 5 == 0 then
+        if sWarioSpinCount % 5 == 0 and not is_skipped_behavior(o) then
             --spawn_non_sync_object(id_bhvWarioCoins, sWarioCoinRand[math.random(1, 6)], m.marioObj.oPosX +(random_float() * 20), m.marioObj.oPosY + 100, m.marioObj.oPosZ + (random_float() * 20), nil)
             spawn_non_sync_object(id_bhvWarioCoins, E_MODEL_GREEN_COIN, m.marioObj.oPosX +(random_float() * 20), m.marioObj.oPosY + 100, m.marioObj.oPosZ + (random_float() * 20), nil)
         end

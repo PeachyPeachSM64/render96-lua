@@ -40,6 +40,7 @@ r96lib.addModelParamOverride(id_bhvKoopa, 0x02030000, E_MODEL_KOOPA_QUICK_THI)
 
 r96lib.addModelLevelOverride(id_bhvGoomba, E_MODEL_GOOMBA_SSL,         E_MODEL_GOOMBA,     LEVEL_SSL, 1, nil)
 r96lib.addModelLevelOverride(id_bhvGoomba, E_MODEL_GOOMBA_UNDERGROUND, E_MODEL_GOOMBA,     LEVEL_SSL, 2, nil)
+r96lib.addModelLevelOverride(id_bhvGoomba, E_MODEL_GOOMBA_UNDERGROUND, E_MODEL_GOOMBA,     LEVEL_JRB, 1, nil)
 r96lib.addModelLevelOverride(id_bhvGoomba, E_MODEL_GOOMBA_BOXART,      E_MODEL_GOOMBA,     LEVEL_BITDW, 1, nil)
 r96lib.addModelLevelOverride(id_bhvGoomba, E_MODEL_GOOMBA_BOXART,      E_MODEL_GOOMBA,     LEVEL_BITFS, 1, nil)
 r96lib.addModelLevelOverride(id_bhvGoomba, E_MODEL_GOOMBA_BOXART,      E_MODEL_GOOMBA,     LEVEL_BITS, 1, nil)

@@ -1322,7 +1322,7 @@ hook_mario_action(ACT_LUIGI_SCUTTLE_RUN,        act_luigi_scuttle_run)
 hook_mario_action(ACT_LUIGI_SCUTTLE_RUN_HOLD,   act_luigi_scuttle_run_hold)
 hook_mario_action(ACT_LUIGI_BACKFLIP,           act_luigi_backflip)
 hook_mario_action(ACT_LUIGI_TWIRLING,           act_luigi_twirling)
-hook_mario_action(ACT_LUIGI_TWIRLING_DOWN,      act_luigi_twirling_down)
+hook_mario_action(ACT_LUIGI_TWIRLING_DOWN,      act_luigi_twirling_down, INT_GROUND_POUND)
 
 hook_mario_action(ACT_YOSHI_RIDE_IDLE,          act_yoshi_ride_idle )
 hook_mario_action(ACT_YOSHI_RIDE_WALK,          act_yoshi_ride_walk )

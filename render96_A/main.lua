@@ -3,9 +3,10 @@
 -- author: \#ff3030\Render96DX Team
 
 local r96lib = require("/lib/r96lib")
-local charSelect = _G.charSelect
+charSelect = _G.charSelect
 
 --gLevelValues.entryLevel = SPECIAL_WARP_TITLE
+--gLevelValues.entryLevel = LEVEL_ENDING
 
 -- Models
 r96lib.addModelOverride(id_bhvBalconyBigBoo,           E_MODEL_BOO_BIG)
@@ -35,7 +36,7 @@ r96lib.addModelOverride(id_bhvSnowmansBottom,          E_MODEL_SNOWMAN_BODY)
 r96lib.addModelOverride(id_bhvBigSnowmanWhole,         E_MODEL_SNOWMAN_BODY)
 
 r96lib.addModelParamOverride(id_bhvKoopa, 0x01020000, E_MODEL_KOOPA_QUICK_BOB)
-r96lib.addModelParamOverride(id_bhvKoopa, 0x02030000, E_MODEL_KOOPA_QUICK_BOB)
+r96lib.addModelParamOverride(id_bhvKoopa, 0x02030000, E_MODEL_KOOPA_QUICK_THI)
 
 r96lib.addModelLevelOverride(id_bhvGoomba, E_MODEL_GOOMBA_SSL,         E_MODEL_GOOMBA,     LEVEL_SSL, 1, nil)
 r96lib.addModelLevelOverride(id_bhvGoomba, E_MODEL_GOOMBA_UNDERGROUND, E_MODEL_GOOMBA,     LEVEL_SSL, 2, nil)
@@ -46,7 +47,7 @@ r96lib.addModelLevelOverride(id_bhvGoomba, E_MODEL_GOOMBA_BOXART,      E_MODEL_G
 r96lib.addModelLevelOverride(id_bhvFlame,  E_MODEL_RED_FLAME_TORCH,    E_MODEL_RED_FLAME,  LEVEL_CASTLE, 3, nil)
 r96lib.addModelLevelOverride(id_bhvFlame,  E_MODEL_BLUE_FLAME_TORCH,   E_MODEL_BLUE_FLAME, LEVEL_CASTLE, 3, nil)
 r96lib.addModelLevelOverride(id_bhvFlame,  E_MODEL_RED_FLAME_TORCH,    E_MODEL_RED_FLAME,  LEVEL_HMC, 1, nil)
-r96lib.addModelLevelOverride(id_bhvFlame,  E_MODEL_RED_FLAME_TORCH,    E_MODEL_RED_FLAME,  LEVEL_BBH, 1, nil)
+r96lib.addModelLevelOverride(id_bhvFlame,  E_MODEL_RED_FLAME_BBH_TORCH,    E_MODEL_RED_FLAME,  LEVEL_BBH, 1, nil)
 
 r96lib.addModelLevelOverride(id_bhvFlyguyFlame,               E_MODEL_RED_FLAME_BOWSER,  E_MODEL_RED_FLAME,  LEVEL_BOWSER_1, 1, nil)
 r96lib.addModelLevelOverride(id_bhvFlyguyFlame,               E_MODEL_BLUE_FLAME_BOWSER, E_MODEL_BLUE_FLAME, LEVEL_BOWSER_1, 1, nil)
@@ -100,6 +101,7 @@ r96lib.addModelLevelOverride(id_bhvFlameMovingForwardGrowing, E_MODEL_RED_FLAME_
 r96lib.addModelLevelOverride(id_bhvFlameMovingForwardGrowing, E_MODEL_BLUE_FLAME_BOWSER, E_MODEL_BLUE_FLAME, LEVEL_BOWSER_3, 1, nil)
 
 -- Enemies
+r96lib.addSpawn(SPECIAL_WARP_TITLE,  1, E_MODEL_MR_I, id_bhvRender96MrI,   0, 0, 0, 0, 0, 0, false, nil, function(o) cur_obj_scale(100) end)
 r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_BLARGG_FRIENDLY, id_bhvRender96BlarggFriendly, -2070, 0, 6177, 0, 0, 0, 0, {5, 6})
 r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_BLARGG, id_bhvRender96Blargg, -6766, 0,  3033, 0, 0, 0, false)
 r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_BLARGG, id_bhvRender96Blargg, -6018, 0, -5512, 0, 0, 0, false)
@@ -129,6 +131,41 @@ r96lib.addSpawn(LEVEL_SA,    1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -318,  -160,
 r96lib.addSpawn(LEVEL_PSS,   1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, 6094,  6144,  -4145, 0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 6 end)
 r96lib.addSpawn(LEVEL_BITDW, 1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -4560, 1126,  -179,  0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 7 end)
 
+r96lib.addSpawn(LEVEL_VCUTM, 1, E_MODEL_WARIO_LUNAR_COIN,   id_bhvSixGoldenCoin, 4287, 685, -4391,    0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 0 end)
+r96lib.addSpawn(LEVEL_TOTWC, 1, E_MODEL_WARIO_HOUSE_COIN,   id_bhvSixGoldenCoin, 4045, 490, 5154,     0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 1 end)
+r96lib.addSpawn(LEVEL_LLL,   1, E_MODEL_WARIO_PUMPKIN_COIN, id_bhvSixGoldenCoin, 6585, 142, -6909,    0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 2 end)
+r96lib.addSpawn(LEVEL_SSL,   1, E_MODEL_WARIO_KOOPA_COIN,   id_bhvSixGoldenCoin, -2052, 1830, -1021,  0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 3 end)
+r96lib.addSpawn(LEVEL_DDD,   2, E_MODEL_WARIO_MARIO_COIN,   id_bhvSixGoldenCoin, 5025, -3681, -1430,  0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 4 end)
+r96lib.addSpawn(LEVEL_COTMC, 1, E_MODEL_WARIO_TREE_COIN,    id_bhvSixGoldenCoin, 7, -143, 2141,       0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 5 end)
+
+local TEX_BOO_KEY    = get_texture_info("texture_hud_boo_key")
+local TEX_WARIO_COIN = get_texture_info("texture_hud_wario_coin")
+
+local function render_hud_keys()
+    if gNumLuigiKeys <= 0 or gNumLuigiKeys >= 8 then return end
+    djui_hud_set_resolution(RESOLUTION_N64)
+    djui_hud_set_color(255, 255, 255, 255)
+    djui_hud_render_texture(TEX_BOO_KEY, 22, 35, 0.5, 0.5)
+    djui_hud_set_font(FONT_HUD)
+    djui_hud_print_text("@", 38, 35, 1)
+    djui_hud_print_text(tostring(gNumLuigiKeys), 54, 35, 1)
+end
+
+local function render_hud_wario_coins()
+    if gNumWarioCoins <= 0 or gNumWarioCoins >= 6 then return end
+    djui_hud_set_resolution(RESOLUTION_N64)
+    djui_hud_set_color(255, 255, 255, 255)
+    djui_hud_render_texture(TEX_WARIO_COIN, 22, 55, 0.25, 0.25)
+    djui_hud_set_font(FONT_HUD)
+    djui_hud_print_text("@", 38, 55, 1)
+    djui_hud_print_text(tostring(gNumWarioCoins), 54, 55, 1)
+end
+
+hook_event(HOOK_ON_HUD_RENDER, function()
+    render_hud_keys()
+    render_hud_wario_coins()
+end)
+
 local function entity_cleanup()
     local mrI = obj_get_nearest_object_with_behavior_id(gMarioStates[0].marioObj, id_bhvMrI)
     if mrI ~= nil then
@@ -138,7 +175,7 @@ local function entity_cleanup()
 end
 
 hook_event(HOOK_ON_OBJECT_LOAD, entity_cleanup)
-
+    local audioStream = nil
 function wario_head_spawner()
     local levelNum = gNetworkPlayers[0].currLevelNum
     local areaNum = gNetworkPlayers[0].currAreaIndex
@@ -160,10 +197,24 @@ function wario_head_spawner()
             door = obj_get_next_with_same_behavior_id(door)
         end
     end
+    if levelNum == LEVEL_INNER_WORKINGS then 
+        audioStream = INNER_WORKINGS_SONG
+        audio_stream_set_loop_points(audioStream, 15102, 1204316)
+        audio_stream_set_looping(audioStream, true)
+        audio_stream_play(audioStream, true, 0.7)
+    end
 end
 
  --REPLACE WITH C CODE?
 function check_model_cheat()
+        local levelNum = gNetworkPlayers[0].currLevelNum
+        if levelNum ~= LEVEL_INNER_WORKINGS then
+        if audioStream ~= nil then
+            audio_stream_set_looping(audioStream, false)
+            audio_stream_stop(audioStream)
+            audioStream = nil
+        end
+    end
     --print("X: " .. gMarioStates[0].marioObj.oPosX .. " Y: " .. gMarioStates[0].marioObj.oPosY .. " Z: " .. gMarioStates[0].marioObj.oPosZ)
     --if gNumLuigiKeys ~= 8 and gMarioStates[0].character.type == CT_LUIGI then _G.charSelect.character_set_current_number(CT_MARIO, 1) end
     --if gNumWarioCoins ~= 6 and gMarioStates[0].character.type == CT_WARIO then _G.charSelect.character_set_current_number(CT_MARIO, 1) end
@@ -180,18 +231,22 @@ hook_event(HOOK_MARIO_UPDATE, squishtest)
 
 local function mario_update(m)
    --if m.playerIndex ~= 0 then return end
-   -- if m.controller.buttonPressed & X_BUTTON ~= 0 then
-    --spawn_non_sync_object(id_bhvRender96YoshiRideable, E_MODEL_YOSHI_RIDEABLE, m.pos.x + 200, m.pos.y, m.pos.z, nil)
-    -- spawn_non_sync_object(id_bhv1Up, E_MODEL_1UP, m.pos.x + 200, m.pos.y, m.pos.z, nil)
+ --if m.controller.buttonPressed & X_BUTTON ~= 0 then
+   --     --initiate_warp(LEVEL_CASTLE_GROUNDS, 1, WARP_NODE_CREDITS_START, 0);
+   --     initiate_warp(LEVEL_CASTLE_GROUNDS, 1, WARP_NODE_CREDITS_END, 0);
+   --     --WARP_NODE_CREDITS_END
+   ----spawn_non_sync_object(id_bhvRender96YoshiRideable, E_MODEL_YOSHI_RIDEABLE, m.pos.x + 200, m.pos.y, m.pos.z, nil)
+   ----spawn_non_sync_object(id_bhvGrandStar, E_MODEL_1UP, m.pos.x + 200, m.pos.y, m.pos.z, nil)
+--end
+   --if m.action == ACT_BACKFLIP then
+   --    warp_to_level(LEVEL_BOB, 1, 1)
    --end
-    if m.action == ACT_BACKFLIP then
-        warp_to_level(LEVEL_BOWSER_3, 1, 1)
-    end
    --SPECIAL_WARP_CAKE
    --WARP_NODE_CREDITS_START
    --SPECIAL_WARP_TITLE
    --SPECIAL_WARP_LEVEL_SELECT
    --SPECIAL_WARP_GODDARD
+   --WARP_OP_CREDITS_START
 end
 
 hook_event(HOOK_MARIO_UPDATE, mario_update)

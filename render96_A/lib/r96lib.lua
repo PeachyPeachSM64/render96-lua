@@ -517,7 +517,6 @@ local function on_object_unload(o)
     end
 end
 
-
 ---@param o Object
 ---@param opts table
 local function npcThrownDeath(o, opts)

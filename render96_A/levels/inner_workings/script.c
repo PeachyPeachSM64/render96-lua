@@ -20,9 +20,8 @@
 const LevelScript level_inner_workings_entry[] = {
 	INIT_LEVEL(),
 	LOAD_MIO0(0x7, _inner_workings_segment_7SegmentRomStart, _inner_workings_segment_7SegmentRomEnd), 
-	LOAD_MIO0(0xa, _water_skybox_mio0SegmentRomStart, _water_skybox_mio0SegmentRomEnd), 
 	ALLOC_LEVEL_POOL(),
-	MARIO(MODEL_MARIO, 0x00000001, bhvMario), 
+	MARIO(MODEL_MARIO, 0x00000001, bhvMario),
 	/* Fast64 begin persistent block [level commands] */
 	/* Fast64 end persistent block [level commands] */
 

@@ -64,6 +64,30 @@ bloWarps.createWarpObj(pipeGreenBhv[pipe_green()], pipeModel[pipe_green()], 0x01
 bloWarps.newWarpNode(LEVEL_INNER_WORKINGS, 1, 0x02, LEVEL_INNER_WORKINGS, 1, 0x02, pipe_entry, boo_pipe_yellow_exit, true)
 bloWarps.createWarpObj(pipeYellowBhv[pipe_yellow()], pipeModel[pipe_yellow()], 0x02, nil, LEVEL_INNER_WORKINGS, 1, {-2700, 0, 700}, {0, 0x4000, 0})
 
+local sLastGreenUnlocked = pipe_green()
+local sLastYellowUnlocked = pipe_yellow()
+
+local function refresh_pipe(level, area, node, bhvTable, modelTable, unlocked, pos, angle)
+    bloWarps.deleteWarpObj(level, area, node)
+    bloWarps.createWarpObj(bhvTable[unlocked], modelTable[unlocked], node, nil, level, area, pos, angle)
+end
+
+local function update_pipe_locks()
+    local green = pipe_green()
+    if green ~= sLastGreenUnlocked then
+        sLastGreenUnlocked = green
+        refresh_pipe(LEVEL_INNER_WORKINGS, 1, 0x01, pipeGreenBhv, pipeModel, green, {2700, 800, -200}, {0, -0x4000, 0})
+    end
+
+    local yellow = pipe_yellow()
+    if yellow ~= sLastYellowUnlocked then
+        sLastYellowUnlocked = yellow
+        refresh_pipe(LEVEL_INNER_WORKINGS, 1, 0x02, pipeYellowBhv, pipeModel, yellow, {-2700, 0, 700}, {0, 0x4000, 0})
+    end
+end
+
+hook_event(HOOK_UPDATE, update_pipe_locks)
+
 local function is_mario_at_cabinet()
     return gNetworkPlayers[0].currLevelNum == LEVEL_INNER_WORKINGS
 end

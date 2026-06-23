@@ -96,7 +96,14 @@ define_custom_obj_fields({
     oYoshiCustomBlinkTimer = "s32",
     oWallAngle          = "f32",
     oWallX              = "f32",
-    oWallZ              = "f32"
+    oWallY              = "f32",
+    oWallZ              = "f32",
+    oTongueU              = "f32",
+    oTongueTimer              = "f32",
+    oTongueTarget              = "f32",
+    oTongueLockX              = "f32",
+    oTongueLockY              = "f32",
+    oTongueLockZ              = "f32",
 })
 
 eyeStateCustom = {
@@ -134,190 +141,171 @@ function geo_switch_mario_face(node, matStackIndex)
     local marioHurtCounter = m.hurtCounter
     local marioHealth = m.health
 
-    switchCase.selectedCase = faceStateCustom.FACE_DEFAULT
-
-    if marioAction == ACT_IDLE or
-    marioAction == ACT_HOLD_IDLE or
-    marioAction == ACT_HOLD_HEAVY_IDLE or
-    marioAction == ACT_CRAWLING or
-    marioAction == ACT_WALKING or
-    marioAction == ACT_HOLD_WALKING or
-    marioAction == ACT_HOLD_HEAVY_WALKING or
-    marioAction == ACT_LONG_JUMP_LAND or
-    marioAction == ACT_JUMP_LAND or
-    marioAction == ACT_JUMP_LAND_STOP or
-    marioAction == ACT_DOUBLE_JUMP_LAND or
-    marioAction == ACT_DOUBLE_JUMP_LAND_STOP then
-        longJumpTimer = 0
-        switchCase.selectedCase = faceStateCustom.FACE_DEFAULT end
-    
-    if (marioAction & ACT_FLAG_ATTACKING) ~= 0 then switchCase.selectedCase = faceStateCustom.FACE_ANGRY end
-
-    if (marioAction & ACT_FLAG_SWIMMING) ~= 0 then switchCase.selectedCase = faceStateCustom.FACE_DEFAULT end
-    
-    if marioAction == ACT_LONG_JUMP then
-        longJumpTimer = longJumpTimer + 1
-        if longJumpTimer < 15 then switchCase.selectedCase = faceStateCustom.FACE_HAPPY
-        else switchCase.selectedCase = faceStateCustom.FACE_OPEN end
+    if m.actionArg == 8 then -- END_PEACH_CUTSCENE_KISS_FROM_PEACH
+        local lip_sync = sMarioLipSwitchEndingKiss[m.actionTimer]
+        if lip_sync then switchCase.selectedCase = lip_sync end
     end
+    if m.actionArg == 9 then
+        local lip_sync = sMarioLipSwitchEndingHereWeGo[m.actionTimer]
+        if lip_sync then switchCase.selectedCase = lip_sync end
+    end
+    if m.actionArg ~= 8 and m.actionArg ~= 9 then
+        switchCase.selectedCase = faceStateCustom.FACE_DEFAULT
+        if sMarioFaceDefaultIdle[marioAction] then
+            longJumpTimer = 0
+            switchCase.selectedCase = faceStateCustom.FACE_DEFAULT
+        end
 
-    if marioAction == ACT_DOUBLE_JUMP or
-    marioAction == ACT_TRIPLE_JUMP then
-        switchCase.selectedCase = faceStateCustom.FACE_DEFAULT end
+        if (marioAction & ACT_FLAG_ATTACKING) ~= 0 then
+            switchCase.selectedCase = faceStateCustom.FACE_ANGRY
+        end
 
-    if marioAction == ACT_DOUBLE_JUMP_LAND or
-    marioAction == ACT_DOUBLE_JUMP_LAND_STOP then
-        switchCase.selectedCase = faceStateCustom.FACE_DEFAULT end
+        if (marioAction & ACT_FLAG_SWIMMING) ~= 0 then
+            switchCase.selectedCase = faceStateCustom.FACE_DEFAULT
+        end
 
-    if marioAction == ACT_JUMP or
-    marioAction == ACT_TRIPLE_JUMP_LAND or
-    marioAction == ACT_TRIPLE_JUMP_LAND_STOP or
-    marioAction == ACT_BACKFLIP_LAND or
-    marioAction == ACT_BACKFLIP_LAND_STOP then
-        switchCase.selectedCase = faceStateCustom.FACE_HAPPY end
-    
-    if marioAction == ACT_BURNING_GROUND or
-    marioAction == ACT_BURNING_JUMP or
-    marioAction == ACT_BURNING_FALL or
-    marioAction == ACT_LAVA_BOOST or
-    marioAction == ACT_LAVA_BOOST_LAND then
-        switchCase.selectedCase = faceStateCustom.FACE_OPEN end 
+        if marioAction == ACT_LONG_JUMP then
+            longJumpTimer = longJumpTimer + 1
+            switchCase.selectedCase = (longJumpTimer < 15)
+                and faceStateCustom.FACE_HAPPY
+                or faceStateCustom.FACE_OPEN
+        end
 
-    if marioAction == ACT_DEATH_EXIT or
-    marioAction == ACT_DEATH_EXIT_LAND or
-    marioAction == ACT_DEATH_ON_STOMACH or
-    marioAction == ACT_DEATH_ON_BACK or
-    marioAction == ACT_QUICKSAND_DEATH or
-    marioAction == ACT_ELECTROCUTION or
-    marioAction == ACT_SUFFOCATION then
-        switchCase.selectedCase = faceStateCustom.FACE_DEFAULT end
+        if sMarioFaceDefaultOther[marioAction] then
+            switchCase.selectedCase = faceStateCustom.FACE_DEFAULT
+        end
 
-    if marioAction == ACT_START_SLEEPING then
-		switchCase.selectedCase = faceStateCustom.FACE_DEFAULT end
+        if sMarioFaceHappy[marioAction] then
+            switchCase.selectedCase = faceStateCustom.FACE_HAPPY
+        end
 
-	if marioAction == ACT_SLEEPING then
-        if sleepTimer % 3 == 0 then 
+        if sMarioFaceOpen[marioAction] then
             switchCase.selectedCase = faceStateCustom.FACE_OPEN
-        else switchCase.selectedCase = faceStateCustom.FACE_DEFAULT end
+        end
+
+        if marioAction == ACT_SLEEPING then
+            switchCase.selectedCase = (sleepTimer % 3 == 0)
+                and faceStateCustom.FACE_OPEN
+                or faceStateCustom.FACE_DEFAULT
+        end
+
+        if marioAction ~= ACT_SLEEPING then
+            sleepTimer = 0
+        end
+
+        if marioHurtCounter ~= nil and marioHurtCounter > 0 then
+            switchCase.selectedCase = faceStateCustom.FACE_ANGRY
+        end
+
+        if marioHealth ~= nil and marioHealth <= 0xFF then
+            switchCase.selectedCase = faceStateCustom.FACE_ANGRY
+        end
+
+        if marioAction == ACT_PANTING then
+            switchCase.selectedCase = faceStateCustom.FACE_OPEN
+        end
     end
-
-    if marioAction ~= ACT_SLEEPING then sleepTimer = 0 end
-
-    if marioHurtCounter ~= nil and marioHurtCounter > 0 then
-        switchCase.selectedCase = faceStateCustom.FACE_ANGRY end
-
-    if marioHealth ~= nil and marioHealth <= 0xFF then
-        switchCase.selectedCase = faceStateCustom.FACE_ANGRY end
-
-    if marioAction == ACT_PANTING then
-        switchCase.selectedCase = faceStateCustom.FACE_OPEN end
-
 end
 
+--// blink twice then have half-shut eyes (see end_peach_cutscene_kiss_from_peach)
+sMarioBlinkEnding = {
+    [90] = eyeStateCustom.EYES_HALF_CLOSED, 
+    [92] = eyeStateCustom.EYES_CLOSED, 
+    [94] = eyeStateCustom.EYES_HALF_CLOSED, 
+    [96] = eyeStateCustom.EYES_OPEN,
+    [98] = eyeStateCustom.EYES_HALF_CLOSED, 
+    [100] = eyeStateCustom.EYES_CLOSED, 
+    [102] = eyeStateCustom.EYES_HALF_CLOSED, 
+    [104] = eyeStateCustom.EYES_OPEN,
+    [106] = eyeStateCustom.EYES_HALF_CLOSED, 
+    [108] = eyeStateCustom.EYES_CLOSED,
+}
+
 function geo_switch_mario_eye_custom(node, matStackIndex)
-    --local bodyState = geo_get_body_state()
-    local m = gMarioStates[0]
     local switchCase = cast_graph_node(node) ---@type GraphNodeSwitchCase
     local marioAction = m.action
     local marioHurtCounter = m.hurtCounter
     local marioHealth = m.health
+    
+    if m.actionArg == 8 then -- END_PEACH_CUTSCENE_KISS_FROM_PEACH
+        local eye_sync = sMarioBlinkEnding[m.actionTimer]
+        if eye_sync then switchCase.selectedCase = eye_sync end
+        if m.actionTimer == 75 then switchCase.selectedCase = eyeStateCustom.EYES_HALF_CLOSED end
+        if m.actionTimer == 76 then switchCase.selectedCase = eyeStateCustom.EYES_CLOSED end
+        if m.actionTimer == 110 then switchCase.selectedCase = eyeStateCustom.EYES_HALF_CLOSED end
+    end
+    if m.actionArg == 9 then
+        if m.actionTimer == 0 then switchCase.selectedCase = eyeStateCustom.EYES_HALF_CLOSED end
+        if m.actionTimer == 58 then switchCase.selectedCase = eyeStateCustom.EYES_OPEN end
+    end
+    if m.actionArg ~= 8 and m.actionArg ~= 9 then
+        blinkTimer = blinkTimer + 1
 
-    blinkTimer = blinkTimer + 1
-
-    if blinkFrame == 5 then
-        if blinkTimer % 20 == 0 then
-            blinkFrame = blinkFrame + 1
-            blinkTimer = 0
+        if blinkFrame == 5 then
+            if blinkTimer % 20 == 0 then
+                blinkFrame = blinkFrame + 1
+                blinkTimer = 0
+            end
+        elseif blinkFrame == 9 then
+            if blinkTimer % 50 == 0 then
+                blinkFrame = 1
+                blinkTimer = 0
+            end
+        elseif (blinkFrame < 5 and blinkFrame >= 1) or (blinkFrame < 9 and blinkFrame > 5) then
+            if blinkTimer % 2 == 0 then
+                blinkFrame = blinkFrame + 1
+            end
         end
-    elseif blinkFrame == 9 then
-        if blinkTimer % 50 == 0 then 
+
+        if sMarioEyeBlinkable[marioAction] then
+            switchCase.selectedCase = gMarioBlinkAnimation[blinkFrame]
+        else
             blinkFrame = 1
             blinkTimer = 0
+            switchCase.selectedCase = eyeStateCustom.EYES_OPEN
         end
-    elseif (blinkFrame < 5 and blinkFrame >= 1) or (blinkFrame < 9 and blinkFrame > 5) then
-        if blinkTimer % 2 == 0 then 
-            blinkFrame = blinkFrame + 1
+
+        if (marioAction & ACT_FLAG_ATTACKING) ~= 0 or
+           (marioAction & ACT_FLAG_SWIMMING) ~= 0 then
+            switchCase.selectedCase = eyeStateCustom.EYES_ANGRY
+        end
+
+        if sMarioEyeOpenWalking[marioAction] then
+            switchCase.selectedCase = eyeStateCustom.EYES_OPEN
+        end
+
+        if marioAction == ACT_START_SLEEPING then
+            switchCase.selectedCase = eyeStateCustom.EYES_HALF_CLOSED
+        end
+
+        if marioAction == ACT_SLEEPING then
+            switchCase.selectedCase = eyeStateCustom.EYES_CLOSED
+        end
+
+        if marioAction == ACT_CRAWLING then
+            switchCase.selectedCase = eyeStateCustom.EYES_HALF_OPEN
+        end
+
+        if sMarioEyeHappy[marioAction] then
+            switchCase.selectedCase = eyeStateCustom.EYES_HAPPY
+        end
+
+        if sMarioEyeDead[marioAction] then
+            switchCase.selectedCase = eyeStateCustom.EYES_DEAD
+        end
+
+        if marioHurtCounter ~= nil and marioHurtCounter > 0 then
+            switchCase.selectedCase = eyeStateCustom.EYES_HURT
+        end
+
+        if marioHealth ~= nil and marioHealth <= 0xFF then
+            switchCase.selectedCase = eyeStateCustom.EYES_HURT
+        end
+
+        if marioAction == ACT_PANTING then
+            switchCase.selectedCase = eyeStateCustom.EYES_EXHAUSTED
         end
     end
-
-    if marioAction ~= ACT_IDLE and 
-    marioAction ~= ACT_HOLD_IDLE and
-    marioAction ~= ACT_HOLD_HEAVY_IDLE and
-    marioAction ~= ACT_JUMP_LAND and 
-    marioAction ~= ACT_JUMP_LAND_STOP and 
-    marioAction ~= ACT_DOUBLE_JUMP_LAND and 
-    marioAction ~= ACT_DOUBLE_JUMP_LAND_STOP then
-        blinkFrame = 1
-        blinkTimer = 0
-        switchCase.selectedCase = eyeStateCustom.EYES_OPEN end
-
-    if marioAction == ACT_IDLE or
-    marioAction == ACT_HOLD_IDLE or
-    marioAction == ACT_HOLD_HEAVY_IDLE or
-    marioAction == ACT_JUMP_LAND or
-    marioAction == ACT_JUMP_LAND_STOP or
-    marioAction == ACT_DOUBLE_JUMP_LAND or
-    marioAction == ACT_DOUBLE_JUMP_LAND_STOP then
-        switchCase.selectedCase = gMarioBlinkAnimation[blinkFrame] end
-
-    if (marioAction & ACT_FLAG_ATTACKING) ~= 0 or
-    (marioAction & ACT_FLAG_SWIMMING) ~= 0 then
-        switchCase.selectedCase = eyeStateCustom.EYES_ANGRY end
-
-    if marioAction == ACT_WALKING or
-    marioAction == ACT_HOLD_WALKING or
-    marioAction == ACT_HOLD_HEAVY_WALKING then
-        local speed = 0
-        if m.forwardVel ~= nil then
-            speed = math.abs(m.forwardVel)
-        end
-        if speed < 16 then switchCase.selectedCase = eyeStateCustom.EYES_HALF_OPEN
-        else switchCase.selectedCase = eyeStateCustom.EYES_OPEN end
-    end
-
-    if marioAction == ACT_START_SLEEPING then
-		switchCase.selectedCase = eyeStateCustom.EYES_HALF_CLOSED end
-
-	if marioAction == ACT_SLEEPING then
-		switchCase.selectedCase = eyeStateCustom.EYES_CLOSED end
-
-    if marioAction == ACT_CRAWLING then
-        switchCase.selectedCase = eyeStateCustom.EYES_HALF_OPEN end
-
-    if marioAction == ACT_JUMP or
-    marioAction == ACT_DOUBLE_JUMP or
-    marioAction == ACT_TRIPLE_JUMP or
-    marioAction == ACT_TRIPLE_JUMP_LAND or
-    marioAction == ACT_TRIPLE_JUMP_LAND_STOP or
-    marioAction == ACT_BACKFLIP_LAND or
-    marioAction == ACT_BACKFLIP_LAND_STOP then
-        switchCase.selectedCase = eyeStateCustom.EYES_HAPPY end
-
-    if marioAction == ACT_BURNING_GROUND or
-    marioAction == ACT_BURNING_JUMP or
-    marioAction == ACT_BURNING_FALL or
-    marioAction == ACT_LAVA_BOOST or
-    marioAction == ACT_LAVA_BOOST_LAND then
-        switchCase.selectedCase = eyeStateCustom.EYES_DEAD end
-
-    if marioAction == ACT_DEATH_EXIT or
-    marioAction == ACT_DEATH_EXIT_LAND or
-    marioAction == ACT_DEATH_ON_STOMACH or
-    marioAction == ACT_DEATH_ON_BACK or
-    marioAction == ACT_QUICKSAND_DEATH or
-    marioAction == ACT_ELECTROCUTION or
-    marioAction == ACT_SUFFOCATION then
-        switchCase.selectedCase = eyeStateCustom.EYES_DEAD end
-
-    if marioHurtCounter ~= nil and marioHurtCounter > 0 then
-        switchCase.selectedCase = eyeStateCustom.EYES_HURT end
-
-    if marioHealth ~= nil and marioHealth <= 0xFF then
-        switchCase.selectedCase = eyeStateCustom.EYES_HURT end
-
-    if marioAction == ACT_PANTING then
-        switchCase.selectedCase = eyeStateCustom.EYES_EXHAUSTED end
-
 end
 
 function geo_function_disable_billboard(node, matStackIndex)
@@ -350,15 +338,85 @@ function geo_function_door_switch(node, matStackIndex) cast_graph_node(node).sel
 function geo_switch_fire_spitter(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
 function geo_switch_wiggler(node, matStackIndex) cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1 return end
 
-function geo_function_wall_align(node, matStackIndex)
-    local o = geo_get_current_object()
-    -- Note, add whatever check is needed for this to only happen for torches
-    -- or not, i'm not your mom - Squishy
+function geo_switch_peach_lip(node, matStackIndex) 
 
+    if m.actionArg == 6 then -- END_PEACH_CUTSCENE_DIALOG_1
+        local lip_sync = sPeachCutsceneDialog1[m.actionTimer]
+        if lip_sync then cast_graph_node(node).selectedCase = lip_sync end
+            --print("ANIM ID: " .. geo_get_current_object().header.gfx.animInfbo.animID .. " ANIM FRAME: " .. geo_get_current_object().header.gfx.animInfo.animFrame)
+    end
+    if m.actionArg == 7 then -- END_PEACH_CUTSCENE_DIALOG_2
+        local lip_sync = sPeachCutsceneDialog2[m.actionTimer]
+        if lip_sync then cast_graph_node(node).selectedCase = lip_sync end
+    end
+    if m.actionArg == 10 then -- END_PEACH_CUTSCENE_DIALOG_3
+        local lip_sync = sPeachCutsceneDialog3[m.actionTimer]
+        if lip_sync then cast_graph_node(node).selectedCase = lip_sync end
+    end
+    return    
+end
+function geo_switch_peach(node, matStackIndex) cast_graph_node(node).selectedCase = 0 
 
+return end
+function geo_switch_peach_left_hand(node, matStackIndex)
+    if m.actionArg == 3 or m.actionArg == 4 or m.actionArg == 5 then -- END_PEACH_CUTSCENE_SPAWN_PEACH END_PEACH_CUTSCENE_DESCEND_PEACH END_PEACH_CUTSCENE_RUN_TO_PEACH
+        cast_graph_node(node).selectedCase = 1
+    end
+    if m.actionArg == 6 then -- END_PEACH_CUTSCENE_DIALOG_1
+        if m.actionTimer == 120 then cast_graph_node(node).selectedCase = 0 end
+        if m.actionTimer == 320 then cast_graph_node(node).selectedCase = 1 end
+    end
+    if m.actionArg == 7 then -- END_PEACH_CUTSCENE_DIALOG_2
+        if m.actionTimer == 0 then cast_graph_node(node).selectedCase = 0 end
+        if m.actionTimer == 42 then cast_graph_node(node).selectedCase = 1 end
+    end
+    if m.actionArg == 8 then -- END_PEACH_CUTSCENE_KISS_FROM_PEACH
+        if m.actionTimer == 0 then cast_graph_node(node).selectedCase = 1 end
+        if m.actionTimer == 35 then cast_graph_node(node).selectedCase = 0 end
+        if m.actionTimer == 130 then cast_graph_node(node).selectedCase = 1 end
+    end
+    if m.actionArg == 10 then -- END_PEACH_CUTSCENE_DIALOG_3
+        if m.actionTimer == 0 then cast_graph_node(node).selectedCase = 1 end
+        if m.actionTimer == 22 then cast_graph_node(node).selectedCase = 0 end
+    end
     return
 end
 
+function geo_switch_peach_right_hand(node, matStackIndex)
+    if m.actionArg == 3 or m.actionArg == 4 or m.actionArg == 5 then -- END_PEACH_CUTSCENE_SPAWN_PEACH END_PEACH_CUTSCENE_DESCEND_PEACH END_PEACH_CUTSCENE_RUN_TO_PEACH
+        cast_graph_node(node).selectedCase = 1
+    end
+    if m.actionArg == 6 then -- END_PEACH_CUTSCENE_DIALOG_1
+        if m.actionTimer == 120 then cast_graph_node(node).selectedCase = 0 end
+        if m.actionTimer == 320 then cast_graph_node(node).selectedCase = 1 end
+    end
+    if m.actionArg == 7 then -- END_PEACH_CUTSCENE_DIALOG_2
+        if m.actionTimer == 0 then cast_graph_node(node).selectedCase = 0 end
+        if m.actionTimer == 42 then cast_graph_node(node).selectedCase = 1 end
+    end
+    if m.actionArg == 8 then -- END_PEACH_CUTSCENE_KISS_FROM_PEACH
+        if m.actionTimer == 0 then cast_graph_node(node).selectedCase = 1 end
+        if m.actionTimer == 35 then cast_graph_node(node).selectedCase = 0 end
+        if m.actionTimer == 130 then cast_graph_node(node).selectedCase = 1 end
+    end
+    if m.actionArg == 10 then -- END_PEACH_CUTSCENE_DIALOG_3
+        if m.actionTimer == 0 then cast_graph_node(node).selectedCase = 1 end
+        if m.actionTimer == 22 then cast_graph_node(node).selectedCase = 0 end
+    end
+        print(m.actionTimer)
+    return
+end
+
+function geo_switch_held_obj(node, matStackIndex)
+    cast_graph_node(node).selectedCase = geo_get_current_object().oSwitchState1
+    if sWarioGrabLightAnims[m.marioObj.header.gfx.animInfo.animID] then
+        smlua_anim_util_set_animation(m.marioObj, sWarioGrabLightAnims[m.marioObj.header.gfx.animInfo.animID])
+        m.marioObj.oSwitchState1 = 1
+    else
+        m.marioObj.oSwitchState1 = 0
+    end
+    return
+end
 
 function geo_switch_wiggler_color(node, matStackIndex)
     local o = obj_get_nearest_object_with_behavior_id(gMarioStates[0].marioObj, id_bhvWigglerHead)
@@ -388,7 +446,20 @@ function geo_function_chuckya_spin(node, matStackIndex)
     local rotN = cast_graph_node(node.next) ---@type GraphNodeRotation
     local rot = (o.oTimer * 0x2000) & 0xFFFF
     rotN.rotation.x = rot
+    return
+end
 
+function geo_function_wing1_rotate(node, matStackIndex)
+    local o = geo_get_current_object()
+    local rotN = cast_graph_node(node.next) ---@type GraphNodeRotation
+    rotN.rotation.x = (coss((o.oTimer & 0xF) << 12) + 1.0) * 4096.0
+    return
+end
+
+function geo_function_wing2_rotate(node, matStackIndex)
+    local o = geo_get_current_object()
+    local rotN = cast_graph_node(node.next) ---@type GraphNodeRotation
+    rotN.rotation.x = -((coss((o.oTimer & 0xF) << 12) + 1.0) * 4096.0)
     return
 end
 
@@ -527,6 +598,40 @@ function geo_function_bowser_color(node, matStackIndex)
         gfx = gfx_get_from_name("bowser_shell_mesh_layer_1")
         apply_color(gfx, o)
     end
+end
+
+function geo_function_bowser_left_eyelid(node, matStackIndex) 
+    local o = geo_get_current_object()
+    local rotN = cast_graph_node(node.next) ---@type GraphNodeRotation
+    if o.oAction == 4 then
+        rotN.rotation.x = 0
+    else
+        local frame = o.oSwitchTimer1 % 90
+        if frame < 14 then
+            local t = math.floor(frame * 0x10000 / 14) & 0xFFFF
+            rotN.rotation.x = -(1.0 - coss(t)) * 0x4000
+        else
+            rotN.rotation.x = 0
+        end
+    end
+    return
+end
+
+function geo_function_bowser_right_eyelid(node, matStackIndex)
+    local o = geo_get_current_object()
+    local rotN = cast_graph_node(node.next) ---@type GraphNodeRotation
+    if o.oAction == 4 then
+        rotN.rotation.x = 0
+    else
+        local frame = o.oSwitchTimer1 % 90
+        if frame < 14 then
+            local t = math.floor(frame * 0x10000 / 14) & 0xFFFF
+            rotN.rotation.x = -(1.0 - coss(t)) * 0x4000
+        else
+            rotN.rotation.x = 0
+        end
+    end
+    return
 end
 
 function geo_function_bowser_left_eye(node, matStackIndex) 
@@ -998,9 +1103,17 @@ local function bhv_goomba_render96_death(o)
 end
 
 local GOOMBA_OPTS = {
-    audio = GOOMBA_SCREAM,
+    audio = EVENT_THROWN,
     interactions = sThrownInteractions,
     enemy = true
+}
+
+local sGoombaWarioDeath = {
+    [ACT_WARIO_GROUND_POUND] = true,
+    [ACT_GROUND_POUND_LAND] = true,
+    [ACT_WARIO_PILE_DRIVER] = true,
+    [ACT_WARIO_PILE_DRIVER_LAND] = true,
+    [ACT_WARIO_CHARGE] = true,
 }
 
 local function bhv_goomba_render96_loop(o)
@@ -1025,22 +1138,24 @@ local function bhv_goomba_render96_loop(o)
 
     if get_character(m).type == CT_WARIO then
         if o.oAction == OBJ_ACT_SQUISHED then
-            if m.action ~= ACT_WARIO_GROUND_POUND and m.action ~= ACT_GROUND_POUND_LAND then
+            if not sGoombaWarioDeath[m.action] then
                 set_mario_particle_flags(m, PARTICLE_HORIZONTAL_STAR, 0)
                 o.oInteractType = INTERACT_GRABBABLE
                 o.oAction = GOOMBA_ACT_STUN
                 o.oSwitchState2 = GOOMBA_FACE_OPEN
                 o.oSwitchState1 = GOOMBA_EYE_DAZED
                 o.oTimer = 0
-                cur_obj_init_animation_with_accel_and_sound(0, 0) 
-            end
-            if m.action == ACT_WARIO_GROUND_POUND or m.action == ACT_GROUND_POUND_LAND then
+                cur_obj_init_animation_with_accel_and_sound(0, 0)
+            elseif sGoombaWarioDeath[m.action] then
                 bhv_goomba_render96_death(o)
             end
         end
     
         --Stunned from wario's jump, checks if going to be grabbed
         if (o.oHeldState == HELD_FREE and o.oAction == GOOMBA_ACT_STUN and o.oTimer <= 150) then
+            if sGoombaWarioDeath[m.action] and dist_between_objects(o, m.marioObj) <= 150 then
+                bhv_goomba_render96_death(o)
+            end
             o.oGoombaTargetYaw = o.oGoombaTargetYaw + 0x1000
             cur_obj_rotate_yaw_toward(o.oGoombaTargetYaw, 0x1000)
             o.oSwitchState2 = GOOMBA_FACE_OPEN
@@ -1074,7 +1189,7 @@ end
 id_bhvRender96Goomba = hook_render96_behavior(id_bhvGoomba, false, bhv_goomba_render96_init, bhv_goomba_render96_loop)
 
 local SHELL_OPTS = {
-    audio = SHELL_THROW,
+    audio = EVENT_SHELL_THROWN,
     interactions = sThrownInteractions,
 }
 
@@ -1454,12 +1569,11 @@ local function bhv_luigi_key_loop(o)
     o.oPosY = o.oPosY + sins(o.oFaceAngleYaw / (20 * 1000)) * 2
     if dist_between_objects(o, m.marioObj) <= 150 then
         r96lib.save_render96_data("luigi_key", o.oBehParams2ndByte)
+        gNumLuigiKeys = select(2, r96lib.load_render96_data("luigi_key"):gsub("1", ""))
+        spawn_non_sync_object(id_bhvCoinSparkles, E_MODEL_SPARKLES, o.oPosX, o.oPosY, o.oPosZ, nil)
+        audio_stream_play(COLLECTABLE, false, 1)
+        cur_obj_disable_rendering_and_become_intangible(o)
         obj_mark_for_deletion(o)
-        --spawn_object(o, MODEL_SPARKLES, bhvGoldenCoinSparkles)
-        --r96_play_collect_jingle(R96_EVENT_COLLECTIBLE_GRAB)
-        --if gMarioState.numKeys >= 10 then
-        --    triggerLuigiNotification()
-        --end
     end
     if r96lib.check_render96_data("luigi_key", o.oBehParams2ndByte) == true then
         cur_obj_disable_rendering_and_become_intangible(o)
@@ -1480,33 +1594,39 @@ local function bhv_six_golden_coin_init(o)
     o.oBuoyancy = 200
     o.hitboxHeight = 64
     o.hitboxRadius = 32
-    cur_obj_scale(2.0)
-    if r96lib.check_render96_data("wario_coin", o.oBehParams2ndByte) == 1 then
-        cur_obj_disable_rendering_and_become_intangible(o)
-        obj_mark_for_deletion(o)
-    end
 end
 
 ---@param o Object
 local function bhv_six_golden_coin_loop(o)
-    if dist_between_objects(o, m.marioObj) <= 50 then
+    o.oFaceAngleYaw = o.oFaceAngleYaw + 0x700
+    o.oPosY = o.oPosY + sins(o.oFaceAngleYaw / (20 * 1000)) * 2
+    if dist_between_objects(o, m.marioObj) <= 150 then
         r96lib.save_render96_data("wario_coin", o.oBehParams2ndByte)
-        gNumWarioCoins = gNumWarioCoins + 1
-        set_mario_particle_flags(m, PARTICLE_SPARKLES, 0)
-        create_sound_spawner(SOUND_GENERAL_COIN)
+        gNumWarioCoins = select(2, r96lib.load_render96_data("wario_coin"):gsub("1", ""))
+        print(gNumWarioCoins)
+        spawn_non_sync_object(id_bhvCoinSparkles, E_MODEL_SPARKLES, o.oPosX, o.oPosY, o.oPosZ, nil)
+        audio_stream_play(COLLECTABLE, false, 1)
         cur_obj_disable_rendering_and_become_intangible(o)
         obj_mark_for_deletion(o)
     end
-    if obj_check_if_collided_with_object(o, m.marioObj) ~= 0  then
-
+    if r96lib.check_render96_data("wario_coin", o.oBehParams2ndByte) == true then
+        cur_obj_disable_rendering_and_become_intangible(o)
         obj_mark_for_deletion(o)
-        --if gMarioState.numWarioCoins >= 6 then
-        --    triggerLuigiNotification()
-        --end
     end
 end
 
 id_bhvSixGoldenCoin = hook_render96_behavior(nil, false, bhv_six_golden_coin_init, bhv_six_golden_coin_loop, OBJ_LIST_SURFACE, "SixGoldenCoin")
+
+local function magnetize_to_mario(o)
+    local targetX = m.pos.x + m.vel.x
+    local targetY = m.pos.y + 10
+    local targetZ = m.pos.z + m.vel.z
+    o.oPosX = math.lerp(o.oPosX, targetX, 0.2)
+    o.oPosY = math.lerp(o.oPosY, targetY, 0.2)
+    o.oPosZ = math.lerp(o.oPosZ, targetZ, 0.2)
+    obj_turn_toward_object(o, m.marioObj, 16, 0x2000)
+    o.oForwardVel = 60
+end
 
 ---@param o Object
 local function bhv_wario_coin_init(o)
@@ -1515,10 +1635,10 @@ local function bhv_wario_coin_init(o)
     o.oDamageOrCoinValue = 0
     o.hitboxHeight = 72
     o.hitboxRadius = 50
+    o.oVelY = 30
     cur_obj_scale(0.8)
     create_sound_spawner(SOUND_GENERAL_COIN_DROP)
 end
-
 
 ---@param o Object
 local function bhv_wario_coin_loop(o)
@@ -1529,7 +1649,7 @@ local function bhv_wario_coin_loop(o)
     o.oBuoyancy = 1.4
     o.oFaceAngleYaw = o.oFaceAngleYaw + 0x1000
     o.oForwardVel = 30
-    if (o.oMoveFlags & OBJ_MOVE_MASK_ON_GROUND) ~= 0 or (o.oMoveFlags & OBJ_MOVE_HIT_WALL) ~= 0 or (o.oMoveFlags & OBJ_MOVE_HIT_EDGE) ~= 0 or (o.oMoveFlags & OBJ_MOVE_MASK_IN_WATER) ~= 0 then obj_turn_toward_object(o, m.marioObj, 16, 0x2000) end
+    if o.oVelY < 0 or (o.oMoveFlags & OBJ_MOVE_MASK_ON_GROUND) ~= 0 or (o.oMoveFlags & OBJ_MOVE_HIT_WALL) ~= 0 or (o.oMoveFlags & OBJ_MOVE_HIT_EDGE) ~= 0 or (o.oMoveFlags & OBJ_MOVE_MASK_IN_WATER) ~= 0 then magnetize_to_mario(o) end
 
     if dist_between_objects(o, m.marioObj) <= 50 then
         set_mario_particle_flags(m, PARTICLE_SPARKLES, 0)
@@ -2246,9 +2366,11 @@ end
 
 ---@param o Object
 local function bhv_bobomb_render96_loop(o)
+    if get_character(m).type == CT_WARIO and sGoombaWarioDeath[m.action] and dist_between_objects(o, m.marioObj) <= 150 then
+        --o.oBobombFuseTimer = 150
+    end
     if o.oBobombFuseTimer == 0 then 
         o.oSwitchState1 = 0
-
     else 
         o.oSwitchState1 = 1
         r96lib.pulse_ramp(o, COLORS_BOBOMB, o.oBobombFuseTimer, 150)
@@ -2297,10 +2419,12 @@ id_bhvRender96Scuttlebug = hook_render96_behavior(id_bhvScuttlebug, false, nil, 
 
 ---@param o Object
 local function bhv_bowser_render96_loop(o)
-    r96lib.pulse_cycle(o, COLORS_BOBOMB, 50)
+    --r96lib.pulse_cycle(o, COLORS_BOBOMB, 50)
+        obj_set_model_extended(o, E_MODEL_BOWSER)
+    o.oSwitchTimer1 = o.oSwitchTimer1 + 1
 end
 
---id_bhvRender96Bowser = hook_render96_behavior(id_bhvBowser, false, nil, bhv_bowser_render96_loop, OBJ_LIST_GENACTOR)
+id_bhvRender96Bowser = hook_render96_behavior(id_bhvBowser, false, nil, bhv_bowser_render96_loop, OBJ_LIST_GENACTOR)
 
 ---@param o Object
 local function bhv_snowball_render96_init(o)
@@ -2313,6 +2437,12 @@ id_bhvRender96MrBlizzardSnowball = hook_render96_behavior(id_bhvMrBlizzardSnowba
 local function bhv_tree_render96_loop(o)
     o.header.gfx.node.flags = o.header.gfx.node.flags & ~GRAPH_RENDER_BILLBOARD
     o.header.gfx.node.flags = o.header.gfx.node.flags & ~GRAPH_RENDER_CYLBOARD
+    local model = obj_get_model_id_extended(o)
+    if o.oTimer < 2 then
+        if model ~= E_MODEL_COURTYARD_SPIKY_TREE or E_MODEL_PALM_TREE then
+            o.oFaceAngleYaw = math.random(0, 10) * 0x10000/10
+        end
+    end
 end
 
 id_bhvRender96Tree = hook_render96_behavior(id_bhvTree, false, nil, bhv_tree_render96_loop, OBJ_LIST_POLELIKE)
@@ -2445,6 +2575,30 @@ local function bhv_yoshi_unridden(o)
     end
 end
 
+
+--/* |description|
+--Checks the current animation frame against two specified frames to trigger footstep sounds.
+--Also chooses specific sounds if Mario is wearing Metal Cap or is in quicksand
+--|descriptionEnd| */
+--void play_step_sound(struct MarioState *m, s16 frame1, s16 frame2) {
+--    if (!m) { return; }
+--    if (is_anim_past_frame(m, frame1) || is_anim_past_frame(m, frame2)) {
+--        if (m->flags & MARIO_METAL_CAP) {
+--            if (m->marioObj->header.gfx.animInfo.animID == get_character_anim(m, CHAR_ANIM_TIPTOE)) {
+--                play_sound_and_spawn_particles(m, SOUND_ACTION_METAL_STEP_TIPTOE, 0);
+--            } else {
+--                play_sound_and_spawn_particles(m, SOUND_ACTION_METAL_STEP, 0);
+--            }
+--        } else if (m->quicksandDepth > 50.0f) {
+--            play_sound(SOUND_ACTION_QUICKSAND_STEP, m->marioObj->header.gfx.cameraToObject);
+--        } else if (m->marioObj->header.gfx.animInfo.animID == get_character_anim(m, CHAR_ANIM_TIPTOE)) {
+--            play_sound_and_spawn_particles(m, SOUND_ACTION_TERRAIN_STEP_TIPTOE, 0);
+--        } else {
+--            play_sound_and_spawn_particles(m, SOUND_ACTION_TERRAIN_STEP, 0);
+--        }
+--    }
+--}
+
 local function bhv_yoshi_rideable_render96_loop(o)
     yoshi_update_blink(o)
 
@@ -2463,30 +2617,35 @@ local function bhv_yoshi_rideable_render96_loop(o)
         local animInfo = o.header.gfx.animInfo
         o.oYoshiIdleTimer = 0
         obj_copy_pos(o, rider.marioObj)
-        rider.marioObj.header.gfx.pos.y = rider.marioObj.header.gfx.pos.y - 30
+        --rider.marioObj.header.gfx.pos.y = rider.marioObj.header.gfx.pos.y - 30
         o.oMoveAngleYaw = rider.faceAngle.y
         o.oFaceAnglePitch = 0
         o.oFaceAngleRoll = 0
 
         local action = rider.action
         if action == ACT_YOSHI_RIDE_IDLE then
-            cur_obj_init_animation(0)
+            smlua_anim_util_set_animation(o, YOSHI_ANIM_RIDABLE_IDLE)
         elseif action == ACT_YOSHI_RIDE_WALK then
-            cur_obj_init_animation_with_accel_and_sound(1, math.abs(rider.forwardVel) / 14)
-            cur_obj_play_sound_at_anim_range(0, 15, SOUND_GENERAL_YOSHI_WALK)
+            --cur_obj_init_animation_with_accel_and_sound(1, math.abs(rider.forwardVel) / 14)
+            --if cur_obj_check_anim_frame(3) then
+            --    play_sound(SOUND_GENERAL_YOSHI_WALK, m.marioObj.header.gfx.cameraToObject)
+            --end
+            --play_step_sound(m, 1, 2);
+            smlua_anim_util_set_animation(o, YOSHI_ANIM_RIDABLE_RUN)
+            cur_obj_play_sound_at_anim_range(3, 9, SOUND_GENERAL_YOSHI_WALK)
         elseif action == ACT_YOSHI_RIDE_JUMP then
             if rider.vel.y >= -21 then
-                cur_obj_init_animation(2)
+                smlua_anim_util_set_animation(o, YOSHI_ANIM_RIDABLE_JUMP)
                 if o.header.gfx.animInfo.animFrame >= 4 then
                     o.header.gfx.animInfo.animFrame = 4
                 end
             else
-                smlua_anim_util_set_animation(o, "YOSHI_FALL")
+                smlua_anim_util_set_animation(o, YOSHI_ANIM_RIDABLE_JUMP_FALL)
             end
         elseif action == ACT_YOSHI_RIDE_FALL then
-            smlua_anim_util_set_animation(o, "YOSHI_FALL_STATIC")
+            smlua_anim_util_set_animation(o, YOSHI_ANIM_RIDABLE_JUMP_FALL)
         elseif action == ACT_YOSHI_RIDE_FLUTTER then
-            smlua_anim_util_set_animation(o, "YOSHI_FLUTTER")
+            smlua_anim_util_set_animation(o, YOSHI_ANIM_RIDABLE_FLUTTER)
         else
             mario_stop_riding_object(rider)
         end
@@ -2582,3 +2741,83 @@ local function bhv_wooden_post_render96_loop(o)
 end
 
 id_bhvRender96WoodenPost = hook_render96_behavior(id_bhvWoodenPost, false, nil, bhv_wooden_post_render96_loop, OBJ_LIST_SURFACE)
+
+local function bhv_lakitu_loop(o)
+   --if o.oAction >= 100 then obj_set_model_extended(o, E_MODEL_LAKITU_ENDING) end
+   --if o.oAction < 100 then obj_set_model_extended(o, E_MODEL_LAKITU) end
+   o.oOpacity = 255
+end
+
+id_bhvRender96BeginningLakitu = hook_render96_behavior(id_bhvBeginningLakitu, false, nil, bhv_lakitu_loop, OBJ_LIST_DEFAULT)
+
+---@param o Object
+local function bhv_yoshi_tongue(o)
+    if m == nil or m.marioObj == nil then
+        obj_mark_for_deletion(o)
+        return
+    end
+
+    -- Target died mid-flight: freeze the lock point where the tip currently is, retract from there.
+    if o.parentObj ~= nil and (o.parentObj.activeFlags & ACTIVE_FLAG_DEACTIVATED) ~= 0 then
+        o.oTongueLockX, o.oTongueLockY, o.oTongueLockZ = o.parentObj.oPosX, o.parentObj.oPosY, o.parentObj.oPosZ
+        o.parentObj = nil
+        o.oAction = TONGUE_STATE_RETRACTING
+    end
+
+    -- Base tracks the mouth every frame so the tongue follows Mario/Yoshi's head while out.
+    local baseX = m.marioObj.oPosX + 20.0 * sins(m.faceAngle.y)
+    local baseY = m.marioObj.oPosY + 60.0
+    local baseZ = m.marioObj.oPosZ + 20.0 * coss(m.faceAngle.y)
+
+    local targetX, targetY, targetZ
+    if o.parentObj ~= nil then
+        targetX, targetY, targetZ = o.parentObj.oPosX, o.parentObj.oPosY, o.parentObj.oPosZ
+    else
+        targetX, targetY, targetZ = o.oTongueLockX, o.oTongueLockY, o.oTongueLockZ
+    end
+
+    local dx, dy, dz = targetX-baseX, targetY-baseY, targetZ-baseZ
+    local distance = math.max(math.sqrt(dx*dx + dy*dy + dz*dz), 0.001)
+
+    if o.oAction == TONGUE_STATE_EXTENDING then
+        o.oTongueU = math.min(o.oTongueU + (1.0 / TONGUE_EXTEND_FRAMES), 1.0)
+
+        if o.oTongueU >= 1.0 then
+            if o.parentObj ~= nil then
+                o.oAction = TONGUE_STATE_LATCHED
+                o.oTongueTimer = 0
+                queue_rumble_data_mario(m, 4, 40)
+                play_sound(SOUND_GENERAL_BOING1, m.marioObj.header.gfx.cameraToObject)
+                -- hook your grab/damage effect on o.parentObj here
+            else
+                o.oAction = TONGUE_STATE_RETRACTING -- missed
+            end
+        end
+
+    elseif o.oAction == TONGUE_STATE_LATCHED then
+        o.oTongueTimer = o.oTongueTimer + 1
+        if o.oTongueTimer >= TONGUE_LATCH_HOLD then
+            o.oAction = TONGUE_STATE_RETRACTING
+        end
+
+    else -- RETRACTING
+        o.oTongueU = o.oTongueU - (1.0 / TONGUE_RETRACT_FRAMES)
+        if o.oTongueU <= 0.0 then
+            obj_mark_for_deletion(o)
+            return
+        end
+    end
+
+    local currentLength = o.oTongueU * distance
+
+    o.oPosX, o.oPosY, o.oPosZ = baseX, baseY, baseZ
+    o.oFaceAngleYaw = atan2s(dz, dx)
+    o.oFaceAnglePitch = atan2s(math.sqrt(dx*dx + dz*dz), dy) -- flip sign if it looks inverted
+
+    o.header.gfx.scale.x = 1.0
+    o.header.gfx.scale.y = 1.0
+    o.header.gfx.scale.z = math.max(currentLength, 0.001) / TONGUE_MODEL_LENGTH
+end
+
+id_bhvRender96YoshiTongue = hook_render96_behavior(nil, false, nil, bhv_yoshi_tongue, OBJ_LIST_SURFACE)
+

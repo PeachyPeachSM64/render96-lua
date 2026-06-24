@@ -171,7 +171,7 @@ local function render_hud_wario_coins()
     djui_hud_print_text(tostring(gNumWarioCoins), 54, 55, 1)
 end
 
-hook_event(HOOK_ON_HUD_RENDER, function()
+hook_event(HOOK_ON_HUD_RENDER_BEHIND, function()
     render_hud_keys()
     render_hud_wario_coins()
 end)

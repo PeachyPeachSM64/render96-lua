@@ -115,7 +115,7 @@ r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_BLARGG, id_bhvRender96Blargg, -5315, 0,  
 r96lib.addSpawn(LEVEL_BBH,  1, E_MODEL_MR_I, id_bhvRender96MrI, -2369, -204,  5184, 0, 0, 0, false)
 r96lib.addSpawn(LEVEL_BBH,  1, E_MODEL_MR_I, id_bhvRender96MrI,   480,   10,  -653, 0, 0, 0, false)
 r96lib.addSpawn(LEVEL_BBH,  1, E_MODEL_MR_I, id_bhvRender96MrI,  1640,  840,  -733, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_BBH,  1, E_MODEL_MR_I, id_bhvRender96MrI,   923, 1741,  -332, 0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 0x05010000 end)
+r96lib.addSpawn(LEVEL_BBH,  1, E_MODEL_MR_I, id_bhvRender96MrI,   923, 1741,  -332, 0, 0, 0, false, nil, function(o) o.oBehParams = 0x05010000 o.oBehParams2ndByte = 0x05010000 end)
 r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_MR_I, id_bhvRender96MrI, -3199,  307,  3456, 0, 0, 0, false)
 r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_MR_I, id_bhvRender96MrI,  6673,  154, -3060, 0, 0, 0, false)
 r96lib.addSpawn(LEVEL_HMC,  1, E_MODEL_MR_I, id_bhvRender96MrI,  4740, 1060,  4680, 0, 0, 0, false)

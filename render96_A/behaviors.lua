@@ -1624,12 +1624,13 @@ local function bhv_six_golden_coin_init(o)
     o.oBuoyancy = 200
     o.hitboxHeight = 64
     o.hitboxRadius = 32
+    o.oHomeY = o.oPosY
 end
 
 ---@param o Object
 local function bhv_six_golden_coin_loop(o)
     o.oFaceAngleYaw = o.oFaceAngleYaw + 0x700
-    o.oPosY = o.oPosY + sins(o.oFaceAngleYaw / (20 * 1000)) * 2
+    o.oPosY = o.oHomeY + sins(o.oTimer * 0x600) * 8
     if dist_between_objects(o, m.marioObj) <= 150 then
         r96lib.save_render96_data("wario_coin", o.oBehParams2ndByte)
         gNumWarioCoins = select(2, r96lib.load_render96_data("wario_coin"):gsub("1", ""))

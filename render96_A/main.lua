@@ -148,15 +148,17 @@ hook_event(HOOK_ON_MODS_LOADED, on_room_create)
 local TEX_BOO_KEY    = get_texture_info("texture_hud_boo_key")
 local TEX_WARIO_COIN = get_texture_info("texture_hud_wario_coin")
 
-local function in_ending_cutscene()
+local function in_cutscene()
     local act = gMarioStates[0].action
     return act == ACT_END_PEACH_CUTSCENE
         or act == ACT_CREDITS_CUTSCENE
         or act == ACT_END_WAVING_CUTSCENE
+        or act == ACT_INTRO_CUTSCENE
 end
 
 local function render_hud_keys()
-    if in_ending_cutscene() then return end
+    if in_cutscene() then return end
+    if obj_get_first_with_behavior_id(id_bhvActSelector) then return end
     if gNumLuigiKeys <= 0 or gNumLuigiKeys >= 8 then return end
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_color(255, 255, 255, 255)
@@ -167,7 +169,8 @@ local function render_hud_keys()
 end
 
 local function render_hud_wario_coins()
-    if in_ending_cutscene() then return end
+    if in_cutscene() then return end
+    if obj_get_first_with_behavior_id(id_bhvActSelector) then return end
     if gNumWarioCoins <= 0 or gNumWarioCoins >= 6 then return end
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_color(255, 255, 255, 255)
@@ -249,9 +252,11 @@ function quality_of_life()
         end
     end
     sWasGameOver = isGameOver
+
+    if m.action == ACT_JUMBO_STAR_CUTSCENE and m.actionArg == 2 then --JUMBO_STAR_CUTSCENE_FLYING
+        m.marioBodyState.handState = MARIO_HAND_OPEN;
+    end
     --print("X: " .. gMarioStates[0].marioObj.oPosX .. " Y: " .. gMarioStates[0].marioObj.oPosY .. " Z: " .. gMarioStates[0].marioObj.oPosZ)
-    --if gNumLuigiKeys ~= 8 and gMarioStates[0].character.type == CT_LUIGI then _G.charSelect.character_set_current_number(CT_MARIO, 1) end
-    --if gNumWarioCoins ~= 6 and gMarioStates[0].character.type == CT_WARIO then _G.charSelect.character_set_current_number(CT_MARIO, 1) end
 end
 hook_event(HOOK_MARIO_UPDATE, quality_of_life)
 

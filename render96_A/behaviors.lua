@@ -2084,6 +2084,9 @@ local function bhv_thwomp_render96_init(o)
     end
     o.oThwompBaseScale = o.header.gfx.scale.x
     o.collisionData = smlua_collision_util_get("thwomp_collision")
+    o.oHomeX = o.oPosX
+    o.oHomeY = o.oPosY
+    o.oHomeZ = o.oPosZ
 end
 
 ---@param o Object
@@ -2110,7 +2113,11 @@ local function bhv_thwomp_render96_loop(o)
     bhv_thwomp_render96_shake(o)
     if o.oAction == 0 then o.oSwitchState2 = 0 end
     if o.oAction == 2 then o.oSwitchState2 = 2 end
-    if o.oAction == 3 then o.oSwitchState2 = 1 end
+    if o.oAction == 3 then o.oSwitchState2 = 1 
+        o.oPosX = o.oHomeX
+        o.oPosY = o.oHomeY
+        o.oPosZ = o.oHomeZ
+    end
 
    local remaining = o.oThwompRandomTimer - o.oTimer
     if remaining > (o.oThwompShakeTicks + 0.5) or remaining < 0 then

@@ -1062,6 +1062,24 @@ local function act_luigi_scuttle_run_hold(m)
     end
 end
 
+-- WALUIGI MOVESET
+
+---@param m MarioState
+local function act_waluigi_air_swim(m)
+    if (m.marioObj.header.gfx.animInfo.animFrame == 0) then
+        play_sound(SOUND_ACTION_SWIM_FAST, m.marioObj.header.gfx.cameraToObject)
+    end
+
+    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
+    update_air_with_turn(m)
+    if m.actionState == 0 then
+        m.actionState = m.actionState + 1
+        m.vel.y = 45
+    end
+    common_air_action_step(m, ACT_DIVE_SLIDE, CHAR_ANIM_SWIM_PART1, 0)
+    m.forwardVel = math.max(m.forwardVel -1, 0)
+end
+
 -- YOSHI MOVESET
 
 local sFlutterTimer = 0
@@ -1305,6 +1323,18 @@ local function luigi_before_phys_step(m)
     end
 end
 
+---@param m MarioState
+local function waluigi_update(m)
+    if (m.action == ACT_JUMP or m.action == ACT_DOUBLE_JUMP or m.action == ACT_TRIPLE_JUMP) and m.actionTimer > 1 and m.controller.buttonPressed & A_BUTTON ~= 0 then
+        set_mario_action(m, ACT_WALUIGI_AIR_SWIM, 0)
+        m.vel.y = 35
+    end
+
+    if m.action == ACT_JUMP or m.action == ACT_DOUBLE_JUMP or m.action == ACT_TRIPLE_JUMP then
+        m.actionTimer = m.actionTimer + 1
+    end
+end
+
 hook_mario_action(ACT_WARIO_CHARGE,             act_wario_charge, INT_FAST_ATTACK_OR_SHELL)
 hook_mario_action(ACT_WARIO_TRIPLE_JUMP,        act_wario_triple_jump)
 hook_mario_action(ACT_WARIO_HOLD_IDLE,          act_wario_hold_idle)
@@ -1327,6 +1357,8 @@ hook_mario_action(ACT_LUIGI_SCUTTLE_RUN_HOLD,   act_luigi_scuttle_run_hold)
 hook_mario_action(ACT_LUIGI_BACKFLIP,           act_luigi_backflip)
 hook_mario_action(ACT_LUIGI_TWIRLING,           act_luigi_twirling)
 hook_mario_action(ACT_LUIGI_TWIRLING_DOWN,      act_luigi_twirling_down, INT_GROUND_POUND)
+
+hook_mario_action(ACT_WALUIGI_AIR_SWIM,         act_waluigi_air_swim)
 
 hook_mario_action(ACT_YOSHI_RIDE_IDLE,          act_yoshi_ride_idle )
 hook_mario_action(ACT_YOSHI_RIDE_WALK,          act_yoshi_ride_walk )
@@ -1364,6 +1396,8 @@ hook_event(HOOK_ON_MODS_LOADED, function ()
         _G.charSelect.character_set_locked(CT_WARIO, wario_bool, true)
         _G.charSelect.character_hook_moveset(CT_WARIO, HOOK_BEFORE_SET_MARIO_ACTION, wario_before_actions)
         _G.charSelect.character_hook_moveset(CT_WARIO, HOOK_MARIO_UPDATE, wario_update)
+        -- Waluigi
+        _G.charSelect.character_hook_moveset(CT_WALUIGI, HOOK_MARIO_UPDATE, waluigi_update)
     end
 end)
 

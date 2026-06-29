@@ -22,6 +22,7 @@ ACT_WARIO_SWING_FLING_START     = allocate_mario_action(ACT_FLAG_STATIONARY | AC
 ACT_WARIO_SWING_FLING_HELD      = allocate_mario_action(ACT_FLAG_STATIONARY | ACT_FLAG_ATTACKING | ACT_FLAG_INVULNERABLE)
 ACT_WARIO_SWING_FLING_THROW     = allocate_mario_action(ACT_FLAG_STATIONARY | ACT_FLAG_ATTACKING | ACT_FLAG_INVULNERABLE)
 ACT_WARIO_GROUND_POUND          = allocate_mario_action(ACT_GROUP_AIRBORNE |ACT_FLAG_AIR | ACT_FLAG_ATTACKING)
+ACT_WALUIGI_AIR_SWIM            = allocate_mario_action(ACT_GROUP_AIRBORNE |ACT_FLAG_AIR | ACT_FLAG_ATTACKING | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION | ACT_FLAG_MOVING)
 
 -- Rideable Yoshi: description: Run around with a Yoshi friend with this mod. Original mod by steven, edited by DorfDork
 ACT_YOSHI_RIDE_IDLE     = allocate_mario_action(ACT_GROUP_STATIONARY | ACT_FLAG_STATIONARY | ACT_FLAG_IDLE)

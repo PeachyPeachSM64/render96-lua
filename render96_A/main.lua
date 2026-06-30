@@ -159,6 +159,7 @@ end
 local function render_hud_keys()
     if in_cutscene() then return end
     if obj_get_first_with_behavior_id(id_bhvActSelector) then return end
+    if hud_is_hidden() then return end
     if gNumLuigiKeys <= 0 or gNumLuigiKeys >= 8 then return end
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_color(255, 255, 255, 255)
@@ -171,6 +172,7 @@ end
 local function render_hud_wario_coins()
     if in_cutscene() then return end
     if obj_get_first_with_behavior_id(id_bhvActSelector) then return end
+    if hud_is_hidden() then return end
     if gNumWarioCoins <= 0 or gNumWarioCoins >= 6 then return end
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_color(255, 255, 255, 255)
@@ -183,6 +185,17 @@ end
 hook_event(HOOK_ON_HUD_RENDER_BEHIND, function()
     render_hud_keys()
     render_hud_wario_coins()
+end)
+
+hook_chat_command("hud", "[0|1]", function(msg)
+    if msg == '0' then
+        hud_hide()
+        return true
+    elseif string.sub(msg, 1, 1) == "1" then
+        hud_show()
+        return true
+    end
+    return false
 end)
 
 local function entity_cleanup()

@@ -1062,10 +1062,10 @@ local function act_luigi_scuttle_run_hold(m)
     end
 end
 
--- WALUIGI MOVESET
+-- BANANAMAN MOVESET
 
 ---@param m MarioState
-local function act_waluigi_air_swim(m)
+local function act_bananaman_jump(m)
     if (m.marioObj.header.gfx.animInfo.animFrame == 0) then
         play_sound(SOUND_ACTION_SWIM_FAST, m.marioObj.header.gfx.cameraToObject)
     end
@@ -1324,10 +1324,10 @@ local function luigi_before_phys_step(m)
 end
 
 ---@param m MarioState
-local function waluigi_update(m)
+local function bananaman_update(m)
     if (m.action == ACT_JUMP or m.action == ACT_DOUBLE_JUMP or m.action == ACT_TRIPLE_JUMP) and m.actionTimer > 1 and m.controller.buttonPressed & A_BUTTON ~= 0 then
         m.faceAngle.y = m.intendedYaw
-        set_mario_action(m, ACT_WALUIGI_AIR_SWIM, 0)
+        set_mario_action(m, ACT_BANANAMAN_JUMP, 0)
         m.vel.y = 35
     end
 
@@ -1359,7 +1359,7 @@ hook_mario_action(ACT_LUIGI_BACKFLIP,           act_luigi_backflip)
 hook_mario_action(ACT_LUIGI_TWIRLING,           act_luigi_twirling)
 hook_mario_action(ACT_LUIGI_TWIRLING_DOWN,      act_luigi_twirling_down, INT_GROUND_POUND)
 
-hook_mario_action(ACT_WALUIGI_AIR_SWIM,         act_waluigi_air_swim)
+hook_mario_action(ACT_BANANAMAN_JUMP,           act_bananaman_jump)
 
 hook_mario_action(ACT_YOSHI_RIDE_IDLE,          act_yoshi_ride_idle )
 hook_mario_action(ACT_YOSHI_RIDE_WALK,          act_yoshi_ride_walk )
@@ -1397,8 +1397,8 @@ hook_event(HOOK_ON_MODS_LOADED, function ()
         _G.charSelect.character_set_locked(CT_WARIO, wario_bool, true)
         _G.charSelect.character_hook_moveset(CT_WARIO, HOOK_BEFORE_SET_MARIO_ACTION, wario_before_actions)
         _G.charSelect.character_hook_moveset(CT_WARIO, HOOK_MARIO_UPDATE, wario_update)
-        -- Waluigi
-        _G.charSelect.character_hook_moveset(CT_WALUIGI, HOOK_MARIO_UPDATE, waluigi_update)
+        -- Bananas
+        _G.charSelect.character_hook_moveset(CT_TOAD, HOOK_MARIO_UPDATE, bananaman_update)
     end
 end)
 

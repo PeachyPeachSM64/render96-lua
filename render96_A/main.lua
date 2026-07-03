@@ -348,6 +348,7 @@ local function mario_update(m)
    --SPECIAL_WARP_LEVEL_SELECT
    --SPECIAL_WARP_GODDARD
    --WARP_OP_CREDITS_START
+   
 end
 
 hook_event(HOOK_MARIO_UPDATE, mario_update)

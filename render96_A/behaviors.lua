@@ -2508,6 +2508,13 @@ end
 
 id_bhvRender96WoodenPost = hook_render96_behavior(id_bhvWoodenPost, false, nil, bhv_wooden_post_render96_loop, OBJ_LIST_SURFACE)
 
+---@param o Object
+local function bhv_unagi_render96_init(o)
+    o.header.gfx.skipInViewCheck = true
+end
+
+id_bhvRender96Unagi = hook_render96_behavior(id_bhvUnagi, false, bhv_unagi_render96_init, nil, OBJ_LIST_GENACTOR)
+
 local YOSHI_RIDING_ACTIONS = {
     [ACT_YOSHI_RIDE_IDLE]    = true,
     [ACT_YOSHI_RIDE_WALK]    = true,

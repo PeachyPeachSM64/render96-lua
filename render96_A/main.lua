@@ -121,6 +121,7 @@ r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_MR_I, id_bhvRender96MrI,  6673,  154, -30
 r96lib.addSpawn(LEVEL_HMC,  1, E_MODEL_MR_I, id_bhvRender96MrI,  4740, 1060,  4680, 0, 0, 0, false)
 r96lib.addSpawn(LEVEL_HMC,  1, E_MODEL_MR_I, id_bhvRender96MrI,  6700, 1020,  6820, 0, 0, 0, false)
 r96lib.addSpawn(LEVEL_BITS, 1, E_MODEL_MARTY, id_bhvThwomp,     -5247, -1330,  -787, 0, 0, 0, true, nil, function(o) o.oBehParams = 1 end)
+r96lib.addSpawn(LEVEL_SL, 1, E_MODEL_BIG_CHILL_BULLY, id_bhvBigBullyWithMinions, 315, 1331, -4852, 0, 0, 0, false, nil, function(o) o.oBullySubtype = BULLY_STYPE_CHILL end)
 
 -- Extra
 r96lib.addSpawn(LEVEL_BOB,   1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, 7141,  2030,  -6711, 0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 0 end)

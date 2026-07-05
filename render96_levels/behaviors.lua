@@ -76,8 +76,15 @@ UvScroll.hook_scrolling_function('bowser_2_dl_bowser_2_environment_mesh_layer_1_
 
 ---@param o Object
 local function bhv_tilting_bowser_lava_platform_init(o)
-        o.header.gfx.skipInViewCheck = true
+    o.header.gfx.skipInViewCheck = true
     o.collisionData = smlua_collision_util_get("bitfs_tilting_arena_collision")
 end
 
 id_bhvRender96TiltingBowserLavaPlatform = hook_render96_behavior(id_bhvTiltingBowserLavaPlatform, false, bhv_tilting_bowser_lava_platform_init, nil)
+
+---@param o Object
+local function bhv_falling_bowser_platform_init(o)
+    o.header.gfx.skipInViewCheck = true
+end
+
+id_bhvRender96FallingBowserPlatform = hook_render96_behavior(id_bhvFallingBowserPlatform, false, bhv_falling_bowser_platform_init, nil)

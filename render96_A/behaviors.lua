@@ -114,6 +114,8 @@ define_custom_obj_fields({
     oTongueLockX           = "f32",
     oTongueLockY           = "f32",
     oTongueLockZ           = "f32",
+    oMarioBlinkTimer       = "s32",
+    oMarioBlinkFrame       = "s32",
 })
 
 local R96_EYES_OPEN = 0
@@ -130,9 +132,6 @@ local R96_FACE_DEFAULT = 0
 local R96_FACE_HAPPY = 3
 local R96_FACE_ANGRY = 4
 local R96_FACE_OPEN = 5
-
-local blinkFrame = 1
-local blinkTimer = 0
 
 local sleepFrame = 1
 local sleepTimer = 1
@@ -432,9 +431,10 @@ function geo_switch_kug(node, matStackIndex)
     if o == nil then return end
     cast_graph_node(node).selectedCase = (geo_get_current_object().oTimer // 4) % 4
 end
- 
+
 function geo_switch_mario_eye_custom(node, matStackIndex)
     local switchCase = cast_graph_node(node) ---@type GraphNodeSwitchCase
+    local m = geo_get_mario_state()
     local marioAction = m.action
     local marioHurtCounter = m.hurtCounter
     local marioHealth = m.health
@@ -451,29 +451,29 @@ function geo_switch_mario_eye_custom(node, matStackIndex)
         if m.actionTimer == 58 then switchCase.selectedCase = R96_EYES_OPEN end
     end
     if m.actionArg ~= 8 and m.actionArg ~= 9 then
-        blinkTimer = blinkTimer + 1
+        m.marioObj.oMarioBlinkTimer = m.marioObj.oMarioBlinkTimer + 1
  
-        if blinkFrame == 5 then
-            if blinkTimer % 20 == 0 then
-                blinkFrame = blinkFrame + 1
-                blinkTimer = 0
+        if m.marioObj.oMarioBlinkFrame == 4 then
+            if m.marioObj.oMarioBlinkTimer % 20 == 0 then
+                m.marioObj.oMarioBlinkFrame = m.marioObj.oMarioBlinkFrame + 1
+                m.marioObj.oMarioBlinkTimer = 0
             end
-        elseif blinkFrame == 9 then
-            if blinkTimer % 50 == 0 then
-                blinkFrame = 1
-                blinkTimer = 0
+        elseif m.marioObj.oMarioBlinkFrame == 8 then
+            if m.marioObj.oMarioBlinkTimer % 50 == 0 then
+                m.marioObj.oMarioBlinkFrame = 1
+                m.marioObj.oMarioBlinkTimer = 0
             end
-        elseif (blinkFrame < 5 and blinkFrame >= 1) or (blinkFrame < 9 and blinkFrame > 5) then
-            if blinkTimer % 2 == 0 then
-                blinkFrame = blinkFrame + 1
+        elseif (m.marioObj.oMarioBlinkFrame < 4 and m.marioObj.oMarioBlinkFrame >= 0) or (m.marioObj.oMarioBlinkFrame < 8 and m.marioObj.oMarioBlinkFrame > 4) then
+            if m.marioObj.oMarioBlinkTimer % 2 == 0 then
+                m.marioObj.oMarioBlinkFrame = m.marioObj.oMarioBlinkFrame + 1
             end
         end
  
         if gMarioEyeBlinkable[marioAction] then
-            switchCase.selectedCase = sMarioBlinkAnimation[blinkFrame]
+            switchCase.selectedCase = sMarioBlinkAnimation[m.marioObj.oMarioBlinkFrame + 1]
         else
-            blinkFrame = 1
-            blinkTimer = 0
+            m.marioObj.oMarioBlinkFrame = 1
+            m.marioObj.oMarioBlinkTimer = 0
             switchCase.selectedCase = R96_EYES_OPEN
         end
  
@@ -522,6 +522,7 @@ end
  
 function geo_switch_mario_face(node, matStackIndex)
     local switchCase = cast_graph_node(node) ---@type GraphNodeSwitchCase
+    local m = geo_get_mario_state()
     local marioAction = m.action
     local marioHurtCounter = m.hurtCounter
     local marioHealth = m.health
@@ -2741,4 +2742,3 @@ local function bhv_yoshi_tongue(o)
 end
 
 id_bhvRender96YoshiTongue = hook_render96_behavior(nil, false, nil, bhv_yoshi_tongue, OBJ_LIST_SURFACE)
-

@@ -2149,34 +2149,25 @@ end
 id_bhvRender96Thwomp = hook_render96_behavior(id_bhvThwomp, false, bhv_thwomp_render96_init, bhv_thwomp_render96_loop)
 id_bhvRender96Thwomp2 = hook_render96_behavior(id_bhvThwomp2, false, bhv_thwomp_render96_init, bhv_thwomp_render96_loop)
 
+-- hat, vest
+local toadOutfits = {
+    [133] = { 0, 0 }, -- castle inside first toad
+    [135] = { 0, 3 }, -- WF room
+    [134] = { 3, 2 }, -- JRB room
+    [137] = { 1, 0 }, -- castle inside second floor next to bobomb painting
+    [83]  = { 4, 4 }, -- castle inside third floor star
+    [76]  = { 4, 4 }, -- castle inside second floor star
+    [136] = { 2, 1 }, -- basement green wall toad
+    [82]  = { 4, 4 }, -- basement star
+}
 ---@param o Object
 local function bhv_toad_render96_loop(o)
     local dialogId = (o.oBehParams >> 24) & 0xFF
 
-    if dialogId == 133 then     -- castle inside first toad
-        o.oSwitchState2 = 0     -- vest
-        o.oSwitchState1 = 0     -- hat
-    elseif dialogId == 135 then -- WF room
-        o.oSwitchState2 = 3
-        o.oSwitchState1 = 0
-    elseif dialogId == 134 then -- JRB room
-        o.oSwitchState2 = 2
-        o.oSwitchState1 = 3
-    elseif dialogId == 137 then -- castle inside second floor next to bobomb painting
-        o.oSwitchState2 = 0
-        o.oSwitchState1 = 1
-    elseif dialogId == 83 then -- castle inside third floor star
-        o.oSwitchState2 = 4
-        o.oSwitchState1 = 4
-    elseif dialogId == 76 then -- castle inside second floor star
-        o.oSwitchState2 = 4
-        o.oSwitchState1 = 4
-    elseif dialogId == 136 then -- basement green wall toad
-        o.oSwitchState2 = 1
-        o.oSwitchState1 = 2
-    elseif dialogId == 82 then -- basement star
-        o.oSwitchState2 = 4
-        o.oSwitchState1 = 4
+    local outfit = toadOutfits[dialogId]
+    if outfit then
+        o.oSwitchState1 = outfit[1]
+        o.oSwitchState2 = outfit[2]
     end
 end
 

@@ -157,35 +157,38 @@ local function in_cutscene()
         or act == ACT_INTRO_CUTSCENE
 end
 
-local function render_hud_keys()
-    if in_cutscene() then return end
-    if obj_get_first_with_behavior_id(id_bhvActSelector) then return end
-    if hud_is_hidden() then return end
-    if gNumLuigiKeys <= 0 or gNumLuigiKeys >= 8 then return end
+local function render_hud_keys(y)
+    if in_cutscene() then return y end
+    if obj_get_first_with_behavior_id(id_bhvActSelector) then return y end
+    if hud_is_hidden() then return y end
+    if gNumLuigiKeys <= 0 or gNumLuigiKeys >= 8 then return y end
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_color(255, 255, 255, 255)
-    djui_hud_render_texture(TEX_BOO_KEY, 22, 35, 0.0625, 0.0625)
+    djui_hud_render_texture(TEX_BOO_KEY, 22, y, 0.0625, 0.0625)
     djui_hud_set_font(FONT_HUD)
-    djui_hud_print_text("@", 38, 35, 1)
-    djui_hud_print_text(tostring(gNumLuigiKeys), 54, 35, 1)
+    djui_hud_print_text("@", 38, y, 1)
+    djui_hud_print_text(tostring(gNumLuigiKeys), 54, y, 1)
+    return y + 20
 end
 
-local function render_hud_wario_coins()
-    if in_cutscene() then return end
-    if obj_get_first_with_behavior_id(id_bhvActSelector) then return end
-    if hud_is_hidden() then return end
-    if gNumWarioCoins <= 0 or gNumWarioCoins >= 6 then return end
+local function render_hud_wario_coins(y)
+    if in_cutscene() then return y end
+    if obj_get_first_with_behavior_id(id_bhvActSelector) then return y end
+    if hud_is_hidden() then return y end
+    if gNumWarioCoins <= 0 or gNumWarioCoins >= 6 then return y end
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_color(255, 255, 255, 255)
-    djui_hud_render_texture(TEX_WARIO_COIN, 22, 55, 0.0625, 0.0625)
+    djui_hud_render_texture(TEX_WARIO_COIN, 22, y, 0.0625, 0.0625)
     djui_hud_set_font(FONT_HUD)
-    djui_hud_print_text("@", 38, 55, 1)
-    djui_hud_print_text(tostring(gNumWarioCoins), 54, 55, 1)
+    djui_hud_print_text("@", 38, y, 1)
+    djui_hud_print_text(tostring(gNumWarioCoins), 54, y, 1)
+    return y + 20
 end
 
 hook_event(HOOK_ON_HUD_RENDER_BEHIND, function()
-    render_hud_keys()
-    render_hud_wario_coins()
+    local y = 35
+    y = render_hud_keys(y)
+    y = render_hud_wario_coins(y)
 end)
 
 hook_chat_command("hud", "[0|1]", function(msg)
@@ -208,6 +211,8 @@ local sBullySpawns = {
 }
 
 local function entity_cleanup()
+    -- WTF IS THIS
+    -- Every time any object spawns... a random Mr I dies????
     local mrI = obj_get_nearest_object_with_behavior_id(gMarioStates[0].marioObj, id_bhvMrI)
     if mrI ~= nil then
         --print(mrI.oPosX, mrI.oPosY, mrI.oPosZ)

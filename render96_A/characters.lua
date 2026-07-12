@@ -22,10 +22,6 @@ _G.charSelect.character_add_costume(CT_WARIO, "Vanilla Wario", nil, nil, nil, E_
 _G.charSelect.character_edit(CT_WARIO, nil, nil, "Render96", nil, E_MODEL_R96_WARIO)
 ]]
 
-local sWarioWalkSpin = false
-local sWarioSpinCount = 0
-local sWarioChargeCount = 0
-
 local function wario_should_begin_sliding(m)
     if m == nil then return false end
 
@@ -106,22 +102,24 @@ end
 
 ---@param m MarioState
 local function act_wario_charge(m)
+    local mo = m.marioObj
+
     if (m.input & INPUT_A_PRESSED) ~= 0 then
-        sWarioChargeCount = 0
+        mo.oWarioChargeCount = 0
         return set_mario_action(m, ACT_WARIO_TRIPLE_JUMP, 0)
     end
 
-    if sWarioChargeCount == 0 then
+    if mo.oWarioChargeCount == 0 then
         if (m.flags & MARIO_MARIO_SOUND_PLAYED) == 0 then
             play_character_sound_offset(m, CHAR_SOUND_YAHOO_WAHA_YIPPEE, ((random_u16() % 3) << 16))
             m.flags = m.flags | MARIO_MARIO_SOUND_PLAYED
         end
     end
 
-    sWarioChargeCount = sWarioChargeCount + 1
+    mo.oWarioChargeCount = mo.oWarioChargeCount + 1
 
-    if sWarioChargeCount < 60 then
-        local sYaw = r96lib.convert_s16(m.intendedYaw - m.faceAngle.y)
+    if mo.oWarioChargeCount < 60 then
+        local sYaw = math.s16(m.intendedYaw - m.faceAngle.y)
         sYaw = _max(-0x300, _min(0x300, sYaw))
         m.intendedYaw = m.faceAngle.y + sYaw
 
@@ -136,12 +134,12 @@ local function act_wario_charge(m)
         local step = perform_ground_step(m)
 
         if step == GROUND_STEP_LEFT_GROUND then
-            sWarioChargeCount = 0
+            mo.oWarioChargeCount = 0
             set_mario_action(m, ACT_FREEFALL, 0)
             set_character_animation(m, CHAR_ANIM_GENERAL_FALL)
 
         elseif step == GROUND_STEP_HIT_WALL then
-            sWarioChargeCount = 0
+            mo.oWarioChargeCount = 0
             play_sound(
                 ((m.flags & MARIO_METAL_CAP) ~= 0) and SOUND_ACTION_METAL_BONK or SOUND_ACTION_BONK,
                 m.marioObj.header.gfx.cameraToObject)
@@ -156,7 +154,7 @@ local function act_wario_charge(m)
         adjust_sound_for_speed(m)
         reset_rumble_timers(m)
     else
-        sWarioChargeCount = 0
+        mo.oWarioChargeCount = 0
         m.forwardVel = 1
         set_mario_action(m, ACT_WALKING, 0)
     end
@@ -184,15 +182,14 @@ local function act_wario_triple_jump(m)
     end
 end
 
-local sPileDriverTimer = 0
-
 ---@param m MarioState
 local function act_wario_pile_driver(m)
     local stepResult
+    local mo = m.marioObj
     m.marioBodyState.grabPos = GRAB_POS_HEAVY_OBJ
-    if sPileDriverTimer < 20 then
+    if mo.oWarioPileDriverTimer < 20 then
         m.twirlYaw = m.intendedYaw
-        m.angleVel.y = 0x1500 + (sPileDriverTimer * 0x64)
+        m.angleVel.y = 0x1500 + (mo.oWarioPileDriverTimer * 0x64)
         m.faceAngle.y = m.faceAngle.y + m.angleVel.y
         m.marioObj.header.gfx.angle.y = m.marioObj.header.gfx.angle.y + m.angleVel.y
         queue_rumble_data_mario(m, 4, 20)
@@ -201,16 +198,16 @@ local function act_wario_pile_driver(m)
 
     if m.actionState == 0 then
         if m.actionTimer == 0 then
-            sPileDriverTimer = 0
+            mo.oWarioPileDriverTimer = 0
             play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
         end
 
-        sPileDriverTimer = sPileDriverTimer + 1
+        mo.oWarioPileDriverTimer = mo.oWarioPileDriverTimer + 1
         m.actionTimer = m.actionTimer + 1
 
         local yVel = 0.0
-        if sPileDriverTimer < 15 then
-            yVel = sPileDriverTimer
+        if mo.oWarioPileDriverTimer < 15 then
+            yVel = mo.oWarioPileDriverTimer
         end
 
         if m.pos.y + yVel + 160.0 < m.ceilHeight then
@@ -222,7 +219,7 @@ local function act_wario_pile_driver(m)
         mario_set_forward_vel(m, 0.0)
         set_character_animation(m, CHAR_ANIM_GRAB_BOWSER)
 
-        if sPileDriverTimer >= 20 then
+        if mo.oWarioPileDriverTimer >= 20 then
             m.vel.y = -20.0
             m.actionState = 1
         end
@@ -710,8 +707,9 @@ local function wario_swing_fling_spin(m)
     local step = perform_ground_step(m)
 
     if step == GROUND_STEP_LEFT_GROUND then
-        sWarioWalkSpin = false
-        sWarioSpinCount = 0
+        local mo = m.marioObj
+        mo.oWarioWalkSpin = 0
+        mo.oWarioSpinCount = 0
         set_mario_action(m, ACT_FREEFALL, 0)
         set_character_animation(m, CHAR_ANIM_GENERAL_FALL)
     end
@@ -735,11 +733,12 @@ end
 ---@param m MarioState
 local function act_wario_swing_fling_held(m)
     local spin
+    local mo = m.marioObj
     local o = m.heldObj
     if (m.input & INPUT_B_PRESSED) ~= 0 then
         play_character_sound_if_no_flag(m, CHAR_SOUND_HERE_WE_GO, MARIO_MARIO_SOUND_PLAYED)
-        sWarioWalkSpin = false
-        sWarioSpinCount = 0
+        mo.oWarioWalkSpin = 0
+        mo.oWarioSpinCount = 0
         return set_mario_action(m, ACT_WARIO_SWING_FLING_THROW, 0)
     end
 
@@ -770,15 +769,15 @@ local function act_wario_swing_fling_held(m)
         m.angleVel.y = approach_s32(m.angleVel.y, 0, 64, 64)
     end
 
-    if not sWarioWalkSpin then
+    if mo.oWarioWalkSpin == 0 then
         if m.angleVel.y <= -0xE00 or m.angleVel.y >= 0xE00 then
-            sWarioWalkSpin = true
+            mo.oWarioWalkSpin = 1
         else
             stationary_ground_step(m)
         end
     end
 
-    if sWarioWalkSpin then
+    if mo.oWarioWalkSpin == 1 then
         if obj_has_behavior_id(o, id_bhvBobomb) == 1 then
             if o.oBobombFuseTimer >= 150 then 
                 o.oBobombFuseTimer = 125
@@ -788,15 +787,15 @@ local function act_wario_swing_fling_held(m)
         if m.angleVel.y >= 0xE00 then m.angleVel.y = 0x1800 end
 
         wario_swing_fling_spin(m)
-        sWarioSpinCount = sWarioSpinCount + 1
-        if sWarioSpinCount % 5 == 0 and not is_skipped_behavior(o) then
+        mo.oWarioSpinCount = mo.oWarioSpinCount + 1
+        if mo.oWarioSpinCount % 5 == 0 and not is_skipped_behavior(o) then
             spawn_non_sync_object(id_bhvWarioCoins, E_MODEL_GREEN_COIN, m.marioObj.oPosX +(random_float() * 20), m.marioObj.oPosY + 100, m.marioObj.oPosZ + (random_float() * 20), nil)
         end
         set_mario_particle_flags(m, PARTICLE_SPARKLES, 0)
-        if sWarioSpinCount >= 135 then
+        if mo.oWarioSpinCount >= 135 then
             play_character_sound_if_no_flag(m, CHAR_SOUND_SO_LONGA_BOWSER, MARIO_MARIO_SOUND_PLAYED)
-            sWarioWalkSpin = false
-            sWarioSpinCount = 0
+            mo.oWarioWalkSpin = 0
+            mo.oWarioSpinCount = 0
             return set_mario_action(m, ACT_WARIO_SWING_FLING_THROW, 0)
         end
     end
@@ -891,8 +890,6 @@ local function act_wario_ground_pound(m)
 end
 
 -- LUIGI MOVESET
-
-local sScuttleTimer = 0
 
 local sScuttleRun = {
     [ACT_JUMP] = true,
@@ -995,20 +992,22 @@ local function act_luigi_backflip(m)
     return false
 end
 
-local sMoveAngle = 0
+-- TODO: remove this shit?
+-- local sMoveAngle = 0
 
 ---@param m MarioState
 local function scuttle_physics(m)
-    if sScuttleTimer <= 20 then
-        m.vel.y = 2 - (sScuttleTimer * 0.8)
+    local mo = m.marioObj
+    if mo.oLuigiScuttleTimer <= 20 then
+        m.vel.y = 2 - (mo.oLuigiScuttleTimer * 0.8)
     end
-    sScuttleTimer = sScuttleTimer + 1
+    mo.oLuigiScuttleTimer = mo.oLuigiScuttleTimer + 1
     if (m.input & INPUT_NONZERO_ANALOG) ~= 0 then
-        if sMoveAngle == 0 then
-            sMoveAngle = m.faceAngle.y
-        end
+        -- if sMoveAngle == 0 then
+        --     sMoveAngle = m.faceAngle.y
+        -- end
 
-        sMoveAngle = m.intendedYaw - approach_s32( r96lib.convert_s16(m.intendedYaw - sMoveAngle), 0, 0x400, 0x400)
+        -- sMoveAngle = m.intendedYaw - approach_s32(math.s16(m.intendedYaw - sMoveAngle), 0, 0x400, 0x400)
         m.forwardVel = approach_f32(m.forwardVel, m.intendedMag * 0.8, 4.0, 4.0)
     else
         m.forwardVel = approach_f32(m.forwardVel, 0, 2.0, 2.0)
@@ -1082,32 +1081,31 @@ end
 
 -- YOSHI MOVESET
 
-local sFlutterTimer = 0
-
 local sFlutterJump = {
     [ACT_YOSHI_RIDE_JUMP] = true,
 }
 
 ---@param m MarioState
 local function flutter_physics(m)
-    sFlutterTimer = sFlutterTimer + 1
-    if sFlutterTimer == 1 then
+    local mo = m.marioObj
+    mo.oYoshiFlutterTimer = mo.oYoshiFlutterTimer + 1
+    if mo.oYoshiFlutterTimer == 1 then
         m.vel.y = 15
-    elseif sFlutterTimer <= 45 then
-        m.vel.y = 15 * 0.01 * sFlutterTimer
+    elseif mo.oYoshiFlutterTimer <= 45 then
+        m.vel.y = 15 * 0.01 * mo.oYoshiFlutterTimer
         if m.vel.y < -3 then
             m.vel.y = -3
         end
     else
-        local gravity = (45 - sFlutterTimer )
+        local gravity = (45 - mo.oYoshiFlutterTimer)
         m.vel.y = 15 * 0.1 * gravity
     end
     if (m.input & INPUT_NONZERO_ANALOG) ~= 0 then
-        if sMoveAngle == 0 then
-            sMoveAngle = m.faceAngle.y
-        end
+        -- if sMoveAngle == 0 then
+        --     sMoveAngle = m.faceAngle.y
+        -- end
 
-        sMoveAngle = m.intendedYaw - approach_s32( r96lib.convert_s16(m.intendedYaw - sMoveAngle), 0, 0x400, 0x400)
+        -- sMoveAngle = m.intendedYaw - approach_s32(math.s16(m.intendedYaw - sMoveAngle), 0, 0x400, 0x400)
         m.forwardVel = approach_f32(m.forwardVel, m.intendedMag * 0.4, 3.0, 3.0)
     else
         m.forwardVel = approach_f32(m.forwardVel, 0, 2.0, 2.0)
@@ -1145,7 +1143,7 @@ local function yoshi_walk_speed(m)
 
     if m.forwardVel > 64.0 then m.forwardVel = 64.0 end
 
-    m.faceAngle.y = m.intendedYaw - approach_s32(r96lib.convert_s16(m.intendedYaw - m.faceAngle.y), 0, 0x800, 0x800)
+    m.faceAngle.y = m.intendedYaw - approach_s32(math.s16(m.intendedYaw - m.faceAngle.y), 0, 0x800, 0x800)
     apply_slope_accel(m)
 end
 
@@ -1290,7 +1288,8 @@ local function luigi_update(m)
     m.vel.y < 0 then
         if sScuttleRun[m.action] then set_mario_action(m, ACT_LUIGI_SCUTTLE_RUN, 0)
         elseif m.action == ACT_HOLD_JUMP then set_mario_action(m, ACT_LUIGI_SCUTTLE_RUN_HOLD, 0) end
-        sScuttleTimer = 0
+        local mo = m.marioObj
+        mo.oLuigiScuttleTimer = 0
     end
 
     if m.prevAction & ACT_FLAG_AIR == 0 and 
@@ -1373,7 +1372,8 @@ hook_event(HOOK_MARIO_UPDATE, function(m)
     m.input & INPUT_A_DOWN ~= 0 and 
     m.vel.y < 0 then
         if sFlutterJump[m.action] then set_mario_action(m, ACT_YOSHI_RIDE_FLUTTER, 0) end
-        sFlutterTimer = 0
+        local mo = m.marioObj
+        mo.oYoshiFlutterTimer = 0
     end
 end)
 

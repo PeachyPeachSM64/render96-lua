@@ -3,10 +3,6 @@ bloWarps = {}
 
 local npl = gNetworkPlayers -- ain't no one got time to write all that
 
-define_custom_obj_fields({
-    oCustomWarpNode = "u32",
-})
-
 local sWarpTable = {}
 local sActiveWarp = nil
 

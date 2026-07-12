@@ -10,15 +10,17 @@ local _pi     = math.pi
 r96lib = {}
 
 local m = gMarioStates[0]
-define_custom_obj_fields({
-    oColorR      = 'f32',
-    oColorG      = 'f32',
-    oColorB      = 'f32',
-    oThwompShakeTimer = 'f32',
+
+r96lib.customObjectFields = {
+    oColorR        = 's32',
+    oColorG        = 's32',
+    oColorB        = 's32',
     oShakeBasePosX = 'f32',
     oShakeBasePosY = 'f32',
-    oShakeBasePosZ = 'f32'
-})
+    oShakeBasePosZ = 'f32',
+}
+
+define_custom_obj_fields(r96lib.customObjectFields)
 
 function r96lib.spawn_object(modelId, bhvId, x, y, z, rx, ry, rz, func)
     local childObj = spawn_non_sync_object(bhvId, modelId, 0, 0, 0, func)
@@ -26,12 +28,6 @@ function r96lib.spawn_object(modelId, bhvId, x, y, z, rx, ry, rz, func)
     obj_set_pos(childObj, x, y, z)
     obj_set_angle(childObj, rx, ry, rz)
     return childObj
-end
-
-function r96lib.convert_s16(num)
-    while num < -32768 do num = 32767 + (num + 32768) end
-    while num >  32767 do num = -32768 + (num - 32767) end
-    return num
 end
 
 function r96lib.squish_apply(o, timer, duration, intensityX, intensityY, intensityZ, baseScale, sound)

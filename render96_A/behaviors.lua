@@ -1,4 +1,5 @@
-local o2oint = require("lib/o2oint")
+local version = require("/lib/version")
+local o2oint = require("/lib/o2oint")
 local r96lib = require("/lib/r96lib")
 --local UvScroll = require("/lib/uv-scroll")
 require("constants")
@@ -82,41 +83,78 @@ local sThrownInteractions = o2oint.Interactions({
     }
 })
 
-define_custom_obj_fields({
-    oSwitchState1          = 'f32',
-    oSwitchTimer1          = 's32',
-    oSwitchState2          = 'f32',
-    oSwitchTimer2          = 's32',
-    oMrIBlinkIndex         = 's32',
-    oMrITracking           = 'f32',
-    oMrILastAngle          = 'f32',
-    oMrIFireTimer          = 'f32',
-    oMrIDizzyTimer         = 'f32',
-    oMrIDizzyDuration      = 'f32',
-    oMrIDetectRadius       = 'f32',
-    oThwompShakeTicks      = 'f32',
-    oThwompPosMag          = 'f32',
-    oThwompAngleMag        = 'f32',
-    oThwompPrevAction      = 'f32',
-    oThwompSquishTimer     = 'f32',
-    oThwompSquishDur       = 'f32',
-    oThwompBaseScale       = 'f32',
-    oWarioHeadBool         = 'f32',
-    oCelebrationStar       = 'f32',
-    oYoshiIdleTimer        = "f32",
-    oYoshiCustomBlinkTimer = "s32",
-    oWallX                 = "f32",
-    oWallY                 = "f32",
-    oWallZ                 = "f32",
-    oTongueU               = "f32",
-    oTongueTimer           = "f32",
-    oTongueTarget          = "f32",
-    oTongueLockX           = "f32",
-    oTongueLockY           = "f32",
-    oTongueLockZ           = "f32",
-    oMarioBlinkTimer       = "s32",
-    oMarioBlinkFrame       = "s32",
-})
+local sBehaviorsCustomObjectFields = {
+
+    -- Geo switches
+    oSwitchState1 = 's32',
+    oSwitchTimer1 = 's32',
+    oSwitchState2 = 's32',
+    oSwitchTimer2 = 's32',
+
+    -- Mario
+    oMarioBlinkTimer = 's32',
+    oMarioBlinkFrame = 's32',
+
+    -- Luigi
+    oLuigiScuttleTimer = 's32',
+
+    -- Wario
+    oWarioWalkSpin        = 's32',
+    oWarioSpinCount       = 's32',
+    oWarioChargeCount     = 's32',
+    oWarioPileDriverTimer = 's32',
+
+    -- Yoshi
+    oTongueU               = 'f32',
+    oTongueTimer           = 's32',
+    oTongueTarget          = 'f32',
+    oTongueLockX           = 'f32',
+    oTongueLockY           = 'f32',
+    oTongueLockZ           = 'f32',
+    oYoshiIdleTimer        = 's32',
+    oYoshiCustomBlinkTimer = 's32',
+    oYoshiFlutterTimer     = 's32',
+
+    -- Mr I
+    oMrIBlinkIndex    = 's32',
+    oMrITracking      = 'f32',
+    oMrILastAngle     = 's32',
+    oMrIFireTimer     = 's32',
+    oMrIDizzyTimer    = 's32',
+    oMrIDizzyDuration = 's32',
+    oMrIDetectRadius  = 'f32',
+
+    -- Thwomp
+    oThwompShakeTimer  = 's32',
+    oThwompShakeTicks  = 's32',
+    oThwompPosMag      = 'f32',
+    oThwompAngleMag    = 's32',
+    oThwompPrevAction  = 's32',
+    oThwompSquishTimer = 's32',
+    oThwompSquishDur   = 's32',
+    oThwompBaseScale   = 'f32',
+
+    -- Wario head
+    oWarioHeadBool = 's32',
+
+    -- Misc
+    oWallX           = 'f32',
+    oWallY           = 'f32',
+    oWallZ           = 'f32',
+    oCelebrationStar = 's32',
+}
+
+if not version.GLOBAL_OBJECT_FIELDS then
+    -- Need to fill custom object fields with as much dummy fields as defined in r96lib to preserve indexing
+    -- Since object fields are sorted alphabetically, we must make sure they are defined first
+    local i = 0
+    for _ in pairs(r96lib.customObjectFields) do
+        sBehaviorsCustomObjectFields[string.format("o%u", i)] = "u32"
+        i = i + 1
+    end
+end
+
+define_custom_obj_fields(sBehaviorsCustomObjectFields)
 
 local R96_EYES_OPEN = 0
 local R96_EYES_HALF_CLOSED = 1
@@ -672,6 +710,8 @@ function geo_switch_spindle(node, matStackIndex)
     cast_graph_node(node).selectedCase = switchCase
 end
 
+-- WTF IS THIS
+-- switch param 0 seems to be wiggler head, while param 1 seems to be body
 function geo_switch_wiggler_color(node, matStackIndex)
     local o = obj_get_nearest_object_with_behavior_id(gMarioStates[0].marioObj, id_bhvWigglerHead)
     if o == nil then return end
@@ -1476,6 +1516,8 @@ local function bhv_koopa_shell_render96_loop(o)
             o.oAction = 50
         end
     
+        -- WTF IS THIS
+        -- If a koopa shell exists, all koopas die instantly if there is at least one Wario on the map????
         local koopa = obj_get_nearest_object_with_behavior_id(o, id_bhvKoopa)
         if koopa ~= nil then
             spawn_mist_particles()
@@ -2199,7 +2241,7 @@ local function bhv_tree_render96_loop(o)
     bhv_pole_base_loop()
     local model = obj_get_model_id_extended(o)
     if o.oTimer < 2 then
-        if model ~= E_MODEL_COURTYARD_SPIKY_TREE or E_MODEL_PALM_TREE then
+        if model ~= E_MODEL_COURTYARD_SPIKY_TREE or model ~= E_MODEL_PALM_TREE then
             o.oFaceAngleYaw = _random(0, 10) * 0x10000/10
         end
     end

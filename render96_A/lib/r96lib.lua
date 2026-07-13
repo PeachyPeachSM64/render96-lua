@@ -1,3 +1,4 @@
+local version = require("version")
 
 local _floor  = math.floor
 local _max    = math.max
@@ -132,8 +133,13 @@ local objSoundData = {}
 ---@param rangeMax number? The range in units at which audio is quietest (0)
 ---@param isMusic boolean? Wheather the audio is forced looped and the Doppler Effect is deactivated
 function r96lib.audio_fade(o, audioStream, rangeMin, rangeMax, isMusic, loopingStart, loopingEnd)
-    if o == nil or gMarioStates[0] == nil then return end
-    if audioStream == nil or not audioStream.isStream then return end
+    if o == nil or gMarioStates[0] == nil or audioStream == nil then return end
+    if version.MOD_AUDIO_OVERHAUL then
+        if (audioStream.flags & 0x3) ~= MA_TYPE_STREAM then return end
+    else
+        if not audioStream.isStream then return end
+    end
+
     local wallInterupt = collision_find_surface_on_ray(m.pos.x, m.pos.y + 70, m.pos.z, o.oPosX - m.pos.x, (o.oPosY + o.hitboxHeight*0.5) - (m.pos.y + 70), o.oPosZ - m.pos.z, 128).surface ~= nil
     local objDist = _sqrt((o.oPosX - m.pos.x)^2 + (o.oPosY - m.pos.y)^2 + (o.oPosZ - m.pos.z)^2) * (wallInterupt and 2 or 1)
 

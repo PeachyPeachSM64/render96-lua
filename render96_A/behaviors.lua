@@ -95,15 +95,6 @@ local sBehaviorsCustomObjectFields = {
     oMarioBlinkTimer = 's32',
     oMarioBlinkFrame = 's32',
 
-    -- Luigi
-    oLuigiScuttleTimer = 's32',
-
-    -- Wario
-    oWarioWalkSpin        = 's32',
-    oWarioSpinCount       = 's32',
-    oWarioChargeCount     = 's32',
-    oWarioPileDriverTimer = 's32',
-
     -- Yoshi
     oTongueU               = 'f32',
     oTongueTimer           = 's32',
@@ -113,7 +104,6 @@ local sBehaviorsCustomObjectFields = {
     oTongueLockZ           = 'f32',
     oYoshiIdleTimer        = 's32',
     oYoshiCustomBlinkTimer = 's32',
-    oYoshiFlutterTimer     = 's32',
 
     -- Mr I
     oMrIBlinkIndex    = 's32',
@@ -1234,12 +1224,57 @@ local function bhv_big_bully_render96_init(o)
     cur_obj_scale(2)
 end
 
+---@param o Object
+local function bhv_big_chill_bully_with_minions_render96_init(o)
+    o.oFlags = OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
+    o.oAnimations = gObjectAnimations.bully_seg5_anims_0500470C
+    o.oFloorHeight = find_floor_height(o.oPosX, o.oPosY + 200, o.oPosZ)
+    o.oPosY = o.oFloorHeight + 1000
+    o.oHomeX = o.oPosX
+    o.oHomeY = o.oFloorHeight
+    o.oHomeZ = o.oPosZ
+
+    bhv_big_bully_init()
+    bhv_big_bully_render96_init(o)
+    cur_obj_hide()
+    cur_obj_become_intangible()
+    o.oAction = BULLY_ACT_INACTIVE
+    o.oBullySubtype = BULLY_STYPE_CHILL
+
+    -- spawn minions
+    for _, pos in ipairs({
+        {x = 125, y = 1331, z = -4100},
+        {x = 600, y = 1331, z = -4485},
+        {x = 200, y = 1331, z = -4900},
+    }) do
+        local bully = spawn_non_sync_object(id_bhvSmallBully, E_MODEL_CHILL_BULLY, pos.x, pos.y, pos.z)
+        bully.oHomeX = bully.oPosX
+        bully.oHomeY = bully.oPosY
+        bully.oHomeZ = bully.oPosZ
+        bully.oGravity = 8
+        bully.parentObj = o
+        bully.oBullySubtype = BULLY_STYPE_MINION
+        bully.oBehParams2ndByte = BULLY_BP_SIZE_SMALL
+    end
+end
+
+---@param o Object
+local function bhv_big_chill_bully_with_minions_render96_loop(o)
+    if o.oAction == BULLY_ACT_INACTIVE or o.oAction == BULLY_ACT_ACTIVATE_AND_FALL then
+        bhv_big_bully_with_minions_loop()
+    else
+        o.oIntangibleTimer = 0
+        bhv_bully_loop()
+    end
+    bhv_bully_render96_loop(o)
+end
+
 id_bhvRender96Bully = hook_render96_behavior(id_bhvSmallBully, false, nil, bhv_bully_render96_loop)
 id_bhvRender96SmallChillBully = hook_render96_behavior(id_bhvSmallChillBully, false, nil, bhv_bully_render96_loop)
 
 id_bhvRender96BigBully = hook_render96_behavior(id_bhvBigBully, false, bhv_big_bully_render96_init, bhv_bully_render96_loop)
-id_bhvRender96BigChillBully = hook_render96_behavior(id_bhvBigChillBully, false, bhv_big_bully_render96_init, bhv_bully_render96_loop)
 id_bhvRender96BigBullyWithMinions = hook_render96_behavior(id_bhvBigBullyWithMinions, false, bhv_big_bully_render96_init, bhv_bully_render96_loop)
+id_bhvRender96BigChillBully = hook_render96_behavior(id_bhvBigChillBully, true, bhv_big_chill_bully_with_minions_render96_init, bhv_big_chill_bully_with_minions_render96_loop)
 
 ---@param o Object
 local function bhv_chain_chomp_render96_loop(o)
@@ -1639,6 +1674,7 @@ local function  bhv_mr_i_render96_init(o)
 
     if o.oBehParams2ndByte == 0x05010000 then o.oMrISize = 4 o.oPosY = o.oPosY + 120 o.oHomeY = o.oPosY end
     cur_obj_scale(o.oMrISize)
+    obj_set_model_extended(o, E_MODEL_MR_I)
 end
 
 ---@param o Object
@@ -1805,7 +1841,7 @@ local function bhv_mr_i_render96_loop(o)
     o.oInteractStatus = 0
 end
 
-id_bhvRender96MrI = hook_render96_behavior(nil, true, bhv_mr_i_render96_init, bhv_mr_i_render96_loop, OBJ_LIST_GENACTOR, "MrI")
+id_bhvRender96MrI = hook_render96_behavior(id_bhvMrI, true, bhv_mr_i_render96_init, bhv_mr_i_render96_loop, OBJ_LIST_GENACTOR, "MrI")
 
 ---@param o Object
 local function bhv_mr_i_render96_fire_particle_init(o)

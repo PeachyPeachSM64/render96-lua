@@ -8,7 +8,12 @@ charSelect = _G.charSelect
 gLevelValues.entryLevel = SPECIAL_WARP_TITLE
 --gLevelValues.entryLevel = LEVEL_ENDING
 
--- Models
+gBehaviorValues.ProcessLODs = 1
+
+------------
+-- Models --
+------------
+
 r96lib.addModelOverride(id_bhvBalconyBigBoo,           E_MODEL_BOO_BIG)
 r96lib.addModelOverride(id_bhvMerryGoRoundBigBoo,      E_MODEL_BOO_BIG)
 r96lib.addModelOverride(id_bhvBooWithCage,             E_MODEL_BOO_BIG)
@@ -101,7 +106,10 @@ r96lib.addModelLevelOverride(id_bhvFlameLargeBurningOut,      E_MODEL_BLUE_FLAME
 r96lib.addModelLevelOverride(id_bhvFlameMovingForwardGrowing, E_MODEL_RED_FLAME_BOWSER,  E_MODEL_RED_FLAME,  LEVEL_BOWSER_3, 1, nil)
 r96lib.addModelLevelOverride(id_bhvFlameMovingForwardGrowing, E_MODEL_BLUE_FLAME_BOWSER, E_MODEL_BLUE_FLAME, LEVEL_BOWSER_3, 1, nil)
 
--- Enemies
+-------------
+-- Enemies --
+-------------
+
 r96lib.addSpawn(SPECIAL_WARP_TITLE,  1, E_MODEL_MR_I, id_bhvRender96MrI,   0, 0, 0, 0, 0, 0, false, nil, function(o) cur_obj_scale(100) end)
 r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_BLARGG_FRIENDLY, id_bhvRender96BlarggFriendly, -2070, 0, 6177, 0, 0, 0, 0, {5, 6})
 r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_BLARGG, id_bhvRender96Blargg, -6766, 0,  3033, 0, 0, 0, false)
@@ -112,18 +120,12 @@ r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_BLARGG, id_bhvRender96Blargg,  7408, 0, -
 r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_BLARGG, id_bhvRender96Blargg,  6318, 0,   752, 0, 0, 0, false)
 r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_BLARGG, id_bhvRender96Blargg,  5647, 0,  3426, 0, 0, 0, false)
 r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_BLARGG, id_bhvRender96Blargg, -5315, 0,  7493, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_BBH,  1, E_MODEL_MR_I, id_bhvRender96MrI, -2369, -204,  5184, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_BBH,  1, E_MODEL_MR_I, id_bhvRender96MrI,   480,   10,  -653, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_BBH,  1, E_MODEL_MR_I, id_bhvRender96MrI,  1640,  840,  -733, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_BBH,  1, E_MODEL_MR_I, id_bhvRender96MrI,   923, 1741,  -332, 0, 0, 0, false, nil, function(o) o.oBehParams = 0x05010000 o.oBehParams2ndByte = 0x05010000 end)
-r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_MR_I, id_bhvRender96MrI, -3199,  307,  3456, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_LLL,  1, E_MODEL_MR_I, id_bhvRender96MrI,  6673,  154, -3060, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_HMC,  1, E_MODEL_MR_I, id_bhvRender96MrI,  4740, 1060,  4680, 0, 0, 0, false)
-r96lib.addSpawn(LEVEL_HMC,  1, E_MODEL_MR_I, id_bhvRender96MrI,  6700, 1020,  6820, 0, 0, 0, false)
 r96lib.addSpawn(LEVEL_BITS, 1, E_MODEL_MARTY, id_bhvThwomp,     -5247, -1330,  -787, 0, 0, 0, true, nil, function(o) o.oBehParams = 1 end)
-r96lib.addSpawn(LEVEL_SL, 1, E_MODEL_BIG_CHILL_BULLY, id_bhvBigBullyWithMinions, 315, 1331, -4852, 0, 0, 0, false, nil, function(o) o.oBullySubtype = BULLY_STYPE_CHILL end)
 
--- Extra
+----------------
+-- Luigi keys --
+----------------
+
 r96lib.addSpawn(LEVEL_BOB,   1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, 7141,  2030,  -6711, 0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 0 end)
 r96lib.addSpawn(LEVEL_WF,    1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -356,  3584,  -21,   0, 0, 0, false, {2, 3, 4, 5, 6}, function(o) o.oBehParams2ndByte = 1 end)
 r96lib.addSpawn(LEVEL_JRB,   1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, 7134,  -3322, 2169,  0, 0, 0, false, {2}, function(o) o.oBehParams2ndByte = 2 end)
@@ -133,6 +135,10 @@ r96lib.addSpawn(LEVEL_SA,    1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -318,  -160,
 r96lib.addSpawn(LEVEL_PSS,   1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, 6094,  6144,  -4145, 0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 6 end)
 r96lib.addSpawn(LEVEL_BITDW, 1, E_MODEL_LUIGI_KEY, id_bhvLuigiKeys, -4560, 1126,  -179,  0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 7 end)
 
+-----------------
+-- Wario coins --
+-----------------
+
 r96lib.addSpawn(LEVEL_VCUTM, 1, E_MODEL_WARIO_LUNAR_COIN,   id_bhvSixGoldenCoin, 4287, 685, -4391,    0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 0 end)
 r96lib.addSpawn(LEVEL_TOTWC, 1, E_MODEL_WARIO_HOUSE_COIN,   id_bhvSixGoldenCoin, 4045, 490, 5154,     0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 1 end)
 r96lib.addSpawn(LEVEL_LLL,   1, E_MODEL_WARIO_PUMPKIN_COIN, id_bhvSixGoldenCoin, 6585, 142, -6909,    0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 2 end)
@@ -140,88 +146,14 @@ r96lib.addSpawn(LEVEL_SSL,   1, E_MODEL_WARIO_KOOPA_COIN,   id_bhvSixGoldenCoin,
 r96lib.addSpawn(LEVEL_DDD,   2, E_MODEL_WARIO_MARIO_COIN,   id_bhvSixGoldenCoin, 5025, -3681, -1430,  0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 4 end)
 r96lib.addSpawn(LEVEL_COTMC, 1, E_MODEL_WARIO_TREE_COIN,    id_bhvSixGoldenCoin, 7, -143, 2141,       0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 5 end)
 
-local function on_room_create()
-    gBehaviorValues.ProcessLODs = 1
-end
 
-hook_event(HOOK_ON_MODS_LOADED, on_room_create)
 
-local TEX_BOO_KEY    = get_texture_info("texture_hud_boo_key")
-local TEX_WARIO_COIN = get_texture_info("texture_hud_wario_coin")
+------
+-- TODO
+-- Tackle the rest of this next
+------
 
-local function in_cutscene()
-    local act = gMarioStates[0].action
-    return act == ACT_END_PEACH_CUTSCENE
-        or act == ACT_CREDITS_CUTSCENE
-        or act == ACT_END_WAVING_CUTSCENE
-        or act == ACT_INTRO_CUTSCENE
-end
-
-local function render_hud_keys(y)
-    if in_cutscene() then return y end
-    if obj_get_first_with_behavior_id(id_bhvActSelector) then return y end
-    if hud_is_hidden() then return y end
-    if gNumLuigiKeys <= 0 or gNumLuigiKeys >= 8 then return y end
-    djui_hud_set_resolution(RESOLUTION_N64)
-    djui_hud_set_color(255, 255, 255, 255)
-    djui_hud_render_texture(TEX_BOO_KEY, 22, y, 0.0625, 0.0625)
-    djui_hud_set_font(FONT_HUD)
-    djui_hud_print_text("@", 38, y, 1)
-    djui_hud_print_text(tostring(gNumLuigiKeys), 54, y, 1)
-    return y + 20
-end
-
-local function render_hud_wario_coins(y)
-    if in_cutscene() then return y end
-    if obj_get_first_with_behavior_id(id_bhvActSelector) then return y end
-    if hud_is_hidden() then return y end
-    if gNumWarioCoins <= 0 or gNumWarioCoins >= 6 then return y end
-    djui_hud_set_resolution(RESOLUTION_N64)
-    djui_hud_set_color(255, 255, 255, 255)
-    djui_hud_render_texture(TEX_WARIO_COIN, 22, y, 0.0625, 0.0625)
-    djui_hud_set_font(FONT_HUD)
-    djui_hud_print_text("@", 38, y, 1)
-    djui_hud_print_text(tostring(gNumWarioCoins), 54, y, 1)
-    return y + 20
-end
-
-hook_event(HOOK_ON_HUD_RENDER_BEHIND, function()
-    local y = 35
-    y = render_hud_keys(y)
-    y = render_hud_wario_coins(y)
-end)
-
-hook_chat_command("hud", "[0|1]", function(msg)
-    if msg == '0' then
-        hud_hide()
-        return true
-    elseif string.sub(msg, 1, 1) == "1" then
-        hud_show()
-        return true
-    end
-    return false
-end)
-
-local sBullyNum = 1
-
-local sBullySpawns = {
-    {x = 125, y = 1331, z = -4100},
-    {x = 600, y = 1331, z = -4485},
-    {x = 200, y = 1331, z = -4900},
-}
-
-local function entity_cleanup()
-    -- WTF IS THIS
-    -- Every time any object spawns... a random Mr I dies????
-    local mrI = obj_get_nearest_object_with_behavior_id(gMarioStates[0].marioObj, id_bhvMrI)
-    if mrI ~= nil then
-        --print(mrI.oPosX, mrI.oPosY, mrI.oPosZ)
-        obj_mark_for_deletion(mrI)
-    end
-end
-
-hook_event(HOOK_ON_OBJECT_LOAD, entity_cleanup)
-    local audioStream = nil
+local audioStream = nil
 function wario_head_spawner()
     local levelNum = gNetworkPlayers[0].currLevelNum
     local areaNum = gNetworkPlayers[0].currAreaIndex
@@ -249,7 +181,6 @@ function wario_head_spawner()
         audio_stream_set_looping(sAudioStream, true)
         audio_stream_play(sAudioStream, true, 0.7)
     end
-    sBullyNum = 1
 end
 
 local sWasGameOver = false
@@ -285,43 +216,6 @@ function quality_of_life()
         m.marioBodyState.handState = MARIO_HAND_OPEN;
     end
 
-    if levelNum == LEVEL_SL then
-        local bully = obj_get_nearest_object_with_behavior_id(gMarioStates[0].marioObj, id_bhvSmallBully)
-        while bully ~= nil and obj_get_model_id_extended(bully) ~= E_MODEL_CHILL_BULLY do
-            obj_set_model_extended(bully, E_MODEL_CHILL_BULLY)
-            bully.oPosX = sBullySpawns[sBullyNum].x
-            bully.oPosY = sBullySpawns[sBullyNum].y
-            bully.oPosZ = sBullySpawns[sBullyNum].z
-            bully.oHomeX =  bully.oPosX
-            bully.oHomeY =  bully.oPosY
-            bully.oHomeZ =  bully.oPosZ
-            bully.oGravity = 8
-            bully = obj_get_next_with_same_behavior_id(bully)
-            sBullyNum = sBullyNum + 1
-        end
-        local chillyChief = obj_get_nearest_object_with_behavior_id(gMarioStates[0].marioObj, id_bhvBigChillBully)
-        local bigBully = obj_get_nearest_object_with_behavior_id(gMarioStates[0].marioObj, id_bhvBigBullyWithMinions)
-        if chillyChief ~= nil and bigBully ~= nil and bigBully.oBullySubtype == 16 then
-            obj_mark_for_deletion(chillyChief)
-            bigBully.oBullySubtype = 17
-        end
-        if bigBully ~= nil and bigBully.oBullySubtype == 17 then
-            if bigBully.oBullyKBTimerAndMinionKOCounter == 3 then
-                obj_mark_for_deletion(bigBully)
-                chillyChief = spawn_non_sync_object(id_bhvBigChillBully, E_MODEL_BIG_CHILL_BULLY, -1273, 1980, 6759, function(o) 
-                    o.oBehParams = 0x01000000 o.oBullySubtype = BULLY_STYPE_CHILL
-                    o.oColorR = 1 play_puzzle_jingle() end)
-            end
-        end
-        if chillyChief ~= nil and chillyChief.oTimer == 5 and chillyChief.oColorR == 1 then
-            chillyChief.oColorR = 0
-            chillyChief.oPosX = 315
-            chillyChief.oPosY = 3000
-            chillyChief.oPosZ = -4852
-            chillyChief.oHomeX = 315 chillyChief.oHomeY = 1352 chillyChief.oHomeZ = -4852
-            chillyChief.oAction = 2
-        end
-    end
     --print("X: " .. gMarioStates[0].marioObj.oPosX .. " Y: " .. gMarioStates[0].marioObj.oPosY .. " Z: " .. gMarioStates[0].marioObj.oPosZ)
 end
 hook_event(HOOK_MARIO_UPDATE, quality_of_life)

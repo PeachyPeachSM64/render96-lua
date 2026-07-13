@@ -1,4 +1,6 @@
 local bloWarps = require("/lib/warps")
+require("/characters/luigi")
+require("/characters/wario")
 
 local function pipe_entry(m, o)
     play_sound(SOUND_MENU_ENTER_PIPE, gGlobalSoundSource)
@@ -16,22 +18,22 @@ end
 
 local function boo_pipe_green_exit(m, o)
     pipe_exit(m)
-    local char = gNumLuigiKeys == 8 and CT_LUIGI or m.character.type
+    local char = is_luigi_unlocked() and CT_LUIGI or m.character.type
     charSelect.character_set_current_number(char, 1)
 end
 
 local function boo_pipe_yellow_exit(m, o)
     pipe_exit(m)
-    local char = gNumWarioCoins == 6 and CT_WARIO or m.character.type
+    local char = is_wario_unlocked() and CT_WARIO or m.character.type
     charSelect.character_set_current_number(char, 1)
 end
 
 local function pipe_green()
-    return gNumLuigiKeys == 8 and 1 or 0
+    return is_luigi_unlocked() and 1 or 0
 end
 
 local function pipe_yellow()
-    return gNumWarioCoins == 6 and 1 or 0
+    return is_wario_unlocked() and 1 or 0
 end
 
 local pipeGreenBhv = {

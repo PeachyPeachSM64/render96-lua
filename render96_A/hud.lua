@@ -13,7 +13,7 @@ local function render_hud_keys(y)
     if in_cutscene() then return y end
     if obj_get_first_with_behavior_id(id_bhvActSelector) then return y end
     if hud_is_hidden() then return y end
-    if gNumLuigiKeys <= 0 or gNumLuigiKeys >= 8 then return y end
+    if gNumLuigiKeys <= 0 or is_luigi_unlocked() then return y end
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_color(255, 255, 255, 255)
     djui_hud_render_texture(TEX_BOO_KEY, 22, y, 16 / TEX_BOO_KEY.width, 16 / TEX_BOO_KEY.height)
@@ -27,7 +27,7 @@ local function render_hud_wario_coins(y)
     if in_cutscene() then return y end
     if obj_get_first_with_behavior_id(id_bhvActSelector) then return y end
     if hud_is_hidden() then return y end
-    if gNumWarioCoins <= 0 or gNumWarioCoins >= 6 then return y end
+    if gNumWarioCoins <= 0 or is_wario_unlocked() then return y end
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_color(255, 255, 255, 255)
     djui_hud_render_texture(TEX_WARIO_COIN, 22, y, 16 / TEX_WARIO_COIN.width, 16 / TEX_WARIO_COIN.height)

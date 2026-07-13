@@ -146,6 +146,15 @@ r96lib.addSpawn(LEVEL_SSL,   1, E_MODEL_WARIO_KOOPA_COIN,   id_bhvSixGoldenCoin,
 r96lib.addSpawn(LEVEL_DDD,   2, E_MODEL_WARIO_MARIO_COIN,   id_bhvSixGoldenCoin, 5025, -3681, -1430,  0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 4 end)
 r96lib.addSpawn(LEVEL_COTMC, 1, E_MODEL_WARIO_TREE_COIN,    id_bhvSixGoldenCoin, 7, -143, 2141,       0, 0, 0, false, nil, function(o) o.oBehParams2ndByte = 5 end)
 
+------------------------
+-- Character movesets --
+------------------------
+
+require("/characters/mario")
+require("/characters/luigi")
+require("/characters/wario")
+require("/characters/yoshi")
+require("/characters/bananaman")
 
 
 ------

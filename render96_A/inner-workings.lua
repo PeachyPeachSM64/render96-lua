@@ -1,6 +1,4 @@
 local bloWarps = require("/lib/warps")
-require("/characters/luigi")
-require("/characters/wario")
 
 local function pipe_entry(m, o)
     play_sound(SOUND_MENU_ENTER_PIPE, gGlobalSoundSource)
@@ -74,13 +72,23 @@ local function refresh_pipe(level, area, node, bhvTable, modelTable, unlocked, p
     bloWarps.createWarpObj(bhvTable[unlocked], modelTable[unlocked], node, nil, level, area, pos, angle)
 end
 
-local function update_pipe_locks()
+local sAudioStream = nil
+
+local function inner_workings_update()
+
+    -- Stop music
+    if sAudioStream ~= nil and gNetworkPlayers[0].currLevelNum ~= LEVEL_INNER_WORKINGS then
+        audio_stream_set_looping(sAudioStream, false)
+        audio_stream_stop(sAudioStream)
+        sAudioStream = nil
+    end
+
+    -- Update pipe locks
     local green = pipe_green()
     if green ~= sLastGreenUnlocked then
         sLastGreenUnlocked = green
         refresh_pipe(LEVEL_INNER_WORKINGS, 1, 0x01, pipeGreenBhv, pipeModel, green, {2700, 800, -200}, {0, -0x4000, 0})
     end
-
     local yellow = pipe_yellow()
     if yellow ~= sLastYellowUnlocked then
         sLastYellowUnlocked = yellow
@@ -88,7 +96,18 @@ local function update_pipe_locks()
     end
 end
 
-hook_event(HOOK_UPDATE, update_pipe_locks)
+hook_event(HOOK_UPDATE, inner_workings_update)
+
+local function set_inner_workings_music()
+    if gNetworkPlayers[0].currLevelNum == LEVEL_INNER_WORKINGS then
+        sAudioStream = INNER_WORKINGS_SONG
+        audio_stream_set_loop_points(sAudioStream, 15102, 1204316)
+        audio_stream_set_looping(sAudioStream, true)
+        audio_stream_play(sAudioStream, true, 0.7)
+    end
+end
+
+hook_event(HOOK_ON_WARP, set_inner_workings_music)
 
 local function is_mario_at_cabinet()
     return gNetworkPlayers[0].currLevelNum == LEVEL_INNER_WORKINGS

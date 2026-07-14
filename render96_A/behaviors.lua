@@ -2434,10 +2434,7 @@ local WARIO_GREETING = 0
 local WARIO_BITE = 1
 local WARIO_LOL = 2
 local WARIO_DEATH = 3
-local sAudioStream = nil
---audio_stream_set_loop_points(sAudioStream, 0, 333353)
---audio_stream_set_looping(sAudioStream, true)
-        
+
 ---@param o Object
 local function bhv_wario_head_loop(o)
     local player = nearest_player_to_object(o)

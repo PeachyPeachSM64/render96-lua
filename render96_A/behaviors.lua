@@ -2275,8 +2275,8 @@ end
 ---@param o Object
 local function bhv_tree_render96_loop(o)
     bhv_pole_base_loop()
-    local model = obj_get_model_id_extended(o)
     if o.oTimer < 2 then
+        local model = obj_get_model_id_extended(o)
         if model ~= E_MODEL_COURTYARD_SPIKY_TREE or model ~= E_MODEL_PALM_TREE then
             o.oFaceAngleYaw = _random(0, 10) * 0x10000/10
         end

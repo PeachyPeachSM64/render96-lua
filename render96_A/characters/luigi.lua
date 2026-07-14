@@ -52,7 +52,7 @@ local function act_luigi_twirling(m)
 
     if (m.input & INPUT_Z_DOWN) ~= 0 then
         return set_mario_action(m, ACT_LUIGI_TWIRLING_DOWN, 0)
-    else 
+    else
         if m.vel.y < -7.0 then m.vel.y = -7.0 end
     end
 
@@ -82,6 +82,8 @@ local function act_luigi_twirling(m)
     if stepResult == AIR_STEP_LANDED then set_mario_action(m, ACT_TWIRL_LAND, 0)
     elseif stepResult == AIR_STEP_HIT_WALL then mario_bonk_reflection(m, 0)
     elseif stepResult == AIR_STEP_HIT_LAVA_WALL then lava_boost_on_wall(m) end
+
+    m.peakHeight = m.pos.y
     m.marioObj.header.gfx.angle.y = m.marioObj.header.gfx.angle.y + m.twirlYaw
 
     return false
@@ -117,6 +119,8 @@ local function act_luigi_twirling_down(m)
     if stepResult == AIR_STEP_LANDED then set_mario_action(m, ACT_TWIRL_LAND, 0)
     elseif stepResult == AIR_STEP_HIT_WALL then mario_bonk_reflection(m, 0)
     elseif stepResult == AIR_STEP_HIT_LAVA_WALL then lava_boost_on_wall(m) end
+
+    m.peakHeight = m.pos.y
     m.marioObj.header.gfx.angle.y = m.marioObj.header.gfx.angle.y + m.twirlYaw
 
     return false

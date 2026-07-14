@@ -1487,7 +1487,7 @@ local function bhv_goomba_render96_loop(o)
             end
         end
         
-        r96lib.npcGrabHandler(o, GOOMBA_OPTS)
+        r96lib.update_held_object(m, o, GOOMBA_OPTS)
 
         if o.oHeldState == HELD_HELD then
             o.oSwitchState2 = 1
@@ -1562,7 +1562,7 @@ local function bhv_koopa_shell_render96_loop(o)
             obj_mark_for_deletion(koopa)
         end
 
-        r96lib.npcGrabHandler(o, SHELL_OPTS)
+        r96lib.update_held_object(m, o, SHELL_OPTS)
 
         if o.oHeldState == HELD_HELD then
             if gMarioStates[0].heldObj ~= nil then
@@ -2641,7 +2641,7 @@ local function bhv_yoshi_unridden(o)
     local dist = dist_between_objects(o, player.marioObj)
 
     o.oYoshiIdleTimer = o.oYoshiIdleTimer + 1
-    r96lib.yoshiRun(o)
+    r96lib.yoshi_run(o)
     if dist < 100 then r96lib.push_mario_out_of_object(player, o, 2) end
 
     if o.oYoshiIdleTimer >= 600 then

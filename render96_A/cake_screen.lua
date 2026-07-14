@@ -9,30 +9,32 @@ local sCakeScreen = {
     [CT_WARIO] = TEX_WARIO_CAKE
 }
 
-function render_character_end_screen()
-    local x = djui_hud_get_screen_width() / 2 - TEX_MARIO_CAKE.width / 2
-    local y = djui_hud_get_screen_height() / 2 - TEX_MARIO_CAKE.height / 2
-    local charNum = _G.charSelect.character_get_current_number()
+local function get_current_character_cake_texture()
+    if gMarioStates[0].numStars < 70 then
+        return TEX_BOWSER_CAKE
+    end
 
+    local charNum = _G.charSelect.character_get_current_number()
+    return sCakeScreen[charNum]
+end
+
+local function render_character_end_screen()
     if gNetworkPlayers[0].currLevelNum ~= LEVEL_ENDING then return end
 
+    local cakeTexture = get_current_character_cake_texture()
+    if not cakeTexture then return end
+
+    djui_hud_set_resolution(RESOLUTION_N64)
+    djui_hud_set_font(FONT_HUD)
+    djui_hud_set_color(0, 0, 0, 255)
     djui_hud_render_rect(0, 0, djui_hud_get_screen_width(), djui_hud_get_screen_height())
+
+    local x = djui_hud_get_screen_width() / 2 - cakeTexture.width / 2
+    local y = djui_hud_get_screen_height() / 2 - cakeTexture.height / 2
 
     djui_hud_set_color(255, 255, 255, 255)
     djui_hud_set_filter(FILTER_LINEAR)
-
-    -- Character Specific Rendering Based on Star Count
-    if gMarioStates[0].numStars >= 70 then
-        djui_hud_render_texture(sCakeScreen[charNum], x, y, 1, 1)
-    else
-        djui_hud_render_texture(TEX_BOWSER_CAKE, x, y, 1, 1)
-    end
+    djui_hud_render_texture(cakeTexture, x, y, 1, 1)
 end
 
-hook_event(HOOK_ON_HUD_RENDER_BEHIND, function()
-    djui_hud_set_resolution(RESOLUTION_N64)
-    djui_hud_set_font(FONT_HUD)
-
-    djui_hud_set_color(0, 0, 0, 255)
-    render_character_end_screen()
-end)
+hook_event(HOOK_ON_HUD_RENDER_BEHIND, render_character_end_screen)

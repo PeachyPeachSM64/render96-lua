@@ -1,0 +1,53 @@
+local version = require("/lib/version")
+local o2oint = require("/lib/o2oint")
+local r96lib = require("/lib/r96lib")
+--local UvScroll = require("/lib/uv-scroll")
+require("constants")
+
+local _floor  = math.floor
+local _abs    = math.abs
+local _max    = math.max
+local _min    = math.min
+local _sqrt   = math.sqrt
+local _random = math.random
+local _sin    = math.sin
+local _cos    = math.cos
+local _lerp   = math.lerp
+local _atan2  = math.atan2
+local _pi     = math.pi
+
+------------------------
+-- Behavior functions --
+------------------------
+
+---@param o Object
+local function bhv_flame_render96_init(o)
+    o.oWallAngle = 0
+    o.oWallX = 0
+    o.oWallZ = 0
+    for i = 0, 3 do
+        local ray = collision_find_surface_on_ray(o.oPosX, o.oPosY, o.oPosZ, sins(i*0x4000)*500, 0, coss(i*0x4000)*500, 128)
+        local dist = _sqrt((ray.hitPos.x - o.oPosX)^2 + (ray.hitPos.z - o.oPosZ)^2)
+        local nDist = _sqrt((o.oWallX - o.oPosX)^2 + (o.oWallZ - o.oPosZ)^2)
+        if (dist < nDist or not o.oWallAngle) and ray.surface then
+            o.oWallX = ray.hitPos.x
+            o.oWallZ = ray.hitPos.z
+            o.oWallAngle = atan2s(ray.surface.normal.z, ray.surface.normal.x)
+        end
+    end
+end
+
+---@param o Object
+local function bhv_flame_render96_loop(o)
+    local model = obj_get_model_id_extended(o)
+    if o.oTimer < 2 then
+        if model == E_MODEL_RED_FLAME_TORCH or model == E_MODEL_BLUE_FLAME_TORCH then
+            o.oPosX = o.oWallX
+            o.oPosZ = o.oWallZ
+            o.oFaceAngleYaw = o.oWallAngle
+            o.oMoveAngleYaw = o.oWallAngle
+        end
+    end
+end
+
+id_bhvRender96Flame = hook_render96_behavior(id_bhvFlame, false, bhv_flame_render96_init, bhv_flame_render96_loop, OBJ_LIST_LEVEL)

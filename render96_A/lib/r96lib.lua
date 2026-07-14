@@ -575,7 +575,6 @@ local function obj_thrown_death(o, opts)
     if opts.audio then
         audio_stream_stop(opts.audio)
     end
-    o.activeFlags = ACTIVE_FLAG_DEACTIVATED
     obj_mark_for_deletion(o)
 end
 
@@ -605,7 +604,6 @@ local function obj_thrown_update(o, opts)
         end
 
         if (o.oMoveFlags & OBJ_MOVE_ABOVE_LAVA) ~= 0 then
-            o.activeFlags = ACTIVE_FLAG_DEACTIVATED
             obj_mark_for_deletion(o)
             return
         end

@@ -1,4 +1,3 @@
-
 bloWarps = {}
 
 local np = gNetworkPlayers[0] -- ain't no one got time to write all that

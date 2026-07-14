@@ -296,7 +296,6 @@ local function act_wario_pile_driver_land(m)
         obj_spawn_yellow_coins(o, o.oNumLootCoins)
         create_sound_spawner(SOUND_OBJ_STOMPED)
         o.oAction = OBJ_ACT_SQUISHED
-        o.activeFlags = ACTIVE_FLAG_DEACTIVATED
         obj_mark_for_deletion(o)
     elseif obj_has_behavior_id(o, id_bhvBobomb) == 1 then
         o.oBobombFuseTimer = 152
@@ -925,3 +924,33 @@ hook_mario_action(ACT_WARIO_SWING_FLING_START,  act_wario_swing_fling_start)
 hook_mario_action(ACT_WARIO_SWING_FLING_HELD,   act_wario_swing_fling_held)
 hook_mario_action(ACT_WARIO_SWING_FLING_THROW,  act_wario_swing_fling_throw)
 hook_mario_action(ACT_WARIO_GROUND_POUND,       act_wario_ground_pound, INT_GROUND_POUND)
+
+------------------------
+-- Behavior functions --
+------------------------
+
+function obj_hit_by_wario_charge(o, dist)
+    for i = 0, MAX_PLAYERS - 1 do
+        local m = gMarioStates[i]
+        if m.action == ACT_WARIO_CHARGE and m.marioObj and dist_between_objects(o, m.marioObj) <= dist then
+            return true
+        end
+    end
+    return false
+end
+
+-------------------
+-- Geo functions --
+-------------------
+
+function geo_switch_held_obj(node, matStackIndex)
+    local o = geo_get_current_object()
+    if o == nil then return end
+    cast_graph_node(node).selectedCase = o.oSwitchState1
+    if gWarioGrabLightAnims[o.header.gfx.animInfo.animID] then
+        smlua_anim_util_set_animation(o, gWarioGrabLightAnims[o.header.gfx.animInfo.animID])
+        o.oSwitchState1 = 1
+    else
+        o.oSwitchState1 = 0
+    end
+end

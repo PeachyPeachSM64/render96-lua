@@ -183,10 +183,6 @@ end
 -- Hooks --
 -----------
 
-function is_luigi_unlocked()
-    return gNumLuigiKeys >= 8
-end
-
 ---@param m MarioState
 local function luigi_update(m)
     if (m.prevAction & ACT_FLAG_AIR == 0 and

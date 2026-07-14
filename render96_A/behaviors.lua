@@ -1,7 +1,7 @@
 local version = require("/lib/version")
 local o2oint = require("/lib/o2oint")
 local r96lib = require("/lib/r96lib")
-require("constants")
+require("/constants")
 
 local _floor  = math.floor
 local _abs    = math.abs

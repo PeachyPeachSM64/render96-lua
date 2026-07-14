@@ -226,25 +226,52 @@ end
 -- Data --
 ----------
 
-function r96lib.save_render96_data(name, index)
-    local bits = r96lib.load_render96_data(name)
-    -- Set the character at the index position to '1'
-    bits = bits:sub(1, 7 - index) .. "1" .. bits:sub(9 - index)
-    mod_storage_save(name, bits)
-end
+local DATA_NUM_BITS = 8
 
-function r96lib.check_render96_data(name, index)
-    local bits = r96lib.load_render96_data(name)
-    return bits:sub(8 - index, 8 - index) == "1"
-end
+local sDataCache = {}
 
-function r96lib.load_render96_data(name)
-    local bits = mod_storage_load(name)
-    if bits == nil then
-        bits = "00000000"
-        mod_storage_save(name, bits)
+r96lib.DATA_DEFAULT = string.rep("0", DATA_NUM_BITS) -- "00000000"
+
+function r96lib.save_data(name, data)
+    if data then
+        mod_storage_save(name, data)
+        sDataCache[name] = data
+        return true
     end
-    return bits
+    return false
+end
+
+function r96lib.load_data(name)
+    local data = sDataCache[name]
+    if data ~= nil then
+        return data
+    end
+
+    -- Load if it exists, or save default value
+    if mod_storage_exists(name) then
+        data = mod_storage_load(name)
+    else
+        data = r96lib.DATA_DEFAULT
+        mod_storage_save(name, data)
+    end
+
+    sDataCache[name] = data
+    return data
+end
+
+function r96lib.check_data(data, index)
+    return data and (data:sub(DATA_NUM_BITS - index, DATA_NUM_BITS - index) == "1")
+end
+
+function r96lib.count_data(data)
+    -- 'select(2, ...)' returns the 2nd return value of 'data:gsub("1", "")',
+    -- which is the number of occurrences of "1" in data
+    return data and select(2, data:gsub("1", "")) or 0
+end
+
+function r96lib.update_data(data, index, value)
+    -- Set value at the index position to '1'
+    return data and (data:sub(1, DATA_NUM_BITS - 1 - index) .. tostring(value) .. data:sub(DATA_NUM_BITS + 1 - index)) or nil
 end
 
 -----------

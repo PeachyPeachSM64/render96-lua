@@ -1,4 +1,4 @@
-require("constants")
+require("/constants")
 
 local _floor  = math.floor
 local _abs    = math.abs

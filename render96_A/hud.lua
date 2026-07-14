@@ -13,13 +13,13 @@ local function render_hud_keys(y)
     if in_cutscene() then return y end
     if obj_get_first_with_behavior_id(id_bhvActSelector) then return y end
     if hud_is_hidden() then return y end
-    if gNumLuigiKeys <= 0 or is_luigi_unlocked() then return y end
+    if count_luigi_keys() <= 0 or is_luigi_unlocked() then return y end
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_color(255, 255, 255, 255)
     djui_hud_render_texture(TEX_BOO_KEY, 22, y, 16 / TEX_BOO_KEY.width, 16 / TEX_BOO_KEY.height)
     djui_hud_set_font(FONT_HUD)
     djui_hud_print_text("@", 38, y, 1)
-    djui_hud_print_text(tostring(gNumLuigiKeys), 54, y, 1)
+    djui_hud_print_text(tostring(count_luigi_keys()), 54, y, 1)
     return y + 20
 end
 
@@ -27,13 +27,13 @@ local function render_hud_wario_coins(y)
     if in_cutscene() then return y end
     if obj_get_first_with_behavior_id(id_bhvActSelector) then return y end
     if hud_is_hidden() then return y end
-    if gNumWarioCoins <= 0 or is_wario_unlocked() then return y end
+    if count_wario_coins() <= 0 or is_wario_unlocked() then return y end
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_color(255, 255, 255, 255)
     djui_hud_render_texture(TEX_WARIO_COIN, 22, y, 16 / TEX_WARIO_COIN.width, 16 / TEX_WARIO_COIN.height)
     djui_hud_set_font(FONT_HUD)
     djui_hud_print_text("@", 38, y, 1)
-    djui_hud_print_text(tostring(gNumWarioCoins), 54, y, 1)
+    djui_hud_print_text(tostring(count_wario_coins()), 54, y, 1)
     return y + 20
 end
 

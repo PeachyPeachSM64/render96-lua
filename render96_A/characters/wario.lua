@@ -875,10 +875,6 @@ end
 -- Hooks --
 -----------
 
-function is_wario_unlocked()
-    return gNumWarioCoins >= 6
-end
-
 ---@param m MarioState
 ---@param incomingAct integer
 local function wario_before_actions(m, incomingAct)

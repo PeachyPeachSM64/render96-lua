@@ -1,5 +1,4 @@
-local r96lib = require("/lib/r96lib")
-require("constants")
+require("/constants")
 
 ------------------------
 -- Behavior functions --
@@ -23,17 +22,21 @@ end
 local function bhv_luigi_key_loop(o)
     o.oFaceAngleYaw = o.oFaceAngleYaw + 0x700
     o.oPosY = o.oHomeY + sins(o.oTimer * 0x600) * 8
+
+    -- Unload object if it's already collected
+    if is_luigi_key_collected(o.oBehParams2ndByte) then
+        obj_mark_for_deletion(o)
+        return
+    end
+
+    -- Local Mario only can collect the object
+    local m = gMarioStates[0]
     if dist_between_objects(o, m.marioObj) <= 150 then
-        r96lib.save_render96_data("luigi_key", o.oBehParams2ndByte)
-        gNumLuigiKeys = select(2, r96lib.load_render96_data("luigi_key"):gsub("1", ""))
+        collect_luigi_key(o.oBehParams2ndByte)
         spawn_non_sync_object(id_bhvCoinSparkles, E_MODEL_SPARKLES, o.oPosX, o.oPosY, o.oPosZ, nil)
         audio_stream_play(COLLECTABLE, false, 1)
-        cur_obj_disable_rendering_and_become_intangible(o)
         obj_mark_for_deletion(o)
-    end
-    if r96lib.check_render96_data("luigi_key", o.oBehParams2ndByte) == true then
-        cur_obj_disable_rendering_and_become_intangible(o)
-        obj_mark_for_deletion(o)
+        return
     end
 end
 

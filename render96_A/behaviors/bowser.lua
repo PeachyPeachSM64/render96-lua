@@ -1,5 +1,5 @@
 local r96lib = require("/lib/r96lib")
-require("constants")
+require("/constants")
 
 local _floor = math.floor
 local _max   = math.max

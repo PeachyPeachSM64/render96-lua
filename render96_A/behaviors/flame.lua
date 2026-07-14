@@ -1,4 +1,4 @@
-require("constants")
+require("/constants")
 
 local _sqrt = math.sqrt
 

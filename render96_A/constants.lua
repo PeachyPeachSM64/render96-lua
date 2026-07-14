@@ -359,14 +359,6 @@ YOSHI_ANIM_RIDABLE_JUMP_FALL    = 'yoshi_ridable_jump_fall_10'
 YOSHI_ANIM_RIDABLE_JUMP_LAND    = 'yoshi_ridable_jump_fall_land_11'
 YOSHI_ANIM_RIDABLE_EAT          = 'yoshi_ridable_eat_12'
 
--- Extra content
-gNumLuigiKeys = select(2, r96lib.load_render96_data("luigi_key"):gsub("1", ""))
-gNumWarioCoins = select(2, r96lib.load_render96_data("wario_coin"):gsub("1", ""))
-
---gGlobalSyncTable
---gGlobalSyncTable.luigiKey1 = true WILL SYNC TO ALL CLIENTS
---gPlayerSyncTable[index]
-
 -- Audio
 STAR_AMBIENT        = audio_stream_load("event_star_ambient.mp3")
 GOT_MILK_POWERUP    = audio_stream_load("event_got_milk_powerup.mp3")

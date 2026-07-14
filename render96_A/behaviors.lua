@@ -12,7 +12,6 @@ local _random = math.random
 local _sin    = math.sin
 local _cos    = math.cos
 local _lerp   = math.lerp
-local _atan2  = math.atan2
 local _pi     = math.pi
 
 -------------------
@@ -83,6 +82,45 @@ if not version.GLOBAL_OBJECT_FIELDS then
 end
 
 define_custom_obj_fields(sBehaviorsCustomObjectFields)
+
+--- For VSCode autocompletion
+--- @class Object
+--- @field oSwitchState1 integer
+--- @field oSwitchTimer1 integer
+--- @field oSwitchState2 integer
+--- @field oSwitchTimer2 integer
+--- @field oMarioBlinkTimer integer
+--- @field oMarioBlinkFrame integer
+--- @field oMarioSleepTimer integer
+--- @field oMarioLongJumpTimer integer
+--- @field oTongueU number
+--- @field oTongueTimer integer
+--- @field oTongueTarget number
+--- @field oTongueLockX number
+--- @field oTongueLockY number
+--- @field oTongueLockZ number
+--- @field oYoshiIdleTimer integer
+--- @field oYoshiCustomBlinkTimer integer
+--- @field oMrIBlinkIndex integer
+--- @field oMrITracking number
+--- @field oMrILastAngle integer
+--- @field oMrIFireTimer integer
+--- @field oMrIDizzyTimer integer
+--- @field oMrIDizzyDuration integer
+--- @field oMrIDetectRadius number
+--- @field oThwompShakeTimer integer
+--- @field oThwompShakeTicks integer
+--- @field oThwompPosMag number
+--- @field oThwompAngleMag integer
+--- @field oThwompPrevAction integer
+--- @field oThwompSquishTimer integer
+--- @field oThwompSquishDur integer
+--- @field oThwompBaseScale number
+--- @field oWarioHeadBool integer
+--- @field oWallX number
+--- @field oWallY number
+--- @field oWallZ number
+--- @field oCelebrationStar integer
 
 ------------------
 -- Interactions --
@@ -177,6 +215,41 @@ function obj_update_eye_blink(o, closeMin, closeMax, openMin, openMax)
     end
 end
 
+---@param m MarioState
+---@param o Object
+---@param padding number?
+function push_mario_out_of_object(m, o, padding)
+    local minDistance = o.hitboxRadius + m.marioObj.hitboxRadius + (padding or 0)
+
+    local offsetX = m.pos.x - o.oPosX
+    local offsetZ = m.pos.z - o.oPosZ
+    local distance = _sqrt(offsetX * offsetX + offsetZ * offsetZ)
+
+    if (distance < minDistance) then
+        local floor = m.floor
+        local pushAngle = 0
+        local newMarioX = 0
+        local newMarioZ = 0
+
+        if (distance == 0) then
+            pushAngle = m.faceAngle.y
+        else
+            pushAngle = atan2s(offsetZ, offsetX)
+        end
+
+        newMarioX = o.oPosX + minDistance * sins(pushAngle)
+        newMarioZ = o.oPosZ + minDistance * coss(pushAngle)
+
+        if (floor ~= nil) then
+            m.pos.x = newMarioX
+            m.pos.z = newMarioZ
+            if gLevelValues.fixCollisionBugs ~= 0 then
+                m.floorHeight, m.floor = find_floor(m.pos.x, m.pos.y, m.pos.z)
+            end
+        end
+    end
+end
+
 -------------------
 -- Geo functions --
 -------------------
@@ -246,7 +319,7 @@ end
 -- Behaviors --
 ---------------
 
----@param id BehaviorId|number
+---@param id BehaviorId|number|nil
 ---@param override boolean
 ---@param init function?
 ---@param loop function?

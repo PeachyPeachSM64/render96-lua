@@ -1,24 +1,20 @@
-local version = require("/lib/version")
-local o2oint = require("/lib/o2oint")
-local r96lib = require("/lib/r96lib")
---local UvScroll = require("/lib/uv-scroll")
 require("constants")
 
-local _floor  = math.floor
-local _abs    = math.abs
-local _max    = math.max
-local _min    = math.min
-local _sqrt   = math.sqrt
-local _random = math.random
-local _sin    = math.sin
-local _cos    = math.cos
-local _lerp   = math.lerp
-local _atan2  = math.atan2
-local _pi     = math.pi
+local _sqrt = math.sqrt
 
 ------------------------
 -- Behavior functions --
 ------------------------
+
+local WARIO_HEAD_FUN = audio_stream_load('event_wario_head_fun.mp3')
+local WARIO_HEAD_BITE = audio_stream_load('event_wario_head_yell.mp3')
+local WARIO_HEAD_LAUGH = audio_stream_load('event_wario_head_yell.mp3')
+local WARIO_HEAD_YELL = audio_stream_load('event_wario_head_yell.mp3')
+
+local WARIO_GREETING = 0
+local WARIO_BITE = 1
+local WARIO_LOL = 2
+local WARIO_DEATH = 3
 
 ---@param o Object
 local function bhv_wario_head_init(o)
@@ -46,7 +42,7 @@ local function bhv_wario_head_init(o)
     o.oFriction         = 10.0
     o.oBuoyancy         =  0.0
 
--- hitbox
+    -- hitbox
     o.oInteractType = INTERACT_SHOCK
     o.oHealth = 0
     o.oNumLootCoins = 1
@@ -61,17 +57,6 @@ local function bhv_wario_head_init(o)
     o.oAction = -1
 end
 
-    --5235, -1074,  1995
-    --604, -1074, 1995
-local WARIO_HEAD_FUN = audio_stream_load('event_wario_head_fun.mp3')
-local WARIO_HEAD_BITE = audio_stream_load('event_wario_head_yell.mp3')
-local WARIO_HEAD_LAUGH = audio_stream_load('event_wario_head_yell.mp3')
-local WARIO_HEAD_YELL = audio_stream_load('event_wario_head_yell.mp3')
-local WARIO_GREETING = 0
-local WARIO_BITE = 1
-local WARIO_LOL = 2
-local WARIO_DEATH = 3
-
 ---@param o Object
 local function bhv_wario_head_loop(o)
     local player = nearest_player_to_object(o)
@@ -81,7 +66,6 @@ local function bhv_wario_head_loop(o)
     if o.oWarioHeadBool == 0 then
         o.header.gfx.node.flags = o.header.gfx.node.flags | GRAPH_RENDER_INVISIBLE
         cur_obj_become_intangible()
-        
     end
     if o.oAction == -1 and o.oWarioHeadBool == 1 then
         o.oPosY = -800
@@ -109,7 +93,7 @@ local function bhv_wario_head_loop(o)
         cur_obj_update_floor_and_walls()
     end
 
-    if  o.oWarioHeadBool == 1 and m.pos.x < 604 then
+    if o.oWarioHeadBool == 1 and m.pos.x < 604 then
         o.header.gfx.node.flags = o.header.gfx.node.flags | GRAPH_RENDER_INVISIBLE
         cur_obj_become_intangible()
         audio_stream_play(WARIO_HEAD_YELL, false, 2)

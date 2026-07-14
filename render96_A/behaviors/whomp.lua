@@ -1,20 +1,4 @@
-local version = require("/lib/version")
-local o2oint = require("/lib/o2oint")
-local r96lib = require("/lib/r96lib")
---local UvScroll = require("/lib/uv-scroll")
 require("constants")
-
-local _floor  = math.floor
-local _abs    = math.abs
-local _max    = math.max
-local _min    = math.min
-local _sqrt   = math.sqrt
-local _random = math.random
-local _sin    = math.sin
-local _cos    = math.cos
-local _lerp   = math.lerp
-local _atan2  = math.atan2
-local _pi     = math.pi
 
 ------------------------
 -- Behavior functions --
@@ -24,7 +8,7 @@ local _pi     = math.pi
 local function bhv_whomp_render96_loop(o)
     obj_squish_on_action_enter(o, 5, 0.10, 0.10, -0.2)
     if obj_hit_by_wario_charge(o, 200) then
-        cur_obj_play_sound_2(SOUND_OBJ_THWOMP)
+        cur_obj_play_sound_and_rumble_if_visible(SOUND_OBJ_THWOMP)
         o.oNumLootCoins = 5
         obj_spawn_loot_yellow_coins(o, 5, 20.0)
         create_sound_spawner(SOUND_OBJ_STOMPED)

@@ -21,6 +21,15 @@ r96lib.customObjectFields = {
 
 define_custom_obj_fields(r96lib.customObjectFields)
 
+--- For VSCode autocompletion
+--- @class Object
+--- @field oColorR integer
+--- @field oColorG integer
+--- @field oColorB integer
+--- @field oShakeBasePosX number
+--- @field oShakeBasePosY number
+--- @field oShakeBasePosZ number
+
 -----------
 -- Audio --
 -----------
@@ -674,69 +683,5 @@ function r96lib.update_held_object(m, o, opts)
         mario_drop_held_object(m)
     end
 end
-
-----------
--- Misc --
-----------
-
----
---- TODO: Move this stuff out of here
---- 
-
----@param m MarioState
----@param o Object
----@param padding number?
-function r96lib.push_mario_out_of_object(m, o, padding)
-    local minDistance = o.hitboxRadius + m.marioObj.hitboxRadius + (padding or 0)
-
-    local offsetX = m.pos.x - o.oPosX
-    local offsetZ = m.pos.z - o.oPosZ
-    local distance = _sqrt(offsetX * offsetX + offsetZ * offsetZ)
-
-    if (distance < minDistance) then
-        local floor = m.floor
-        local pushAngle = 0
-        local newMarioX = 0
-        local newMarioZ = 0
-
-        if (distance == 0) then
-            pushAngle = m.faceAngle.y
-        else
-            pushAngle = atan2s(offsetZ, offsetX)
-        end
-
-        newMarioX = o.oPosX + minDistance * sins(pushAngle)
-        newMarioZ = o.oPosZ + minDistance * coss(pushAngle)
-
-        if (floor ~= nil) then
-            --! Doesn't update Mario's referenced floor (allows oob death when
-            -- an object pushes you into a steep slope while in a ground action)
-            --  <Fixed when gLevelValues.fixCollisionBugs != 0>
-            m.pos.x = newMarioX
-            m.pos.z = newMarioZ
-            if gLevelValues.fixCollisionBugs then
-                m.floorHeight, m.floor = find_floor(m.pos.x, m.pos.y, m.pos.z)
-            end
-        end
-    end
-end
-
-
-function r96lib.yoshi_run(o)
-    cur_obj_update_floor_and_walls()
-    cur_obj_move_standard(-78)
-
-    o.oFaceAngleYaw = o.oFaceAngleYaw + 0x1000
-    o.oGravity = -2.5
-    o.oFriction = 0.99
-    o.oBuoyancy = 1.4
-
-    if (o.oMoveFlags & OBJ_MOVE_HIT_EDGE) ~= 0 or o.oMoveFlags & OBJ_MOVE_HIT_WALL ~= 0 then
-        o.oMoveAngleYaw = obj_angle_to_object(o, nearest_player_to_object(o))
-        return
-    end
-end
-
-
 
 return r96lib

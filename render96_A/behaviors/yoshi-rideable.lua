@@ -1,20 +1,4 @@
-local version = require("/lib/version")
-local o2oint = require("/lib/o2oint")
-local r96lib = require("/lib/r96lib")
---local UvScroll = require("/lib/uv-scroll")
 require("constants")
-
-local _floor  = math.floor
-local _abs    = math.abs
-local _max    = math.max
-local _min    = math.min
-local _sqrt   = math.sqrt
-local _random = math.random
-local _sin    = math.sin
-local _cos    = math.cos
-local _lerp   = math.lerp
-local _atan2  = math.atan2
-local _pi     = math.pi
 
 ------------------------
 -- Behavior functions --
@@ -55,13 +39,29 @@ local function yoshi_update_blink(o)
 end
 
 ---@param o Object
+local function yoshi_run(o)
+    cur_obj_update_floor_and_walls()
+    cur_obj_move_standard(-78)
+
+    o.oFaceAngleYaw = o.oFaceAngleYaw + 0x1000
+    o.oGravity = -2.5
+    o.oFriction = 0.99
+    o.oBuoyancy = 1.4
+
+    if (o.oMoveFlags & OBJ_MOVE_HIT_EDGE) ~= 0 or o.oMoveFlags & OBJ_MOVE_HIT_WALL ~= 0 then
+        o.oMoveAngleYaw = obj_angle_to_object(o, nearest_player_to_object(o))
+        return
+    end
+end
+
+---@param o Object
 local function bhv_yoshi_unridden(o)
     local player = nearest_mario_state_to_object(o)
     local dist = dist_between_objects(o, player.marioObj)
 
     o.oYoshiIdleTimer = o.oYoshiIdleTimer + 1
-    r96lib.yoshi_run(o)
-    if dist < 100 then r96lib.push_mario_out_of_object(player, o, 2) end
+    yoshi_run(o)
+    if dist < 100 then push_mario_out_of_object(player, o, 2) end
 
     if o.oYoshiIdleTimer >= 600 then
         spawn_mist_particles_with_sound(SOUND_OBJ_DYING_ENEMY1)
@@ -79,7 +79,7 @@ local function bhv_yoshi_unridden(o)
             player.pos.x = o.oPosX
             player.pos.z = o.oPosZ
             player.faceAngle.y = o.oMoveAngleYaw
-            cur_obj_play_sound_2(SOUND_GENERAL_YOSHI_TALK)
+            cur_obj_play_sound_and_rumble_if_visible(SOUND_GENERAL_YOSHI_TALK)
             player.interactObj = o
             player.usedObj = o
             player.riddenObj = o
@@ -119,7 +119,7 @@ local function bhv_yoshi_rideable_render96_loop(o)
             smlua_anim_util_set_animation(o, YOSHI_ANIM_RIDABLE_IDLE)
         elseif action == ACT_YOSHI_RIDE_WALK then
             --cur_obj_init_animation_with_accel_and_sound(1, _abs(rider.forwardVel) / 14)
-            --if cur_obj_check_anim_frame(3) then
+            --if cur_obj_check_anim_frame(3) ~= 0 then
             --    play_sound(SOUND_GENERAL_YOSHI_WALK, m.marioObj.header.gfx.cameraToObject)
             --end
             --play_step_sound(m, 1, 2);
@@ -145,7 +145,7 @@ local function bhv_yoshi_rideable_render96_loop(o)
         if (o.oInteractStatus & INT_STATUS_STOP_RIDING) ~= 0 then
             o.heldByPlayerIndex = 0
             if rider.hurtCounter ~= 0 then
-                cur_obj_play_sound_2(SOUND_GENERAL_YOSHI_TALK)
+                cur_obj_play_sound_and_rumble_if_visible(SOUND_GENERAL_YOSHI_TALK)
                 o.oAction = 2
             else
                 o.oAction = 0

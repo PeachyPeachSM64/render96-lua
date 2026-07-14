@@ -185,7 +185,7 @@ local function act_yoshi_ride_jump(m)
     end
 
     if m.actionTimer == 0 then
-        play_character_sound(m, CHAR_SOUND_YAH_WAH_HOO) 
+        play_character_sound(m, CHAR_SOUND_YAH_WAH_HOO)
         m.vel.y = _max(_min(80.0, 15.0 + _abs(m.vel.y)), 40.0)
     end
     update_air_without_turn(m)

@@ -1,26 +1,14 @@
-local version = require("/lib/version")
-local o2oint = require("/lib/o2oint")
-local r96lib = require("/lib/r96lib")
---local UvScroll = require("/lib/uv-scroll")
 require("constants")
 
-local _floor  = math.floor
-local _abs    = math.abs
-local _max    = math.max
-local _min    = math.min
-local _sqrt   = math.sqrt
-local _random = math.random
-local _sin    = math.sin
-local _cos    = math.cos
-local _lerp   = math.lerp
-local _atan2  = math.atan2
-local _pi     = math.pi
+local _lerp = math.lerp
 
 ------------------------
 -- Behavior functions --
 ------------------------
 
-local function magnetize_to_mario(o)
+---@param m MarioState
+---@param o Object
+local function mario_attract_object(m, o)
     local targetX = m.pos.x + m.vel.x
     local targetY = m.pos.y + 10
     local targetZ = m.pos.z + m.vel.z
@@ -52,7 +40,10 @@ local function bhv_wario_coin_loop(o)
     o.oBuoyancy = 1.4
     o.oFaceAngleYaw = o.oFaceAngleYaw + 0x1000
     o.oForwardVel = 30
-    if o.oVelY < 0 or (o.oMoveFlags & OBJ_MOVE_MASK_ON_GROUND) ~= 0 or (o.oMoveFlags & OBJ_MOVE_HIT_WALL) ~= 0 or (o.oMoveFlags & OBJ_MOVE_HIT_EDGE) ~= 0 or (o.oMoveFlags & OBJ_MOVE_MASK_IN_WATER) ~= 0 then magnetize_to_mario(o) end
+
+    if o.oVelY < 0 or (o.oMoveFlags & (OBJ_MOVE_MASK_ON_GROUND | OBJ_MOVE_HIT_WALL | OBJ_MOVE_HIT_EDGE | OBJ_MOVE_MASK_IN_WATER)) ~= 0 then
+        mario_attract_object(m, o)
+    end
 
     if dist_between_objects(o, m.marioObj) <= 50 then
         set_mario_particle_flags(m, PARTICLE_SPARKLES, 0)
@@ -60,6 +51,7 @@ local function bhv_wario_coin_loop(o)
         cur_obj_disable_rendering_and_become_intangible(o)
         obj_mark_for_deletion(o)
     end
+
     if (o.oMoveFlags & OBJ_MOVE_ABOVE_LAVA) ~= 0 then
         obj_mark_for_deletion(o)
         return

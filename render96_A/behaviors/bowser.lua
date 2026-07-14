@@ -1,20 +1,10 @@
-local version = require("/lib/version")
-local o2oint = require("/lib/o2oint")
 local r96lib = require("/lib/r96lib")
---local UvScroll = require("/lib/uv-scroll")
 require("constants")
 
-local _floor  = math.floor
-local _abs    = math.abs
-local _max    = math.max
-local _min    = math.min
-local _sqrt   = math.sqrt
-local _random = math.random
-local _sin    = math.sin
-local _cos    = math.cos
-local _lerp   = math.lerp
-local _atan2  = math.atan2
-local _pi     = math.pi
+local _floor = math.floor
+local _max   = math.max
+local _min   = math.min
+local _sin   = math.sin
 
 ------------------------
 -- Behavior functions --
@@ -127,8 +117,8 @@ local function bowser_eye_common(node, yawMin, yawMax, pitchMin, pitchMax)
     if o == nil then return end
     local player = nearest_player_to_object(o)
     if player == nil then return end
-    local rotN  = cast_graph_node(node.next) ---@type GraphNodeRotation
-    local yaw   = obj_angle_to_object(o, player) - o.oFaceAngleYaw
+    local rotN = cast_graph_node(node.next) ---@type GraphNodeRotation
+    local yaw  = obj_angle_to_object(o, player) - o.oFaceAngleYaw
     if yaw >  32767 then yaw = yaw - 65536 end
     if yaw < -32768 then yaw = yaw + 65536 end
     local pitch = obj_pitch_to_object(o, player)
@@ -153,15 +143,10 @@ function geo_function_bowser_color(node, matStackIndex)
 
     local levelNum = gNetworkPlayers[0].currLevelNum
     if levelNum == LEVEL_BOWSER_3 then
-        local t = o.oMrIDizzyTimer
+        local t = o.oTimer
         o.oColorR = _floor((_sin(t * 0.05)         * 0.5 + 0.5) * 100)
         o.oColorG = _floor((_sin(t * 0.05 + 2.094) * 0.5 + 0.5) * 100)
         o.oColorB = _floor((_sin(t * 0.05 + 4.189) * 0.5 + 0.5) * 100)
-
-        o.oMrIDizzyTimer = o.oMrIDizzyTimer + 1
-        if (o.oMrIDizzyTimer > 0xFFFF) then
-            o.oMrIDizzyTimer = 0
-        end
     else
         o.oColorR = 0
         o.oColorG = 0

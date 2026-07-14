@@ -543,7 +543,7 @@ local function act_wario_hold_decelerating(m)
         set_mario_action(m, ACT_HOLD_FREEFALL, 0)
     elseif groundStep == GROUND_STEP_HIT_WALL then
         if slopeClass == SURFACE_CLASS_VERY_SLIPPERY then
-            mario_bonk_reflection(m, true)
+            mario_bonk_reflection(m, 1)
         else
             mario_set_forward_vel(m, 0.0)
         end
@@ -553,7 +553,7 @@ local function act_wario_hold_decelerating(m)
         set_character_animation(m, CHAR_ANIM_IDLE_WITH_LIGHT_OBJ)
         play_sound(SOUND_MOVING_TERRAIN_SLIDE + m.terrainSoundAddend, m.marioObj.header.gfx.cameraToObject)
         adjust_sound_for_speed(m)
-        set_mario_particle_flags(m, PARTICLE_DUST, false)
+        set_mario_particle_flags(m, PARTICLE_DUST, 0)
     else
         local val0C = _floor(m.forwardVel * 0x10000)
         if val0C < 0x1000 then
@@ -595,7 +595,7 @@ local function act_wario_hold_heavy_walking(m)
     update_walking_speed(m)
 
     local step = perform_ground_step(m)
-    if step == GROUND_STEP_LEFT_GROUND then 
+    if step == GROUND_STEP_LEFT_GROUND then
         drop_and_set_mario_action(m, ACT_FREEFALL, 0)
     elseif step == GROUND_STEP_HIT_WALL then
         if m.forwardVel > 10.0 then mario_set_forward_vel(m, 10.0) end
@@ -625,7 +625,7 @@ local function act_wario_hold_jump(m)
         m.actionState = m.actionState + 1
         m.vel.y = 42
     end
-    
+
     play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
     common_air_action_step(m, ACT_HOLD_JUMP_LAND, CHAR_ANIM_JUMP_WITH_LIGHT_OBJ, AIR_STEP_CHECK_LEDGE_GRAB)
     return false
@@ -760,7 +760,7 @@ local function act_wario_swing_fling_held(m)
 
     if m.actionState > 0 then
         if obj_has_behavior_id(o, id_bhvBobomb) == 1 then
-            if o.oBobombFuseTimer >= 150 then 
+            if o.oBobombFuseTimer >= 150 then
                 o.oBobombFuseTimer = 125
             end
         end

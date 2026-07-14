@@ -1,48 +1,28 @@
-local version = require("/lib/version")
-local o2oint = require("/lib/o2oint")
 local r96lib = require("/lib/r96lib")
---local UvScroll = require("/lib/uv-scroll")
 require("constants")
-
-local _floor  = math.floor
-local _abs    = math.abs
-local _max    = math.max
-local _min    = math.min
-local _sqrt   = math.sqrt
-local _random = math.random
-local _sin    = math.sin
-local _cos    = math.cos
-local _lerp   = math.lerp
-local _atan2  = math.atan2
-local _pi     = math.pi
 
 ------------------------
 -- Behavior functions --
 ------------------------
 
 ---@param o Object
-local is_star_collected = function(o)
-    if o == nil then return nil end
-    if gNetworkPlayers[0].currCourseNum == nil then return false end
+local function is_star_collected(o)
     local starId = o.oBehParams >> 24
     local currentLevelStarFlags = save_file_get_star_flags(get_current_save_file_num() - 1,
     (gLevelValues.useGlobalStarIds ~= 0 and (starId / 7) - 1 or gNetworkPlayers[0].currCourseNum - 1))
     local starBit = gLevelValues.useGlobalStarIds and (starId % 7) or starId
-    if currentLevelStarFlags & (1 << starBit) ~= 0 then
-        return true
-    end
-    return false
+    return currentLevelStarFlags & (1 << starBit) ~= 0
 end
 
 ---@param o Object
 local function bhv_star_render96_init(o)
     --if o.oInteractType ~= INTERACT_STAR_OR_KEY then return end
-    if is_star_collected(o) == false or obj_has_behavior_id(o, id_bhvCelebrationStar) == 1 then
-        spawn_non_sync_object(id_bhvRender96StarParticle, E_MODEL_STAR_PARTICLE, o.oPosX, o.oPosY, o.oPosZ, function(o2)
+    if is_star_collected(o) then
+        spawn_non_sync_object(id_bhvRender96StarParticle, E_MODEL_STAR_TRANSPARENT_PARTICLE, o.oPosX, o.oPosY, o.oPosZ, function(o2)
             o2.parentObj = o
         end)
-    elseif is_star_collected(o) == true then
-        spawn_non_sync_object(id_bhvRender96StarParticle, E_MODEL_STAR_TRANSPARENT_PARTICLE, o.oPosX, o.oPosY, o.oPosZ, function(o2)
+    elseif obj_has_behavior_id(o, id_bhvCelebrationStar) == 1 then
+        spawn_non_sync_object(id_bhvRender96StarParticle, E_MODEL_STAR_PARTICLE, o.oPosX, o.oPosY, o.oPosZ, function(o2)
             o2.parentObj = o
         end)
     end
@@ -50,6 +30,7 @@ end
 
 ---@param o Object
 local function bhv_star_render96_loop(o)
+    local m = gMarioStates[0]
     if m.action ~= ACT_CREDITS_CUTSCENE then
         r96lib.audio_fade(o, STAR_AMBIENT, nil, nil, true, 2258, 86840)
     end
@@ -64,8 +45,7 @@ id_bhvRender96CelebrationStar = hook_render96_behavior(id_bhvCelebrationStar, fa
 
 ---@param o Object
 local function bhv_star_particle_render96_init(o)
-    o.header.gfx.node.flags = o.header.gfx.node.flags | GRAPH_RENDER_BILLBOARD
-    o.header.gfx.node.flags = o.header.gfx.node.flags & ~GRAPH_RENDER_INVISIBLE
+    o.header.gfx.node.flags = (o.header.gfx.node.flags | GRAPH_RENDER_BILLBOARD) & ~GRAPH_RENDER_INVISIBLE
     o.activeFlags = ACTIVE_FLAG_ACTIVE | ACTIVE_FLAG_INITIATED_TIME_STOP
     o.oFlags = o.oFlags | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
     o.oCelebrationStar = 0
@@ -76,10 +56,15 @@ end
 local function find_nearest_star(o)
     local star = o.parentObj
     if star == nil then return nil end
-    if obj_has_behavior_id(star, id_bhvCelebrationStar) == 1 then o.oCelebrationStar = 1 else o.oCelebrationStar = 0 end
+    if obj_has_behavior_id(star, id_bhvCelebrationStar) == 1 then
+        o.oCelebrationStar = 1
+    else
+        o.oCelebrationStar = 0
+    end
     return star
 end
 
+---@param timer integer
 local function get_star_scale(timer)
     if timer < 10 then return 0 end
     if timer >= 60 then return 3 end
@@ -98,13 +83,12 @@ local function bhv_star_particle_loop(o)
     else
         cur_obj_unhide()
     end
-    if o.oCelebrationStar == 1 then 
+    if o.oCelebrationStar == 1 then
         local scale = get_star_scale(o.oTimer)
-        cur_obj_scale(scale) 
-        o.header.gfx.node.flags = o.header.gfx.node.flags & ~GRAPH_RENDER_INVISIBLE
-        o.header.gfx.node.flags = o.header.gfx.node.flags & ~GRAPH_RENDER_BILLBOARD
+        cur_obj_scale(scale)
+        o.header.gfx.node.flags = o.header.gfx.node.flags & ~(GRAPH_RENDER_INVISIBLE | GRAPH_RENDER_BILLBOARD)
     end
-    if o.parentObj.oTimer > 0 and o.parentObj.activeFlags == ACTIVE_FLAG_DEACTIVATED then
+    if not o.parentObj or (o.parentObj.oTimer > 0 and o.parentObj.activeFlags == ACTIVE_FLAG_DEACTIVATED) then
         obj_mark_for_deletion(o)
     end
 end

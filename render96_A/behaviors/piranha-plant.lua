@@ -1,24 +1,12 @@
-local version = require("/lib/version")
-local o2oint = require("/lib/o2oint")
-local r96lib = require("/lib/r96lib")
---local UvScroll = require("/lib/uv-scroll")
 require("constants")
 
-local _floor  = math.floor
-local _abs    = math.abs
-local _max    = math.max
-local _min    = math.min
-local _sqrt   = math.sqrt
-local _random = math.random
-local _sin    = math.sin
-local _cos    = math.cos
-local _lerp   = math.lerp
-local _atan2  = math.atan2
-local _pi     = math.pi
+local _min = math.min
 
 ------------------------
 -- Behavior functions --
 ------------------------
+
+local sPiranhaPlantBiteFrames = { 12, 28, 50, 64 }
 
 ---@param o Object
 local function bhv_piranha_plant_render96_init(o)
@@ -27,11 +15,10 @@ end
 
 ---@param o Object
 local function bhv_piranha_plant_render96_loop(o)
-    local sBiteFrames = { 12, 28, 50, 64 }
     local frame = o.header.gfx.animInfo.animFrame
     if o.oAction == PIRANHA_PLANT_ACT_BITING then
         local faceState = 0
-        for _, biteFrame in ipairs(sBiteFrames) do
+        for _, biteFrame in ipairs(sPiranhaPlantBiteFrames) do
             local delta = frame - biteFrame
             if delta >= -9 and delta <= 9 then
                 if delta < 0 then

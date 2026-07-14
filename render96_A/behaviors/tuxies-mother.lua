@@ -1,20 +1,4 @@
-local version = require("/lib/version")
-local o2oint = require("/lib/o2oint")
-local r96lib = require("/lib/r96lib")
---local UvScroll = require("/lib/uv-scroll")
 require("constants")
-
-local _floor  = math.floor
-local _abs    = math.abs
-local _max    = math.max
-local _min    = math.min
-local _sqrt   = math.sqrt
-local _random = math.random
-local _sin    = math.sin
-local _cos    = math.cos
-local _lerp   = math.lerp
-local _atan2  = math.atan2
-local _pi     = math.pi
 
 ------------------------
 -- Behavior functions --
@@ -25,22 +9,27 @@ local function bhv_tuxie_mother_render96_loop(o)
     local player = nearest_player_to_object(o)
     local distanceToPlayer = dist_between_objects(o, player)
     local smallPenguin = obj_get_nearest_object_with_behavior_id(o, id_bhvUnused20E0)
-    if smallPenguin ~= nil and smallPenguin.oPosY < -4850 then 
-        o.oAction = 4 
+
+    if smallPenguin ~= nil and smallPenguin.oPosY < -4850 then
+        o.oAction = 4
         obj_mark_for_deletion(smallPenguin)
-        end
+    end
+
     if o.oAction == 4 then
         o.oForwardVel = 30.0
         cur_obj_rotate_yaw_toward(o.oAngleToMario, 0x1000)
         cur_obj_init_animation_with_accel_and_sound(0, 3)
         if distanceToPlayer < 300 then
             hurt_and_set_mario_action(m, ACT_QUICKSAND_DEATH, 0, 16)
-            o.oAction = 2 
+            o.oAction = 2
         end
-        --if m.health == 255 then 
-        --    o.oAction = 2 
+        --if m.health == 255 then
+        --    o.oAction = 2
         --end
     end
+
+    -- TODO: WTF
+    -- TP to origin if falling to death barrier?
     if o.oPosY < -4850 then
         o.oPosX = 3450
         o.oPosY = -4700
@@ -64,7 +53,6 @@ local function bhv_tuxie_mother_render96_loop(o)
     if o.oForwardVel > 5.0 then
         o.oSwitchState1 = 3
     end
-
 end
 
 id_bhvRender96TuxiesMother = hook_render96_behavior(id_bhvTuxiesMother, false, nil, bhv_tuxie_mother_render96_loop, OBJ_LIST_SURFACE)

@@ -1,24 +1,23 @@
-local version = require("/lib/version")
-local o2oint = require("/lib/o2oint")
 local r96lib = require("/lib/r96lib")
---local UvScroll = require("/lib/uv-scroll")
 require("constants")
-
-local _floor  = math.floor
-local _abs    = math.abs
-local _max    = math.max
-local _min    = math.min
-local _sqrt   = math.sqrt
-local _random = math.random
-local _sin    = math.sin
-local _cos    = math.cos
-local _lerp   = math.lerp
-local _atan2  = math.atan2
-local _pi     = math.pi
 
 ------------------------
 -- Behavior functions --
 ------------------------
+
+local GOOMBA_OPTS = {
+    audio = EVENT_THROWN,
+    interactions = gThrownInteractions,
+    enemy = true
+}
+
+local sGoombaWarioDeath = {
+    [ACT_WARIO_GROUND_POUND] = true,
+    [ACT_GROUND_POUND_LAND] = true,
+    [ACT_WARIO_PILE_DRIVER] = true,
+    [ACT_WARIO_PILE_DRIVER_LAND] = true,
+    [ACT_WARIO_CHARGE] = true,
+}
 
 ---@param o Object
 local function bhv_goomba_render96_init(o)
@@ -36,26 +35,12 @@ local function bhv_goomba_render96_death(o)
     obj_mark_for_deletion(o)
 end
 
-local GOOMBA_OPTS = {
-    audio = EVENT_THROWN,
-    interactions = gThrownInteractions,
-    enemy = true
-}
-
-local sGoombaWarioDeath = {
-    [ACT_WARIO_GROUND_POUND] = true,
-    [ACT_GROUND_POUND_LAND] = true,
-    [ACT_WARIO_PILE_DRIVER] = true,
-    [ACT_WARIO_PILE_DRIVER_LAND] = true,
-    [ACT_WARIO_CHARGE] = true,
-}
-
 ---@param o Object
 local function bhv_goomba_render96_loop(o)
     obj_update_eye_blink(o, 3, 8, 30, 100)
 
     o.oSwitchState2 = 0
-    
+
     if o.oAction == GOOMBA_ACT_JUMP then
         o.oSwitchState1 = 0
         o.oSwitchTimer1 = 0
@@ -76,7 +61,7 @@ local function bhv_goomba_render96_loop(o)
                 bhv_goomba_render96_death(o)
             end
         end
-    
+
         --Stunned from wario's jump, checks if going to be grabbed
         if (o.oHeldState == HELD_FREE and o.oAction == GOOMBA_ACT_STUN and o.oTimer <= 150) then
             if sGoombaWarioDeath[m.action] and dist_between_objects(o, m.marioObj) <= 150 then
@@ -92,7 +77,7 @@ local function bhv_goomba_render96_loop(o)
                 o.oAction = GOOMBA_ACT_GRAB
             end
         end
-        
+
         r96lib.update_held_object(m, o, GOOMBA_OPTS)
 
         if o.oHeldState == HELD_HELD then
@@ -106,7 +91,7 @@ local function bhv_goomba_render96_loop(o)
             o.oAction = GOOMBA_ACT_WALK;
             o.oSwitchState2 = 0
             o.oSwitchState1 = 0
-            cur_obj_init_animation_with_accel_and_sound(0, 1) 
+            cur_obj_init_animation_with_accel_and_sound(0, 1)
             return
         end
     end

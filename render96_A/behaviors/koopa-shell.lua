@@ -1,20 +1,5 @@
-local version = require("/lib/version")
-local o2oint = require("/lib/o2oint")
 local r96lib = require("/lib/r96lib")
---local UvScroll = require("/lib/uv-scroll")
 require("constants")
-
-local _floor  = math.floor
-local _abs    = math.abs
-local _max    = math.max
-local _min    = math.min
-local _sqrt   = math.sqrt
-local _random = math.random
-local _sin    = math.sin
-local _cos    = math.cos
-local _lerp   = math.lerp
-local _atan2  = math.atan2
-local _pi     = math.pi
 
 ------------------------
 -- Behavior functions --
@@ -32,7 +17,7 @@ local function bhv_koopa_shell_render96_loop(o)
         if mario_check_object_grab(m) ~= 0 and (m.heldObj == nil) then
             o.oAction = 50
         end
-    
+
         -- WTF IS THIS
         -- If a koopa shell exists, all koopas die instantly if there is at least one Wario on the map????
         local koopa = obj_get_nearest_object_with_behavior_id(o, id_bhvKoopa)
@@ -51,7 +36,7 @@ local function bhv_koopa_shell_render96_loop(o)
                 spawn_non_sync_object(id_bhvSparkleSpawn, E_MODEL_NONE, gMarioStates[0].marioObj.oPosX, gMarioStates[0].marioObj.oPosY + 100, gMarioStates[0].marioObj.oPosZ, nil)
             end
         end
-    
+
         if o.oHeldState == HELD_FREE and (m.action == ACT_WARIO_CHARGE or m.action == ACT_JUMP_KICK) and dist_between_objects(o, m.marioObj) <= 200 then
             o.oAction = 50
             o.oMoveAngleYaw = m.faceAngle.y

@@ -1,20 +1,5 @@
-local version = require("/lib/version")
-local o2oint = require("/lib/o2oint")
 local r96lib = require("/lib/r96lib")
---local UvScroll = require("/lib/uv-scroll")
 require("constants")
-
-local _floor  = math.floor
-local _abs    = math.abs
-local _max    = math.max
-local _min    = math.min
-local _sqrt   = math.sqrt
-local _random = math.random
-local _sin    = math.sin
-local _cos    = math.cos
-local _lerp   = math.lerp
-local _atan2  = math.atan2
-local _pi     = math.pi
 
 ------------------------
 -- Behavior functions --
@@ -34,14 +19,14 @@ end
 
 ---@param o Object
 local function bhv_bobomb_render96_loop(o)
-    if o.oBobombFuseTimer == 0 then 
+    if o.oBobombFuseTimer == 0 then
         o.oSwitchState1 = 0
-    else 
+    else
         o.oSwitchState1 = 1
         r96lib.pulse_ramp(o, COLORS_BOBOMB, o.oBobombFuseTimer, 150)
     end
-    if m.action == ACT_WARIO_CHARGE and dist_between_objects(o, m.marioObj) <= 200 then
-		set_camera_shake_from_point(SHAKE_POS_MEDIUM, m.pos.x, m.pos.y, m.pos.z)
+    if obj_hit_by_wario_charge(o, 200) then
+        set_camera_shake_from_point(SHAKE_POS_MEDIUM, o.oPosX, o.oPosY, o.oPosZ)
         o.oBobombFuseTimer = 152
     end
 end

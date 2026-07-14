@@ -36,4 +36,4 @@ local function bhv_flame_render96_loop(o)
     end
 end
 
-id_bhvRender96Flame = hook_render96_behavior(id_bhvFlame, false, bhv_flame_render96_init, bhv_flame_render96_loop, OBJ_LIST_LEVEL)
+id_bhvRender96Flame = hook_render96_behavior(id_bhvFlame, false, bhv_flame_render96_init, bhv_flame_render96_loop)

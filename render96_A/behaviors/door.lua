@@ -10,7 +10,7 @@ local function bhv_star_door_render96_init(o)
     obj_set_angle(frame, o.oFaceAnglePitch, o.oFaceAngleYaw, o.oFaceAngleRoll)
 end
 
-id_bhvRender96StarDoor = hook_render96_behavior(id_bhvStarDoor, false, bhv_star_door_render96_init, nil, OBJ_LIST_SURFACE)
+id_bhvRender96StarDoor = hook_render96_behavior(id_bhvStarDoor, false, bhv_star_door_render96_init, nil)
 
 ---@param o Object
 local function bhv_star_door_frame_render96_init(o)

@@ -14,7 +14,7 @@ local function bhv_wiggler_head_render96_loop(o)
     if o.oHealth == 1 then o.oSwitchState1 = 4 end
 end
 
-id_bhvRender96WigglerHead = hook_render96_behavior(id_bhvWigglerHead, false, nil, bhv_wiggler_head_render96_loop, OBJ_LIST_GENACTOR)
+id_bhvRender96WigglerHead = hook_render96_behavior(id_bhvWigglerHead, false, nil, bhv_wiggler_head_render96_loop)
 
 -------------------
 -- Geo functions --

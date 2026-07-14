@@ -77,4 +77,4 @@ local function bhv_yoshi_tongue(o)
     o.header.gfx.scale.z = _max(currentLength, 0.001) / TONGUE_MODEL_LENGTH
 end
 
-id_bhvRender96YoshiTongue = hook_render96_behavior(nil, false, nil, bhv_yoshi_tongue, OBJ_LIST_SURFACE)
+id_bhvRender96YoshiTongue = hook_render96_behavior(nil, false, nil, bhv_yoshi_tongue, OBJ_LIST_DEFAULT)

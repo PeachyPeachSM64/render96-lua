@@ -55,4 +55,4 @@ local function bhv_tuxie_mother_render96_loop(o)
     end
 end
 
-id_bhvRender96TuxiesMother = hook_render96_behavior(id_bhvTuxiesMother, false, nil, bhv_tuxie_mother_render96_loop, OBJ_LIST_SURFACE)
+id_bhvRender96TuxiesMother = hook_render96_behavior(id_bhvTuxiesMother, false, nil, bhv_tuxie_mother_render96_loop)

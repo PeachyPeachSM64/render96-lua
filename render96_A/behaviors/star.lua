@@ -93,7 +93,7 @@ local function bhv_star_particle_loop(o)
     end
 end
 
-id_bhvRender96StarParticle = hook_render96_behavior(nil, false, bhv_star_particle_render96_init, bhv_star_particle_loop, OBJ_LIST_LEVEL, "StarParticle")
+id_bhvRender96StarParticle = hook_render96_behavior(nil, false, bhv_star_particle_render96_init, bhv_star_particle_loop, OBJ_LIST_UNIMPORTANT, "StarParticle")
 
 ---------------
 -- UV scroll --

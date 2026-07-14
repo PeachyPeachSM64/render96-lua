@@ -58,4 +58,4 @@ local function bhv_wario_coin_loop(o)
     end
 end
 
-id_bhvWarioCoins = hook_render96_behavior(nil, false, bhv_wario_coin_init, bhv_wario_coin_loop, OBJ_LIST_SURFACE, "WarioCoins")
+id_bhvWarioCoins = hook_render96_behavior(nil, false, bhv_wario_coin_init, bhv_wario_coin_loop, OBJ_LIST_LEVEL, "WarioCoins")

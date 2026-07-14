@@ -37,4 +37,4 @@ local function bhv_luigi_key_loop(o)
     end
 end
 
-id_bhvLuigiKeys = hook_render96_behavior(nil, false, bhv_luigi_key_init, bhv_luigi_key_loop, OBJ_LIST_SURFACE, "LuigiKeys")
+id_bhvLuigiKeys = hook_render96_behavior(nil, false, bhv_luigi_key_init, bhv_luigi_key_loop, OBJ_LIST_LEVEL, "LuigiKeys")

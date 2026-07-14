@@ -21,7 +21,7 @@ local function bhv_bowser_render96_loop(o)
     o.oSwitchTimer1 = o.oSwitchTimer1 + 1
 end
 
-id_bhvRender96Bowser = hook_render96_behavior(id_bhvBowser, false, nil, bhv_bowser_render96_loop, OBJ_LIST_GENACTOR)
+id_bhvRender96Bowser = hook_render96_behavior(id_bhvBowser, false, nil, bhv_bowser_render96_loop)
 
 -------------------
 -- Geo functions --

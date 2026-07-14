@@ -227,7 +227,7 @@ local function bhv_mr_i_render96_loop(o)
     o.oInteractStatus = 0
 end
 
-id_bhvRender96MrI = hook_render96_behavior(id_bhvMrI, true, bhv_mr_i_render96_init, bhv_mr_i_render96_loop, OBJ_LIST_GENACTOR, "MrI")
+id_bhvRender96MrI = hook_render96_behavior(id_bhvMrI, true, bhv_mr_i_render96_init, bhv_mr_i_render96_loop)
 
 ---@param o Object
 local function bhv_mr_i_render96_fire_particle_init(o)

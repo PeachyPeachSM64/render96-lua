@@ -27,4 +27,4 @@ local function bhv_tree_render96_loop(o)
     end
 end
 
-id_bhvRender96Tree = hook_render96_behavior(id_bhvTree, true, bhv_tree_render96_init, bhv_tree_render96_loop, OBJ_LIST_POLELIKE)
+id_bhvRender96Tree = hook_render96_behavior(id_bhvTree, true, bhv_tree_render96_init, bhv_tree_render96_loop)

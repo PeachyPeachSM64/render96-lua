@@ -45,4 +45,4 @@ local function bhv_fire_spitter_render96_loop(o)
     end
 end
 
-id_bhvRender96FireSpitter = hook_render96_behavior(id_bhvFireSpitter, false, bhv_fire_spitter_render96_init, bhv_fire_spitter_render96_loop, OBJ_LIST_GENACTOR)
+id_bhvRender96FireSpitter = hook_render96_behavior(id_bhvFireSpitter, false, bhv_fire_spitter_render96_init, bhv_fire_spitter_render96_loop)

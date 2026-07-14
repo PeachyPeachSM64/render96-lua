@@ -28,7 +28,7 @@ local function bhv_king_bobomb_render96_loop(o)
     if o.oHealth == 1 then r96lib.pulse_rapid(o, COLORS_KINGBOBOMB, o.oTimer, 0.3) end
 end
 
-id_bhvRender96KingBobomb = hook_render96_behavior(id_bhvKingBobomb, false, bhv_king_bobomb_render96_init, bhv_king_bobomb_render96_loop, OBJ_LIST_GENACTOR)
+id_bhvRender96KingBobomb = hook_render96_behavior(id_bhvKingBobomb, false, bhv_king_bobomb_render96_init, bhv_king_bobomb_render96_loop)
 
 -------------------
 -- Geo functions --

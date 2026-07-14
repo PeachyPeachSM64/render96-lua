@@ -13,7 +13,7 @@ function bhv_chuckya_heaveho_render96_loop(o)
     end
 end
 
-id_bhvRender96Chuckya = hook_render96_behavior(id_bhvChuckya, false, nil, bhv_chuckya_heaveho_render96_loop, OBJ_LIST_GENACTOR)
+id_bhvRender96Chuckya = hook_render96_behavior(id_bhvChuckya, false, nil, bhv_chuckya_heaveho_render96_loop)
 
 -------------------
 -- Geo functions --

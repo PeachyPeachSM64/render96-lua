@@ -8,6 +8,10 @@ end
 -- This could be removed later, but, for now, just emulate the few functions it uses.
 --
 
+for i = 0, MAX_PLAYERS - 1 do
+    gPlayerSyncTable[i].charNum = gNetworkPlayers[i].modelIndex
+end
+
 local sCharacterMovesetHooksGetCharType = {
     [HOOK_MARIO_UPDATE] =                           function (m) return m.character.type end,
     [HOOK_BEFORE_MARIO_UPDATE] =                    function (m) return m.character.type end,
@@ -61,6 +65,7 @@ end
 
 local function character_set_current_number(charNum, charAlt)
     gNetworkPlayers[0].overrideModelIndex = charNum
+    gPlayerSyncTable[0].charNum = charNum
 end
 
 local function hook_allow_menu_open(func)
@@ -69,37 +74,44 @@ end
 
 -- This hook is responsible for assigning the right character to the player
 -- accounting for the character selected in config and available (unlocked) characters
-local sPrevModelIndex = CT_MAX
-hook_event(HOOK_UPDATE, function ()
-    local np = gNetworkPlayers[0]
+local sPrevModelIndex = {}
+hook_event(HOOK_MARIO_UPDATE, function (m)
+    local np = gNetworkPlayers[m.playerIndex]
+    if m.playerIndex ~= 0 then
+        np.overrideModelIndex = gPlayerSyncTable[m.playerIndex].charNum
+    end
 
     -- detect change of model index
-    if np.modelIndex ~= sPrevModelIndex then
-        sPrevModelIndex = np.modelIndex
+    if np.modelIndex ~= sPrevModelIndex[m.playerIndex] then
+        sPrevModelIndex[m.playerIndex] = np.modelIndex
         np.overrideModelIndex = np.modelIndex
     end
 
+    -- if the current character is locked, fall back to Mario
     local charType = np.overrideModelIndex
+    local charLock = sCharacterSetLocked[charType]
+    if charLock and not check_unlocked(charLock.unlockCondition) then
+        np.overrideModelIndex = CT_MARIO
+    end
 
-    for ct = CT_MARIO, CT_MAX-1 do
+    -- sync character
+    if m.playerIndex == 0 then
+        gPlayerSyncTable[m.playerIndex].charNum = np.overrideModelIndex
+    end
+end)
+
+-- This hook is responsible for checking when a character is unlocked
+-- and display a notification to all players
+hook_event(HOOK_UPDATE, function ()
+    for ct = CT_MARIO, CT_MAX - 1 do
         local charLock = sCharacterSetLocked[ct]
-        if charLock then
-            local unlocked = check_unlocked(charLock.unlockCondition)
-
-            -- if not unlocked, fall back to Mario
-            if not unlocked and charType == ct then
-                np.overrideModelIndex = CT_MARIO
+        if charLock and not charLock.unlocked and check_unlocked(charLock.unlockCondition) then
+            if charLock.notify then
+                play_puzzle_jingle()
+                djui_popup_create("Render96:\nYou can now play\nas " .. charLock.name .. "!", 3)
             end
-
-            -- display a message as soon as the character is unlocked
-            if unlocked and not charLock.unlocked then
-                if charLock.notify then
-                    play_puzzle_jingle()
-                    djui_popup_create("Render96:\nYou can now play\nas " .. charLock.name .. "!", 3)
-                end
-                charLock.unlocked = true
-                sPrevModelIndex = CT_MAX -- refresh the selected character
-            end
+            charLock.unlocked = true
+            sPrevModelIndex = {} -- refresh all selected characters
         end
     end
 end)

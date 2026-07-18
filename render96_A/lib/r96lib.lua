@@ -270,7 +270,7 @@ function r96lib.count_data(data)
 end
 
 function r96lib.update_data(data, index, value)
-    -- Set value at the index position to '1'
+    -- Set data at the index position to 'value'
     return data and (data:sub(1, DATA_NUM_BITS - 1 - index) .. tostring(value) .. data:sub(DATA_NUM_BITS + 1 - index)) or nil
 end
 

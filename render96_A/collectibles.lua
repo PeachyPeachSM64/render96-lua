@@ -3,10 +3,6 @@ local r96lib = require("/lib/r96lib")
 -- Luigi keys and Wario coins are shared between all players
 -- But only the host actually saves them to their save file
 
-local function get_collectible(name)
-    return gGlobalSyncTable[name]
-end
-
 local function check_collectible(name, index)
     return r96lib.check_data(gGlobalSyncTable[name], index)
 end
@@ -16,32 +12,43 @@ local function count_collectible(name)
 end
 
 local function load_collectible(name)
-    if network_is_server() or gServerSettings.maxPlayers == 1 then
-        gGlobalSyncTable[name] = r96lib.load_data(name)
-    end
+    gGlobalSyncTable[name] = r96lib.load_data(name)
 end
 
 local function update_collectible(name, index, value)
-    gGlobalSyncTable[name] = r96lib.update_data(gGlobalSyncTable[name], index, value)
     if network_is_server() or gServerSettings.maxPlayers == 1 then
+        gGlobalSyncTable[name] = r96lib.update_data(gGlobalSyncTable[name], index, value)
         r96lib.save_data(name, gGlobalSyncTable[name])
+    else
+        network_send_to(network_local_index_from_global(0), true, {
+            type = "collectible",
+            name = name,
+            index = index,
+            value = value
+        })
     end
 end
 
 local function create_collectible_entry(name)
-    load_collectible(name)
+    gGlobalSyncTable[name] = r96lib.DATA_DEFAULT
 
-    -- Server refreshes the collectible value on sync valid
-    hook_event(HOOK_ON_SYNC_VALID, function ()
+    if network_is_server() or gServerSettings.maxPlayers == 1 then
+
+        -- Init collectible from mod storage
         load_collectible(name)
-    end)
 
-    -- Make sure for the server to save the collectible on sync table change
-    hook_on_sync_table_change(gGlobalSyncTable, name, nil, function (_, oldVal, newVal)
-        if oldVal ~= newVal and (network_is_server() or gServerSettings.maxPlayers == 1) then
-            r96lib.save_data(name, newVal)
-        end
-    end)
+        -- Server refreshes the collectible value on sync valid
+        hook_event(HOOK_ON_SYNC_VALID, function ()
+            load_collectible(name)
+        end)
+
+        -- Receive collectible updates from remote players
+        hook_event(HOOK_ON_PACKET_RECEIVE, function (p)
+            if p.type == "collectible" then
+                update_collectible(p.name, p.index, p.value)
+            end
+        end)
+    end
 end
 
 ----------------

@@ -401,13 +401,7 @@ local function wario_anim_and_audio_for_hold_walk(m)
             if val04 > 6.0 then
                 m.actionTimer = 1
             else
-                local val0C
-                if get_character(m).type == CT_WARIO then
-                    val0C = 0x60000
-                else
-                    val0C = _floor(val04 * 0x10000)
-                end
-                set_character_anim_with_accel(m, CHAR_ANIM_SLOW_WALK_WITH_LIGHT_OBJ, val0C)
+                set_character_anim_with_accel(m, CHAR_ANIM_WALK_WITH_LIGHT_OBJ, 0x60000)
                 play_step_sound(m, 12, 62)
                 running = false
             end
@@ -417,13 +411,7 @@ local function wario_anim_and_audio_for_hold_walk(m)
             elseif val04 > 11.0 then
                 m.actionTimer = 2
             else
-                local val0C
-                if get_character(m).type == CT_WARIO then
-                    val0C = 0x60000
-                else
-                    val0C = _floor(val04 * 0x10000)
-                end
-                set_character_anim_with_accel(m, CHAR_ANIM_WALK_WITH_LIGHT_OBJ, val0C)
+                set_character_anim_with_accel(m, CHAR_ANIM_WALK_WITH_LIGHT_OBJ, 0x60000)
                 play_step_sound(m, 12, 62)
                 running = false
             end
@@ -431,13 +419,7 @@ local function wario_anim_and_audio_for_hold_walk(m)
             if val04 < 8.0 then
                 m.actionTimer = 1
             else
-                local val0C
-                if get_character(m).type == CT_WARIO then
-                    val0C = 0x40000
-                else
-                    val0C = _floor(val04 / 2.0 * 0x10000)
-                end
-                set_character_anim_with_accel(m, CHAR_ANIM_RUN_WITH_LIGHT_OBJ, val0C)
+                set_character_anim_with_accel(m, CHAR_ANIM_WALK_WITH_LIGHT_OBJ, 0x40000)
                 play_step_sound(m, 10, 49)
                 running = false
             end
@@ -557,12 +539,12 @@ local function act_wario_hold_decelerating(m)
         adjust_sound_for_speed(m)
         set_mario_particle_flags(m, PARTICLE_DUST, 0)
     else
-        local val0C = _floor(m.forwardVel * 0x10000)
-        if val0C < 0x1000 then
-            val0C = 0x1000
+        local animAccel = _floor(m.forwardVel * 0x10000)
+        if animAccel < 0x1000 then
+            animAccel = 0x1000
         end
 
-        set_character_anim_with_accel(m, CHAR_ANIM_WALK_WITH_LIGHT_OBJ, val0C)
+        set_character_anim_with_accel(m, CHAR_ANIM_WALK_WITH_LIGHT_OBJ, animAccel)
         play_step_sound(m, 12, 62)
     end
 
@@ -889,7 +871,7 @@ end
 ---@param m MarioState
 ---@param incomingAct integer
 local function wario_before_actions(m, incomingAct)
-    if (incomingAct == ACT_DIVE and m.vel.y == 20) then return ACT_WARIO_CHARGE end
+    if (incomingAct == ACT_DIVE and m.vel.y == 20) then return ACT_WARIO_CHARGE end -- check_ground_dive_or_punch
     if (incomingAct == ACT_TRIPLE_JUMP) then return ACT_WARIO_TRIPLE_JUMP end
     if (incomingAct == ACT_HOLD_JUMP) then return ACT_WARIO_HOLD_JUMP end
     if (incomingAct == ACT_HOLD_FREEFALL) then return ACT_WARIO_HOLD_FREEFALL end
@@ -947,7 +929,7 @@ end
 function obj_ground_pounded_by_wario(o)
     for i = 0, MAX_PLAYERS - 1 do
         local m = gMarioStates[i]
-        if get_character(m).type == CT_WARIO and is_player_active(m) == 1 and obj_is_mario_ground_pounding_platform(m, o) == 1 then
+        if m.character.type == CT_WARIO and is_player_active(m) == 1 and obj_is_mario_ground_pounding_platform(m, o) == 1 then
             return true
         end
     end

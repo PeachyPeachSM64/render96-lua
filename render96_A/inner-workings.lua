@@ -17,14 +17,14 @@ end
 
 local function boo_pipe_green_exit(m, o)
     pipe_exit(m, o)
-    local char = is_luigi_unlocked() and CT_LUIGI or m.character.type
-    charSelect.character_set_current_number(char, 1)
+    local charNum = is_luigi_unlocked() and CT_LUIGI or m.character.type
+    charSelect.character_set_current_number(charNum, 1)
 end
 
 local function boo_pipe_yellow_exit(m, o)
     pipe_exit(m, o)
-    local char = is_wario_unlocked() and CT_WARIO or m.character.type
-    charSelect.character_set_current_number(char, 1)
+    local charNum = is_wario_unlocked() and CT_WARIO or m.character.type
+    charSelect.character_set_current_number(charNum, 1)
 end
 
 local function pipe_green()

@@ -17,12 +17,12 @@ end
 ---@param o Object
 local function bhv_star_render96_init(o)
     --if o.oInteractType ~= INTERACT_STAR_OR_KEY then return end
-    if is_star_collected(o) then
-        spawn_non_sync_object(id_bhvRender96StarParticle, E_MODEL_STAR_TRANSPARENT_PARTICLE, o.oPosX, o.oPosY, o.oPosZ, function(o2)
+    if not is_star_collected(o) or obj_has_behavior_id(o, id_bhvCelebrationStar) == 1 then
+        spawn_non_sync_object(id_bhvRender96StarParticle, E_MODEL_STAR_PARTICLE, o.oPosX, o.oPosY, o.oPosZ, function(o2)
             o2.parentObj = o
         end)
-    elseif obj_has_behavior_id(o, id_bhvCelebrationStar) == 1 then
-        spawn_non_sync_object(id_bhvRender96StarParticle, E_MODEL_STAR_PARTICLE, o.oPosX, o.oPosY, o.oPosZ, function(o2)
+    else
+        spawn_non_sync_object(id_bhvRender96StarParticle, E_MODEL_STAR_TRANSPARENT_PARTICLE, o.oPosX, o.oPosY, o.oPosZ, function(o2)
             o2.parentObj = o
         end)
     end
@@ -53,7 +53,7 @@ local function bhv_star_particle_render96_init(o)
 end
 
 ---@param o Object
-local function find_nearest_star(o)
+local function get_star_object(o)
     local star = o.parentObj
     if star == nil then return nil end
     if obj_has_behavior_id(star, id_bhvCelebrationStar) == 1 then
@@ -74,7 +74,7 @@ end
 ---@param o Object
 local function bhv_star_particle_loop(o)
     smlua_anim_util_set_animation(o, "star_glow")
-    local star = find_nearest_star(o)
+    local star = get_star_object(o)
     if star ~= nil then
         obj_set_pos(o, star.oPosX, star.oPosY, star.oPosZ)
     end

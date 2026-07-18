@@ -50,7 +50,7 @@ end
 ---@param o Object
 local function bhv_blargg_render96_swim(o)
     o.oForwardVel = 5.0
-    if obj_return_home_if_safe(o, o.oHomeX, o.oHomeY, o.oHomeZ, 1000) == 1 then
+    if obj_return_home_if_safe(o, o.oHomeX, o.oPosY, o.oHomeZ, 1000) == 1 then
         if m.floor.type == SURFACE_BURNING then
             o.oAction = BLARGG_MODE_CHASE
         else

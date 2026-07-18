@@ -271,8 +271,10 @@ local function act_wario_pile_driver(m)
         if stepResult == AIR_STEP_LANDED then
             play_mario_heavy_landing_sound(m, SOUND_ACTION_TERRAIN_HEAVY_LANDING)
             m.particleFlags = m.particleFlags | PARTICLE_MIST_CIRCLE | PARTICLE_HORIZONTAL_STAR
-            set_camera_shake_from_hit(SHAKE_LARGE_DAMAGE)
             set_mario_action(m, ACT_WARIO_PILE_DRIVER_LAND, 0)
+            if m.playerIndex == 0 then
+                set_camera_shake_from_hit(SHAKE_LARGE_DAMAGE)
+            end
 
         elseif stepResult == AIR_STEP_HIT_WALL then
             mario_set_forward_vel(m, -16.0)
@@ -319,7 +321,6 @@ local function act_wario_pile_driver_land(m)
     if is_anim_at_end(m) == 1 then
         return set_mario_action(m, ACT_BUTT_SLIDE_STOP, 0)
     end
-
 end
 
 ---@param m MarioState
@@ -773,7 +774,14 @@ local function act_wario_swing_fling_held(m)
 
         m.actionState = m.actionState + 1
         if m.actionState % 5 == 0 and wario_swing_fling_spin_should_spawn_coins(o) then
-            spawn_non_sync_object(id_bhvWarioCoins, E_MODEL_GREEN_COIN, m.marioObj.oPosX +(random_float() * 20), m.marioObj.oPosY + 100, m.marioObj.oPosZ + (random_float() * 20), nil)
+            spawn_non_sync_object(
+                id_bhvWarioCoins, E_MODEL_GREEN_COIN,
+                m.marioObj.oPosX +(random_float() * 20),
+                m.marioObj.oPosY + 100,
+                m.marioObj.oPosZ + (random_float() * 20),
+                function (coin)
+                    coin.globalPlayerIndex = network_global_index_from_local(m.playerIndex)
+                end)
         end
         set_mario_particle_flags(m, PARTICLE_SPARKLES, 0)
         if m.actionState >= 135 then
@@ -863,8 +871,10 @@ local function act_wario_ground_pound(m)
         elseif check_fall_damage(m, ACT_HARD_BACKWARD_GROUND_KB) == 0 then
             play_mario_heavy_landing_sound(m, SOUND_ACTION_TERRAIN_HEAVY_LANDING)
             m.particleFlags = m.particleFlags | PARTICLE_MIST_CIRCLE | PARTICLE_HORIZONTAL_STAR
-            set_camera_shake_from_hit(SHAKE_LARGE_DAMAGE)
             set_mario_action(m, ACT_GROUND_POUND_LAND, 0)
+            if m.playerIndex == 0 then
+                set_camera_shake_from_hit(SHAKE_LARGE_DAMAGE)
+            end
         end
     end
 
@@ -928,7 +938,17 @@ hook_mario_action(ACT_WARIO_GROUND_POUND,       act_wario_ground_pound, INT_GROU
 function obj_hit_by_wario_charge(o, dist)
     for i = 0, MAX_PLAYERS - 1 do
         local m = gMarioStates[i]
-        if m.action == ACT_WARIO_CHARGE and m.marioObj and dist_between_objects(o, m.marioObj) <= dist then
+        if m.action == ACT_WARIO_CHARGE and m.marioObj and is_player_active(m) == 1 and dist_between_objects(o, m.marioObj) <= dist then
+            return true
+        end
+    end
+    return false
+end
+
+function obj_ground_pounded_by_wario(o)
+    for i = 0, MAX_PLAYERS - 1 do
+        local m = gMarioStates[i]
+        if get_character(m).type == CT_WARIO and is_player_active(m) == 1 and obj_is_mario_ground_pounding_platform(m, o) == 1 then
             return true
         end
     end

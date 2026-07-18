@@ -21,10 +21,7 @@ local sMrIBlinkStates = { 0, 1, 2, 3, 4, 3, 2, 1, 0 }
 local function bhv_mr_i_render96_init(o)
     o.oFlags = (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)
     o.oPosY = o.oPosY + 60
-
-    o.oHomeX = o.oPosX
-    o.oHomeY = o.oPosY
-    o.oHomeZ = o.oPosZ
+    obj_set_home(o, o.oPosX, o.oPosY, o.oPosZ)
 
     local sMrIHitbox = get_temp_object_hitbox()
     sMrIHitbox.interactType      = INTERACT_DAMAGE

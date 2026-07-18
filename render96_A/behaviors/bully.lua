@@ -23,9 +23,7 @@ local function bhv_big_chill_bully_with_minions_render96_init(o)
     o.oAnimations = gObjectAnimations.bully_seg5_anims_0500470C
     o.oFloorHeight = find_floor_height(o.oPosX, o.oPosY + 200, o.oPosZ)
     o.oPosY = o.oFloorHeight + 1000
-    o.oHomeX = o.oPosX
-    o.oHomeY = o.oFloorHeight
-    o.oHomeZ = o.oPosZ
+    obj_set_home(o, o.oPosX, o.oFloorHeight, o.oPosZ)
 
     bhv_big_bully_init()
     bhv_big_bully_render96_init(o)
@@ -41,9 +39,7 @@ local function bhv_big_chill_bully_with_minions_render96_init(o)
         {x = 200, y = 1331, z = -4900},
     }) do
         local bully = spawn_non_sync_object(id_bhvSmallBully, E_MODEL_CHILL_BULLY, pos.x, pos.y, pos.z)
-        bully.oHomeX = bully.oPosX
-        bully.oHomeY = bully.oPosY
-        bully.oHomeZ = bully.oPosZ
+        obj_set_home(bully, bully.oPosX, bully.oPosY, bully.oPosZ)
         bully.oGravity = 8
         bully.parentObj = o
         bully.oBullySubtype = BULLY_STYPE_MINION

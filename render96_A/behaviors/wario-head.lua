@@ -31,16 +31,14 @@ local function bhv_wario_head_init(o)
     o.oMoveFlags = o.oMoveFlags | OBJ_MOVE_ON_GROUND
 
     -- home
-    o.oHomeX = o.oPosX
-    o.oHomeY = o.oPosY
-    o.oHomeZ = o.oPosZ
+    obj_set_home(o, o.oPosX, o.oPosY, o.oPosZ)
 
     -- physics
-    o.oGravity          = -4.0
-    o.oBounciness       = -0.5
-    o.oDragStrength     = 10.0
-    o.oFriction         = 10.0
-    o.oBuoyancy         =  0.0
+    o.oGravity = -4.0
+    o.oBounciness = -0.5
+    o.oDragStrength = 10.0
+    o.oFriction = 10.0
+    o.oBuoyancy =  0.0
 
     -- hitbox
     o.oInteractType = INTERACT_SHOCK

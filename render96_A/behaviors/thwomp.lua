@@ -22,9 +22,7 @@ local function bhv_thwomp_render96_init(o)
     o.oThwompBaseScale = o.header.gfx.scale.x
     o.collisionData = smlua_collision_util_get("thwomp_collision")
     o.oNumLootCoins = 5
-    o.oHomeX = o.oPosX
-    o.oHomeY = o.oPosY
-    o.oHomeZ = o.oPosZ
+    obj_set_home(o, o.oPosX, o.oPosY, o.oPosZ)
 end
 
 ---@param o Object
@@ -55,9 +53,7 @@ local function bhv_thwomp_render96_loop(o)
         o.oSwitchState2 = 2
     elseif o.oAction == 3 then
         o.oSwitchState2 = 1
-        o.oPosX = o.oHomeX
-        o.oPosY = o.oHomeY
-        o.oPosZ = o.oHomeZ
+        cur_obj_set_pos_to_home()
     end
 
     obj_squish_on_action_enter(o, 3, 0.15, -0.20, 0.15)

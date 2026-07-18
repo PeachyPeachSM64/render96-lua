@@ -41,6 +41,9 @@ local function bhv_wario_coin_loop(o)
     o.oFaceAngleYaw = o.oFaceAngleYaw + 0x1000
     o.oForwardVel = 30
 
+    local playerIndex = network_local_index_from_global(o.globalPlayerIndex)
+    local m = gMarioStates[playerIndex]
+
     if o.oVelY < 0 or (o.oMoveFlags & (OBJ_MOVE_MASK_ON_GROUND | OBJ_MOVE_HIT_WALL | OBJ_MOVE_HIT_EDGE | OBJ_MOVE_MASK_IN_WATER)) ~= 0 then
         mario_attract_object(m, o)
     end

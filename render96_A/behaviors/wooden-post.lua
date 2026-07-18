@@ -6,8 +6,9 @@ require("/constants")
 
 ---@param o Object
 local function bhv_wooden_post_render96_loop(o)
-    if get_character(m).type == CT_WARIO then
+    if obj_ground_pounded_by_wario(o) then
         o.oWoodenPostSpeedY = -210
+        network_send_object(o, true)
     end
 end
 

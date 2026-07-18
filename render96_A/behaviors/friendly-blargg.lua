@@ -22,10 +22,8 @@ local function bhv_blargg_friendly_render96_init(o)
     obj_set_hitbox(o, blarggFriendlyHitbox)
     o.oAnimations = gObjectAnimations.blargg_seg5_anims_0500616C
     cur_obj_init_animation(BLARGG_ANIM_SWIM)
+    obj_set_home(o, o.oPosX, o.oPosY, o.oPosZ)
     o.oAction = 0
-    o.oHomeX = o.oPosX
-    o.oHomeY = o.oPosY
-    o.oHomeZ = o.oPosZ
     o.activeFlags = ACTIVE_FLAG_ACTIVE
     o.oFlags = o.oFlags | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
     cur_obj_scale(1)

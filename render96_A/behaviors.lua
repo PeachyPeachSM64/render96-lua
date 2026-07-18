@@ -181,6 +181,26 @@ gThrownInteractions = o2oint.Interactions({
 -- Behavior functions --
 ------------------------
 
+local SURFACE_TYPE_DEADLY = {
+    [SURFACE_BURNING] = true,
+    [SURFACE_DEATH_PLANE] = true,
+    [SURFACE_INSTANT_QUICKSAND] = true,
+    [SURFACE_INSTANT_MOVING_QUICKSAND] = true,
+    [SURFACE_VERTICAL_WIND] = true,
+}
+
+function obj_is_on_deadly_floor(o)
+    return o.oFloor ~= nil and
+           o.oFloorHeight >= o.oPosY and
+           SURFACE_TYPE_DEADLY[o.oFloor.type]
+end
+
+function obj_set_home(o, x, y, z)
+    o.oHomeX = x
+    o.oHomeY = y
+    o.oHomeZ = z
+end
+
 function obj_squish_on_action_enter(o, triggerAction, x, y, z)
     local prev = o.oThwompPrevAction or o.oAction
     if prev ~= triggerAction and o.oAction == triggerAction then
@@ -248,6 +268,22 @@ function push_mario_out_of_object(m, o, padding)
             end
         end
     end
+end
+
+function nearest_tangible_mario_state_to_object(o)
+    local nearestDist = 0
+    local nearestMario = nil
+    for i = 0, MAX_PLAYERS - 1 do
+        local m = gMarioStates[0]
+        if m.marioObj ~= o and m.visibleToObjects and m.action & (ACT_FLAG_INTANGIBLE | ACT_FLAG_INVULNERABLE) == 0 and is_player_active(m) == 1 then
+            local dist = dist_between_objects(o, m.marioObj)
+            if not nearestMario or dist < nearestDist then
+                nearestMario = m
+                nearestDist = dist
+            end
+        end
+    end
+    return nearestMario
 end
 
 -------------------

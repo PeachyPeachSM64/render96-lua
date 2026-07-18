@@ -339,13 +339,20 @@ local function spawn_objects()
             local key = make_key(level, area, actNum, i)
             if not sSpawnedObjects[key] then
                 sSpawnedObjects[key] = true
-                local spawnFn = entry.isSync and spawn_sync_object or spawn_non_sync_object
-                spawnFn(entry.bhv, entry.model,
-                    entry.x, entry.y, entry.z,
-                    function(o)
-                        obj_set_angle(o, entry.rx, entry.ry, entry.rz)
-                        if entry.spawnFunc then entry.spawnFunc(o) end
-                    end)
+                local spawnFn
+                if not entry.isSync then
+                    spawnFn = spawn_non_sync_object
+                elseif is_other_player_in_local_area() == 0 then -- do not spawn a sync object again in an already loaded level
+                    spawnFn = spawn_sync_object
+                end
+                if spawnFn then
+                    spawnFn(entry.bhv, entry.model,
+                        entry.x, entry.y, entry.z,
+                        function(o)
+                            obj_set_angle(o, entry.rx, entry.ry, entry.rz)
+                            if entry.spawnFunc then entry.spawnFunc(o) end
+                        end)
+                end
             end
         end
     end

@@ -23,17 +23,17 @@ local function bhv_mr_i_render96_init(o)
     o.oPosY = o.oPosY + 60
     obj_set_home(o, o.oPosX, o.oPosY, o.oPosZ)
 
-    local sMrIHitbox = get_temp_object_hitbox()
-    sMrIHitbox.interactType      = INTERACT_DAMAGE
-    sMrIHitbox.health            = 2
-    sMrIHitbox.numLootCoins      = 5
-    sMrIHitbox.damageOrCoinValue = 2
-    sMrIHitbox.radius            = 80
-    sMrIHitbox.height            = 150
-    sMrIHitbox.hurtboxRadius     = 50
-    sMrIHitbox.hurtboxHeight     = 100
-    sMrIHitbox.downOffset        = 0
-    obj_set_hitbox(o, sMrIHitbox)
+    obj_set_hitbox(o, {
+        interactType      = INTERACT_DAMAGE,
+        health            = 2,
+        numLootCoins      = 5,
+        damageOrCoinValue = 2,
+        radius            = 80,
+        height            = 150,
+        hurtboxRadius     = 50,
+        hurtboxHeight     = 100,
+        downOffset        = 0,
+    })
 
     o.oIntangibleTimer  = 0
     o.oDrawingDistance  = 4000
@@ -58,6 +58,20 @@ local function bhv_mr_i_render96_init(o)
     end
     cur_obj_scale(o.oMrISize)
     obj_set_model_extended(o, E_MODEL_MR_I)
+
+    network_init_object(o, true, {
+        "oAction",
+        "oMrISize",
+        "oSwitchState2",
+        "oSwitchTimer1",
+        "oMrIBlinkIndex",
+        "oMrIDetectRadius",
+        "oMrIDizzyTimer",
+        "oMrIDizzyDuration",
+        "oMrITracking",
+        "oMrILastAngle",
+        "oMrIFireTimer",
+    })
 end
 
 ---@param o Object
@@ -228,17 +242,17 @@ id_bhvRender96MrI = hook_render96_behavior(id_bhvMrI, true, bhv_mr_i_render96_in
 
 ---@param o Object
 local function bhv_mr_i_render96_fire_particle_init(o)
-    local sParticleHitbox = get_temp_object_hitbox()
-    sParticleHitbox.interactType      = INTERACT_FLAME
-    sParticleHitbox.downOffset        = 0
-    sParticleHitbox.damageOrCoinValue = 2
-    sParticleHitbox.health            = 1
-    sParticleHitbox.numLootCoins      = 0
-    sParticleHitbox.radius            = 100
-    sParticleHitbox.height            = 100
-    sParticleHitbox.hurtboxRadius     = 50
-    sParticleHitbox.hurtboxHeight     = 50
-    obj_set_hitbox(o, sParticleHitbox)
+    obj_set_hitbox(o, {
+        interactType      = INTERACT_FLAME,
+        downOffset        = 0,
+        damageOrCoinValue = 2,
+        health            = 1,
+        numLootCoins      = 0,
+        radius            = 100,
+        height            = 100,
+        hurtboxRadius     = 50,
+        hurtboxHeight     = 50,
+    })
 
     o.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
     o.header.gfx.node.flags = o.header.gfx.node.flags | GRAPH_RENDER_BILLBOARD
@@ -268,17 +282,17 @@ id_bhvRender96MrIFireParticle = hook_render96_behavior(nil, false, bhv_mr_i_rend
 
 ---@param o Object
 local function bhv_mr_i_render96_particle_init(o)
-    local sParticleHitbox = get_temp_object_hitbox()
-    sParticleHitbox.interactType      = INTERACT_DAMAGE
-    sParticleHitbox.downOffset        = 0
-    sParticleHitbox.damageOrCoinValue = 2
-    sParticleHitbox.health            = 1
-    sParticleHitbox.numLootCoins      = 0
-    sParticleHitbox.radius            = 100
-    sParticleHitbox.height            = 100
-    sParticleHitbox.hurtboxRadius     = 50
-    sParticleHitbox.hurtboxHeight     = 50
-    obj_set_hitbox(o, sParticleHitbox)
+    obj_set_hitbox(o, {
+        interactType      = INTERACT_DAMAGE,
+        downOffset        = 0,
+        damageOrCoinValue = 2,
+        health            = 1,
+        numLootCoins      = 0,
+        radius            = 100,
+        height            = 100,
+        hurtboxRadius     = 50,
+        hurtboxHeight     = 50,
+    })
 
     o.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
     o.header.gfx.node.flags = o.header.gfx.node.flags | GRAPH_RENDER_BILLBOARD

@@ -9,16 +9,17 @@ local _floor = math.floor
 ---@param o Object
 local function bhv_blargg_render96_init(o)
     -- Hitbox
-    local sBlaargHitbox = get_temp_object_hitbox()
-    sBlaargHitbox.interactType      = INTERACT_FLAME
-    sBlaargHitbox.downOffset        = 0
-    sBlaargHitbox.damageOrCoinValue = 1
-    sBlaargHitbox.health            = 0
-    sBlaargHitbox.numLootCoins      = 0
-    sBlaargHitbox.radius            = 300
-    sBlaargHitbox.height            = 235
-    sBlaargHitbox.hurtboxRadius     = 300
-    sBlaargHitbox.hurtboxHeight     = 110
+    obj_set_hitbox(o, {
+        interactType      = INTERACT_FLAME,
+        downOffset        = 0,
+        damageOrCoinValue = 1,
+        health            = 0,
+        numLootCoins      = 0,
+        radius            = 300,
+        height            = 235,
+        hurtboxRadius     = 300,
+        hurtboxHeight     = 110,
+    })
 
     o.oHomeX = o.oPosX
     o.oHomeZ = o.oPosZ
@@ -26,17 +27,16 @@ local function bhv_blargg_render96_init(o)
     o.oFriction = 0.91
     o.oBuoyancy = 1.3
     o.oAnimations = gObjectAnimations.blargg_seg5_anims_0500616C
-    -- drop to floor
-    o.oPosY, o.oFloor = find_floor(o.oPosX, o.oPosY, o.oPosZ)
-    o.oMoveFlags = (o.oMoveFlags | OBJ_MOVE_ON_GROUND)
+    obj_drop_to_floor(o)
 
-    obj_set_hitbox(o, sBlaargHitbox)
     o.oAction = BLARGG_MODE_CHASE
     cur_obj_init_animation(BLARGG_ANIM_SWIM)
+
+    network_init_object(o, true, {})
 end
 
 ---@param o Object
-local function bhv_blargg_render96_check_mario_collision(o)
+local function bhv_blargg_render96_check_interacted(o)
     if (o.oInteractStatus & INT_STATUS_INTERACTED) ~= 0 then
         cur_obj_play_sound_and_rumble_if_visible(SOUND_MOVING_LAVA_BURN)
         o.oInteractStatus = o.oInteractStatus & (~INT_STATUS_INTERACTED)
@@ -51,29 +51,32 @@ end
 local function bhv_blargg_render96_swim(o)
     o.oForwardVel = 5.0
     if obj_return_home_if_safe(o, o.oHomeX, o.oPosY, o.oHomeZ, 1000) == 1 then
-        if m.floor.type == SURFACE_BURNING then
+        local m = nearest_mario_state_to_object(o)
+        if m ~= nil and m.floor.type == SURFACE_BURNING then
             o.oAction = BLARGG_MODE_CHASE
         else
             o.oAction = BLARGG_MODE_SWIM
-       end
+        end
         cur_obj_init_animation(BLARGG_ANIM_SWIM)
     end
 end
 
 ---@param o Object
 local function bhv_blargg_render96_chase(o)
-    local homeX = o.oHomeX
-    local posY  = o.oPosY
-    local homeZ = o.oHomeZ
+    local m = nearest_mario_state_to_object(o)
+    if m == nil then
+        o.oAction = BLARGG_MODE_SWIM
+        cur_obj_init_animation(BLARGG_ANIM_SWIM)
+        return
+    end
 
     o.oFlags = o.oFlags | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW
     o.oMoveAngleYaw = o.oFaceAngleYaw
 
     obj_turn_toward_object(o, m.marioObj, 16, 0x2000)
+    o.oForwardVel = m.riddenObj ~= nil and 20 or 10
 
-    if m.riddenObj == nil then o.oForwardVel = 10 else o.oForwardVel = 20 end
-
-    if not is_point_within_radius_of_mario(homeX, posY, homeZ, 5000) or m.floor.type == 0 or posY < o.oPosY then
+    if is_point_within_radius_of_mario(o.oHomeX, o.oPosY, o.oHomeZ, 5000) == 0 or m.floor.type ~= SURFACE_BURNING then
         o.oAction = BLARGG_MODE_SWIM
         cur_obj_init_animation(BLARGG_ANIM_SWIM)
     end
@@ -81,13 +84,20 @@ end
 
 ---@param o Object
 local function bhv_blargg_render96_knockback(o)
+    local m = nearest_mario_state_to_object(o)
+    if m == nil then
+        o.oAction = BLARGG_MODE_SWIM
+        cur_obj_init_animation(BLARGG_ANIM_SWIM)
+        return
+    end
+
     if o.oForwardVel < 10.0 and _floor(o.oVelY) == 0 then
         o.oForwardVel = 1.0
-        o.oBullyKBTimerAndMinionKOCounter = o.oBullyKBTimerAndMinionKOCounter + 1
         o.oFlags = o.oFlags | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW
         o.oMoveAngleYaw = o.oFaceAngleYaw
         obj_turn_toward_object(o, m.marioObj, 16, 0x2000)
     end
+
     if cur_obj_check_anim_frame(26) ~= 0 then
         cur_obj_play_sound_if_visible(SOUND_OBJ2_PIRANHA_PLANT_BITE)
     end
@@ -134,8 +144,9 @@ local function bhv_blargg_render96_loop(o)
     o.oBullyPrevY = o.oPosY
     o.oBullyPrevZ = o.oPosZ
 
-    bhv_blargg_render96_check_mario_collision(o)
+    bhv_blargg_render96_check_interacted(o)
     spawn_non_sync_object(id_bhvKoopaShellFlame, E_MODEL_RED_FLAME, o.oPosX, o.oPosY, o.oPosZ, nil)
+
     if o.oAction == BLARGG_MODE_SWIM then
         bhv_blargg_render96_swim(o)
         bhv_blargg_render96_step(o)
@@ -149,7 +160,6 @@ local function bhv_blargg_render96_loop(o)
         bhv_blargg_render96_step(o)
 
     elseif o.oAction == BLARGG_MODE_BACKUP then
-        o.oForwardVel = 10.0
         bhv_blargg_render96_backup(o)
         bhv_blargg_render96_step(o)
 

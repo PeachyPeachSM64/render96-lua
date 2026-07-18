@@ -4,7 +4,7 @@
 
 local r96lib = require("/lib/r96lib")
 
-gLevelValues.entryLevel = SPECIAL_WARP_TITLE
+-- gLevelValues.entryLevel = SPECIAL_WARP_TITLE
 --gLevelValues.entryLevel = LEVEL_ENDING
 
 gBehaviorValues.ProcessLODs = 1
@@ -110,15 +110,15 @@ r96lib.add_model_override_level(id_bhvFlameMovingForwardGrowing, E_MODEL_BLUE_FL
 -------------
 
 r96lib.add_spawn(SPECIAL_WARP_TITLE, 1, E_MODEL_MR_I,            id_bhvRender96MrI,                0,     0,     0, 0, 0, 0, false, nil, function(o) cur_obj_scale(100) end)
-r96lib.add_spawn(LEVEL_LLL,          1, E_MODEL_BLARGG_FRIENDLY, id_bhvRender96BlarggFriendly, -2070,     0,  6177, 0, 0, 0, false, {5, 6})
-r96lib.add_spawn(LEVEL_LLL,          1, E_MODEL_BLARGG,          id_bhvRender96Blargg,         -6766,     0,  3033, 0, 0, 0, false)
-r96lib.add_spawn(LEVEL_LLL,          1, E_MODEL_BLARGG,          id_bhvRender96Blargg,         -6018,     0, -5512, 0, 0, 0, false)
-r96lib.add_spawn(LEVEL_LLL,          1, E_MODEL_BLARGG,          id_bhvRender96Blargg,         -2151,     0, -5254, 0, 0, 0, false)
-r96lib.add_spawn(LEVEL_LLL,          1, E_MODEL_BLARGG,          id_bhvRender96Blargg,          2012,     0, -3440, 0, 0, 0, false)
-r96lib.add_spawn(LEVEL_LLL,          1, E_MODEL_BLARGG,          id_bhvRender96Blargg,          7408,     0, -4223, 0, 0, 0, false)
-r96lib.add_spawn(LEVEL_LLL,          1, E_MODEL_BLARGG,          id_bhvRender96Blargg,          6318,     0,   752, 0, 0, 0, false)
-r96lib.add_spawn(LEVEL_LLL,          1, E_MODEL_BLARGG,          id_bhvRender96Blargg,          5647,     0,  3426, 0, 0, 0, false)
-r96lib.add_spawn(LEVEL_LLL,          1, E_MODEL_BLARGG,          id_bhvRender96Blargg,         -5315,     0,  7493, 0, 0, 0, false)
+r96lib.add_spawn(LEVEL_LLL,          1, E_MODEL_BLARGG_FRIENDLY, id_bhvRender96BlarggFriendly, -2070,     0,  6177, 0, 0, 0, true, {5, 6})
+r96lib.add_spawn(LEVEL_LLL,          1, E_MODEL_BLARGG,          id_bhvRender96Blargg,         -6766,     0,  3033, 0, 0, 0, true)
+r96lib.add_spawn(LEVEL_LLL,          1, E_MODEL_BLARGG,          id_bhvRender96Blargg,         -6018,     0, -5512, 0, 0, 0, true)
+r96lib.add_spawn(LEVEL_LLL,          1, E_MODEL_BLARGG,          id_bhvRender96Blargg,         -2151,     0, -5254, 0, 0, 0, true)
+r96lib.add_spawn(LEVEL_LLL,          1, E_MODEL_BLARGG,          id_bhvRender96Blargg,          2012,     0, -3440, 0, 0, 0, true)
+r96lib.add_spawn(LEVEL_LLL,          1, E_MODEL_BLARGG,          id_bhvRender96Blargg,          7408,     0, -4223, 0, 0, 0, true)
+r96lib.add_spawn(LEVEL_LLL,          1, E_MODEL_BLARGG,          id_bhvRender96Blargg,          6318,     0,   752, 0, 0, 0, true)
+r96lib.add_spawn(LEVEL_LLL,          1, E_MODEL_BLARGG,          id_bhvRender96Blargg,          5647,     0,  3426, 0, 0, 0, true)
+r96lib.add_spawn(LEVEL_LLL,          1, E_MODEL_BLARGG,          id_bhvRender96Blargg,         -5315,     0,  7493, 0, 0, 0, true)
 r96lib.add_spawn(LEVEL_BITS,         1, E_MODEL_MARTY,           id_bhvThwomp,                 -5247, -1330,  -787, 0, 0, 0, true, nil, function(o) o.oBehParams = 1 end)
 
 ----------------

@@ -201,6 +201,30 @@ function obj_set_home(o, x, y, z)
     o.oHomeZ = z
 end
 
+local _obj_set_hitbox = obj_set_hitbox
+function obj_set_hitbox(o, hitbox)
+    if type(hitbox) == "table" then
+        local objHitbox = get_temp_object_hitbox()
+        objHitbox.interactType = hitbox.interactType or 0
+        objHitbox.downOffset = hitbox.downOffset or 0
+        objHitbox.damageOrCoinValue = hitbox.damageOrCoinValue or 0
+        objHitbox.health = hitbox.health or 0
+        objHitbox.numLootCoins = hitbox.numLootCoins or 0
+        objHitbox.radius = hitbox.radius or 0
+        objHitbox.height = hitbox.height or 0
+        objHitbox.hurtboxRadius = hitbox.hurtboxRadius or 0
+        objHitbox.hurtboxHeight = hitbox.hurtboxHeight or 0
+        _obj_set_hitbox(o, objHitbox)
+    else
+        _obj_set_hitbox(o, hitbox)
+    end
+end
+
+function obj_drop_to_floor(o)
+    o.oPosY, o.oFloor = find_floor(o.oPosX, o.oPosY, o.oPosZ)
+    o.oMoveFlags = o.oMoveFlags | OBJ_MOVE_ON_GROUND
+end
+
 function obj_squish_on_action_enter(o, triggerAction, x, y, z)
     local prev = o.oThwompPrevAction or o.oAction
     if prev ~= triggerAction and o.oAction == triggerAction then
@@ -284,6 +308,17 @@ function nearest_tangible_mario_state_to_object(o)
         end
     end
     return nearestMario
+end
+
+-- returns integer instead of bool to match signature of `is_player_in_local_area`
+function is_other_player_in_local_area()
+    for i = 1, MAX_PLAYERS - 1 do
+        local m = gMarioStates[i]
+        if is_player_in_local_area(m) == 1 then
+            return 1
+        end
+    end
+    return 0
 end
 
 -------------------

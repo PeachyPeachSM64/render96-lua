@@ -22,13 +22,7 @@ local function bhv_wario_head_init(o)
     o.oFlags = (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)
 
     -- drop to floor
-    local x = o.oPosX
-    local y = o.oPosY
-    local z = o.oPosZ
-
-    --local floor = find_floor_height(x, y + 200.0, z)
-    --o.oPosY = floor
-    o.oMoveFlags = o.oMoveFlags | OBJ_MOVE_ON_GROUND
+    obj_drop_to_floor(o)
 
     -- home
     obj_set_home(o, o.oPosX, o.oPosY, o.oPosZ)

@@ -5,6 +5,24 @@ require("/constants")
 --_G.charSelect.character_add_costume(CT_MARIO, "Vanilla Mario", nil, nil, nil, E_MODEL_MARIO)
 --_G.charSelect.character_edit(CT_MARIO, nil, nil, "Render96", nil, E_MODEL_R96_MARIO)
 
+-------------
+-- Actions --
+-------------
+
+local function act_jump_no_control_height(m)
+    if check_kick_or_dive_in_air(m) == 1 then
+        return 1
+    end
+
+    if m.input & INPUT_Z_PRESSED ~= 0 then
+        return set_mario_action(m, ACT_GROUND_POUND, 0)
+    end
+
+    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0)
+    common_air_action_step(m, ACT_JUMP_LAND, CHAR_ANIM_SINGLE_JUMP, AIR_STEP_CHECK_LEDGE_GRAB | AIR_STEP_CHECK_HANG)
+    return 0
+end
+
 -----------
 -- Hooks --
 -----------
@@ -25,6 +43,8 @@ end
 
 hook_event(HOOK_MARIO_UPDATE, open_hands_during_jumbo_star_flying)
 hook_event(HOOK_UPDATE, restore_vanilla_gameover)
+
+hook_mario_action(ACT_JUMP_NO_CONTROL_HEIGHT, act_jump_no_control_height)
 
 -------------------
 -- Geo functions --

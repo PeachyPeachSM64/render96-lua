@@ -43,7 +43,7 @@ local objSoundData = {}
 ---@param rangeMax number? The range in units at which audio is quietest (0)
 ---@param isMusic boolean? Wheather the audio is forced looped and the Doppler Effect is deactivated
 function r96lib.audio_fade(o, audioStream, rangeMin, rangeMax, isMusic, loopingStart, loopingEnd)
-    if o == nil or gMarioStates[0] == nil or audioStream == nil then return end
+    if o == nil or audioStream == nil then return end
     if version.MOD_AUDIO_OVERHAUL then
         if (audioStream.flags & 0x3) ~= MA_TYPE_STREAM then return end
     else

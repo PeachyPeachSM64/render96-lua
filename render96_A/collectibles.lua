@@ -29,7 +29,7 @@ local function update_collectible(name, index, value)
 end
 
 local function create_collectible_entry(name)
-    gGlobalSyncTable[name] = r96lib.DATA_DEFAULT
+    load_collectible(name)
 
     -- Server refreshes the collectible value on sync valid
     hook_event(HOOK_ON_SYNC_VALID, function ()

@@ -1,3 +1,5 @@
+local charSelect = require("/lib/char-select")
+
 TEX_BOWSER_CAKE = get_texture_info("cake_bowser")
 TEX_MARIO_CAKE  = get_texture_info("cake")
 TEX_LUIGI_CAKE  = get_texture_info("cake_luigi")
@@ -14,7 +16,7 @@ local function get_current_character_cake_texture()
         return TEX_BOWSER_CAKE
     end
 
-    local charNum = _G.charSelect.character_get_current_number()
+    local charNum = charSelect.character_get_current_number()
     return sCakeScreen[charNum]
 end
 

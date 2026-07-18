@@ -31,7 +31,7 @@ local function bhv_six_golden_coin_loop(o)
 
     -- Local Mario only can collect the object
     local m = gMarioStates[0]
-    if dist_between_objects(o, m.marioObj) <= 150 then
+    if dist_between_objects(o, m.marioObj) <= 100 then
         collect_wario_coin(o.oBehParams2ndByte)
         spawn_non_sync_object(id_bhvCoinSparkles, E_MODEL_SPARKLES, o.oPosX, o.oPosY, o.oPosZ, nil)
         audio_stream_play(COLLECTABLE, false, 1)

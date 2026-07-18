@@ -274,7 +274,7 @@ function nearest_tangible_mario_state_to_object(o)
     local nearestDist = 0
     local nearestMario = nil
     for i = 0, MAX_PLAYERS - 1 do
-        local m = gMarioStates[0]
+        local m = gMarioStates[i]
         if m.marioObj ~= o and m.visibleToObjects and m.action & (ACT_FLAG_INTANGIBLE | ACT_FLAG_INVULNERABLE) == 0 and is_player_active(m) == 1 then
             local dist = dist_between_objects(o, m.marioObj)
             if not nearestMario or dist < nearestDist then

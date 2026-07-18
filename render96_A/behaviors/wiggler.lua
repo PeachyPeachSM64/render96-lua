@@ -4,14 +4,29 @@ require("/constants")
 -- Behavior functions --
 ------------------------
 
+local function check_wiggler_boss_fight_started(o)
+    for i = 0, MAX_PLAYERS - 1 do
+        local m = gMarioStates[i]
+        if m.pos.y >= o.oHomeY and m.visibleToObjects and is_player_active(m) == 1 then
+            return true
+        end
+    end
+    return false
+end
+
 ---@param o Object
 local function bhv_wiggler_head_render96_loop(o)
-    if o.oHealth == 4 then o.oSwitchState1 = 0 end
-    if m.pos.y >= 1650 and o.oHealth == 4 then o.oSwitchState1 = 1 end
-    if o.oHealth == 4 and o.oAction == WIGGLER_ACT_JUMPED_ON then o.oSwitchState1 = 2 end
-    if o.oHealth == 3 and o.oAction == WIGGLER_ACT_JUMPED_ON then o.oSwitchState1 = 3 end
-    if o.oHealth == 2 and o.oAction == WIGGLER_ACT_JUMPED_ON then o.oSwitchState1 = 4 end
-    if o.oHealth == 1 then o.oSwitchState1 = 4 end
+
+    -- Use this unused field to indicate that someone is fighting Wiggler
+    if check_wiggler_boss_fight_started(o) then
+        o.oWigglerUnused = 1
+    end
+
+    if o.oWigglerUnused == 1 then
+        o.oSwitchState1 = math.clamp(5 - o.oHealth + (o.oAction == WIGGLER_ACT_JUMPED_ON and 1 or 0), 1, 4)
+    else
+        o.oSwitchState1 = 0
+    end
 end
 
 id_bhvRender96WigglerHead = hook_render96_behavior(id_bhvWigglerHead, false, nil, bhv_wiggler_head_render96_loop)
@@ -24,24 +39,27 @@ function geo_function_wiggler_rotate(node, matStackIndex)
     local o = geo_get_current_object()
     if o == nil then return end
     local id = o._pointer
-    cast_graph_node(node.next).rotation.x = (((id >> 11) % 4) + 1) * 0x1500
-    cast_graph_node(node.next).rotation.y = (((id >> 11) % 4) + 1) * 0x1500
-    cast_graph_node(node.next).rotation.z = (((id >> 11) % 4) + 1) * 0x1500
+    local rot = cast_graph_node(node.next).rotation
+    rot.x = (((id >> 11) % 4) + 1) * 0x1500
+    rot.y = (((id >> 11) % 4) + 1) * 0x1500
+    rot.z = (((id >> 11) % 4) + 1) * 0x1500
 end
 
--- WTF IS THIS
--- switch param 0 seems to be wiggler head, while param 1 seems to be body
--- nah, get current object and check behavior
--- body parts should have the head as parent
 function geo_switch_wiggler_color(node, matStackIndex)
-    local o = obj_get_nearest_object_with_behavior_id(gMarioStates[0].marioObj, id_bhvWigglerHead)
+    local o = geo_get_current_object()
     if o == nil then return end
+    local wigglerHead = obj_has_behavior_id(o, id_bhvWigglerHead) == 1 and o or o.parentObj
+    if wigglerHead == nil then -- fallback (should not happen)
+        wigglerHead = obj_get_nearest_object_with_behavior_id(o, id_bhvWigglerHead)
+    end
+
+    -- the head state gives the body color
     local switch = cast_graph_node(node)
-    if o.oHealth == 4 then switch.selectedCase = 0 end
-    if o.oHealth == 4 and o.oAction == WIGGLER_ACT_JUMPED_ON then switch.selectedCase = 1 end
-    if o.oHealth == 3 and o.oAction == WIGGLER_ACT_JUMPED_ON then switch.selectedCase = 1 end
-    if o.oHealth == 2 and o.oAction == WIGGLER_ACT_JUMPED_ON then switch.selectedCase = 0 end
-    if o.oHealth == 1 then switch.selectedCase = 0 end
+    if wigglerHead.oSwitchState1 == 2 or wigglerHead.oSwitchState1 == 3 then -- red
+        switch.selectedCase = 1
+    else -- yellow
+        switch.selectedCase = 0
+    end
 end
 
 ---------------

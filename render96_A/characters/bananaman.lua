@@ -1,3 +1,4 @@
+local charSelect = require("/lib/char-select")
 require("/constants")
 
 -------------
@@ -38,9 +39,7 @@ local function bananaman_update(m)
 end
 
 hook_event(HOOK_ON_MODS_LOADED, function ()
-    if _G.charSelect ~= nil then
-        _G.charSelect.character_hook_moveset(CT_TOAD, HOOK_MARIO_UPDATE, bananaman_update)
-    end
+    charSelect.character_hook_moveset(CT_TOAD, HOOK_MARIO_UPDATE, bananaman_update)
 end)
 
 hook_mario_action(ACT_BANANAMAN_JUMP, act_bananaman_jump)

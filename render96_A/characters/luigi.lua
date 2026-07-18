@@ -1,3 +1,4 @@
+local charSelect = require("/lib/char-select")
 require("/constants")
 
 local sLuigiJumpActions = {
@@ -227,11 +228,9 @@ local function luigi_before_phys_step(m)
 end
 
 hook_event(HOOK_ON_MODS_LOADED, function ()
-    if _G.charSelect ~= nil then
-        _G.charSelect.character_set_locked(CT_LUIGI, is_luigi_unlocked, true)
-        _G.charSelect.character_hook_moveset(CT_LUIGI, HOOK_BEFORE_PHYS_STEP, luigi_before_phys_step)
-        _G.charSelect.character_hook_moveset(CT_LUIGI, HOOK_MARIO_UPDATE, luigi_update)
-    end
+    charSelect.character_set_locked(CT_LUIGI, is_luigi_unlocked, true, "\\#0c0\\Luigi\\#\\")
+    charSelect.character_hook_moveset(CT_LUIGI, HOOK_BEFORE_PHYS_STEP, luigi_before_phys_step)
+    charSelect.character_hook_moveset(CT_LUIGI, HOOK_MARIO_UPDATE, luigi_update)
 end)
 
 hook_mario_action(ACT_LUIGI_SCUTTLE_RUN,      act_luigi_scuttle_run)

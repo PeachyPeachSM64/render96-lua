@@ -3,7 +3,6 @@
 -- author: \#ff3030\Render96DX Team
 
 local r96lib = require("/lib/r96lib")
-charSelect = _G.charSelect
 
 gLevelValues.entryLevel = SPECIAL_WARP_TITLE
 --gLevelValues.entryLevel = LEVEL_ENDING

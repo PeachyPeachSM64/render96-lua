@@ -1,3 +1,4 @@
+local charSelect = require("/lib/char-select")
 local bloWarps = require("/lib/warps")
 
 local function pipe_entry(m, o)
@@ -113,4 +114,4 @@ local function is_mario_at_cabinet()
     return gNetworkPlayers[0].currLevelNum == LEVEL_INNER_WORKINGS
 end
 
-_G.charSelect.hook_allow_menu_open(is_mario_at_cabinet)
+charSelect.hook_allow_menu_open(is_mario_at_cabinet)

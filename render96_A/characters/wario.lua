@@ -1,3 +1,4 @@
+local charSelect = require("/lib/char-select")
 require("/constants")
 
 --[[
@@ -907,11 +908,9 @@ local function wario_update(m)
 end
 
 hook_event(HOOK_ON_MODS_LOADED, function ()
-    if _G.charSelect ~= nil then
-        _G.charSelect.character_set_locked(CT_WARIO, is_wario_unlocked, true)
-        _G.charSelect.character_hook_moveset(CT_WARIO, HOOK_BEFORE_SET_MARIO_ACTION, wario_before_actions)
-        _G.charSelect.character_hook_moveset(CT_WARIO, HOOK_MARIO_UPDATE, wario_update)
-    end
+    charSelect.character_set_locked(CT_WARIO, is_wario_unlocked, true, "\\#dd0\\Wario\\#\\")
+    charSelect.character_hook_moveset(CT_WARIO, HOOK_BEFORE_SET_MARIO_ACTION, wario_before_actions)
+    charSelect.character_hook_moveset(CT_WARIO, HOOK_MARIO_UPDATE, wario_update)
 end)
 
 hook_mario_action(ACT_WARIO_CHARGE,             act_wario_charge, INT_FAST_ATTACK_OR_SHELL)

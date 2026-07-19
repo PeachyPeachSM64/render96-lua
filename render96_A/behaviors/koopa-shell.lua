@@ -5,7 +5,7 @@ require("/constants")
 -- Behavior functions --
 ------------------------
 
-local SHELL_OPTS = {
+local KOOPA_SHELL_OPTS = {
     audio = EVENT_SHELL_THROWN,
     interactions = gThrownInteractions,
 }
@@ -18,18 +18,7 @@ local function bhv_koopa_shell_render96_loop(o)
             o.oAction = 50
         end
 
-        -- WTF IS THIS
-        -- If a koopa shell exists, all koopas die instantly if there is at least one Wario on the map????
-        local koopa = obj_get_nearest_object_with_behavior_id(o, id_bhvKoopa)
-        if koopa ~= nil then
-            spawn_mist_particles()
-            spawn_sync_object(id_bhvBlueCoinJumping, E_MODEL_BLUE_COIN, o.oPosX, o.oPosY, o.oPosZ, nil)
-            create_sound_spawner(SOUND_OBJ_STOMPED)
-            koopa.activeFlags = ACTIVE_FLAG_DEACTIVATED
-            obj_mark_for_deletion(koopa)
-        end
-
-        r96lib.update_held_object(m, o, SHELL_OPTS)
+        r96lib.update_held_object(m, o, KOOPA_SHELL_OPTS)
 
         if o.oHeldState == HELD_HELD then
             if gMarioStates[0].heldObj ~= nil then

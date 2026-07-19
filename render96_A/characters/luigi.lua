@@ -1,17 +1,17 @@
 local charSelect = require("/lib/char-select")
 require("/constants")
 
-local sLuigiJumpActions = {
+local LUIGI_JUMP_ACTIONS = {
     [ACT_JUMP] = true,
     [ACT_DOUBLE_JUMP] = true,
     [ACT_TRIPLE_JUMP] = true,
 }
 
-local sLuigiScuttleRunActions = {
+local LUIGI_SCUTTLE_RUN_ACTIONS = {
     [ACT_JUMP] = true,
 }
 
-local sLuigiScuttleRunHoldActions = {
+local LUIGI_SCUTTLE_RUN_HOLD_ACTIONS = {
     [ACT_HOLD_JUMP] = true,
 }
 
@@ -189,14 +189,14 @@ local function luigi_update(m)
     if (m.prevAction & ACT_FLAG_AIR == 0 and
         m.input & INPUT_A_DOWN ~= 0 and
         m.vel.y < 0) then
-        if sLuigiScuttleRunActions[m.action] then
+        if LUIGI_SCUTTLE_RUN_ACTIONS[m.action] then
             set_mario_action(m, ACT_LUIGI_SCUTTLE_RUN, 0)
-        elseif sLuigiScuttleRunHoldActions[m.action] then
+        elseif LUIGI_SCUTTLE_RUN_HOLD_ACTIONS[m.action] then
             set_mario_action(m, ACT_LUIGI_SCUTTLE_RUN_HOLD, 0)
         end
     end
 
-    if (sLuigiJumpActions[m.action] and
+    if (LUIGI_JUMP_ACTIONS[m.action] and
         m.prevAction & ACT_FLAG_AIR == 0 and
         m.input & INPUT_A_PRESSED ~= 0) then
         m.vel.y = m.vel.y + 6.0  -- small height boost

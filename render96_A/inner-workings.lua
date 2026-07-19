@@ -1,29 +1,39 @@
 local charSelect = require("/lib/char-select")
 local bloWarps = require("/lib/warps")
 
+---@param m MarioState
+---@param o Object
 local function pipe_entry(m, o)
     play_sound(SOUND_MENU_ENTER_PIPE, gGlobalSoundSource)
 end
 
+---@param m MarioState
+---@param o Object
 local function pipe_exit(m, o)
     play_sound(SOUND_MENU_EXIT_PIPE, gGlobalSoundSource)
     set_mario_action(m, ACT_EMERGE_FROM_PIPE, 0)
 end
 
+---@param m MarioState
+---@param o Object
 local function boo_pipe_red_exit(m, o)
     pipe_exit(m, o)
     charSelect.character_set_current_number(CT_MARIO, 1)
 end
 
+---@param m MarioState
+---@param o Object
 local function boo_pipe_green_exit(m, o)
     pipe_exit(m, o)
-    local charNum = is_luigi_unlocked() and CT_LUIGI or m.character.type
+    local charNum = is_luigi_unlocked() and CT_LUIGI or charSelect.character_get_current_number(m.playerIndex)
     charSelect.character_set_current_number(charNum, 1)
 end
 
+---@param m MarioState
+---@param o Object
 local function boo_pipe_yellow_exit(m, o)
     pipe_exit(m, o)
-    local charNum = is_wario_unlocked() and CT_WARIO or m.character.type
+    local charNum = is_wario_unlocked() and CT_WARIO or charSelect.character_get_current_number(m.playerIndex)
     charSelect.character_set_current_number(charNum, 1)
 end
 
@@ -35,17 +45,17 @@ local function pipe_yellow()
     return is_wario_unlocked() and 1 or 0
 end
 
-local sPipeGreenBhv = {
+local BEHAVIORS_PIPE_GREEN = {
     [0] = id_bhvRender96WarpPipeGreenLock,
     [1] = id_bhvRender96WarpPipeGreenUnlock,
 }
 
-local sPipeYellowBhv = {
+local BEHAVIORS_PIPE_YELLOW = {
     [0] = id_bhvRender96WarpPipeYellowLock,
     [1] = id_bhvRender96WarpPipeYellowUnlock,
 }
 
-local sPipeModel = {
+local PIPE_MODELS = {
     [0] = E_MODEL_WARP_PIPE_LOCKED,
     [1] = E_MODEL_WARP_PIPE_UNLOCKED,
 }
@@ -60,10 +70,10 @@ bloWarps.new_warp_node(LEVEL_INNER_WORKINGS, 1, 0x00, LEVEL_INNER_WORKINGS, 1, 0
 bloWarps.create_warp_obj(id_bhvRender96WarpPipeRed, E_MODEL_WARP_PIPE_UNLOCKED, 0x00, nil, LEVEL_INNER_WORKINGS, 1, {0, 0, 3200}, {0, 0x8000, 0})
 
 bloWarps.new_warp_node(LEVEL_INNER_WORKINGS, 1, 0x01, LEVEL_INNER_WORKINGS, 1, 0x01, pipe_entry, boo_pipe_green_exit, true)
-bloWarps.create_warp_obj(sPipeGreenBhv[pipe_green()], sPipeModel[pipe_green()], 0x01, nil, LEVEL_INNER_WORKINGS, 1, {2700, 800, -200}, {0, -0x4000, 0})
+bloWarps.create_warp_obj(BEHAVIORS_PIPE_GREEN[pipe_green()], PIPE_MODELS[pipe_green()], 0x01, nil, LEVEL_INNER_WORKINGS, 1, {2700, 800, -200}, {0, -0x4000, 0})
 
 bloWarps.new_warp_node(LEVEL_INNER_WORKINGS, 1, 0x02, LEVEL_INNER_WORKINGS, 1, 0x02, pipe_entry, boo_pipe_yellow_exit, true)
-bloWarps.create_warp_obj(sPipeYellowBhv[pipe_yellow()], sPipeModel[pipe_yellow()], 0x02, nil, LEVEL_INNER_WORKINGS, 1, {-2700, 0, 700}, {0, 0x4000, 0})
+bloWarps.create_warp_obj(BEHAVIORS_PIPE_YELLOW[pipe_yellow()], PIPE_MODELS[pipe_yellow()], 0x02, nil, LEVEL_INNER_WORKINGS, 1, {-2700, 0, 700}, {0, 0x4000, 0})
 
 local sLastGreenUnlocked = pipe_green()
 local sLastYellowUnlocked = pipe_yellow()
@@ -88,12 +98,12 @@ local function inner_workings_update()
     local green = pipe_green()
     if green ~= sLastGreenUnlocked then
         sLastGreenUnlocked = green
-        refresh_pipe(LEVEL_INNER_WORKINGS, 1, 0x01, sPipeGreenBhv, sPipeModel, green, {2700, 800, -200}, {0, -0x4000, 0})
+        refresh_pipe(LEVEL_INNER_WORKINGS, 1, 0x01, BEHAVIORS_PIPE_GREEN, PIPE_MODELS, green, {2700, 800, -200}, {0, -0x4000, 0})
     end
     local yellow = pipe_yellow()
     if yellow ~= sLastYellowUnlocked then
         sLastYellowUnlocked = yellow
-        refresh_pipe(LEVEL_INNER_WORKINGS, 1, 0x02, sPipeYellowBhv, sPipeModel, yellow, {-2700, 0, 700}, {0, 0x4000, 0})
+        refresh_pipe(LEVEL_INNER_WORKINGS, 1, 0x02, BEHAVIORS_PIPE_YELLOW, PIPE_MODELS, yellow, {-2700, 0, 700}, {0, 0x4000, 0})
     end
 end
 

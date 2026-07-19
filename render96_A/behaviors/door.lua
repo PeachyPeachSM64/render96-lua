@@ -31,7 +31,6 @@ local function update_outside_doors_model()
             door = obj_get_next_with_same_behavior_id(door)
         end
     end
-
 end
 
 hook_event(HOOK_ON_WARP, update_outside_doors_model)

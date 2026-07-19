@@ -7,6 +7,8 @@ local _min = math.min
 -- Geo functions --
 -------------------
 
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_function_eyerok(node, matStackIndex)
     local o = geo_get_current_object()
     if o == nil then return end

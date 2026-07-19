@@ -1,13 +1,14 @@
 require("/constants")
 
+-- TODO: same problem as Wario held animations?
+
 -------------------
 -- Geo functions --
 -------------------
 
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_switch_peach_left_hand(node, matStackIndex)
-    local o = geo_get_current_object()
-    if o == nil then return end
-
     local m = gMarioStates[0]
     if m.actionArg == 3 or m.actionArg == 4 or m.actionArg == 5 then -- END_PEACH_CUTSCENE_SPAWN_PEACH END_PEACH_CUTSCENE_DESCEND_PEACH END_PEACH_CUTSCENE_RUN_TO_PEACH
         cast_graph_node(node).selectedCase = 1
@@ -32,9 +33,6 @@ function geo_switch_peach_left_hand(node, matStackIndex)
 end
 
 function geo_switch_peach_lip(node, matStackIndex)
-    local o = geo_get_current_object()
-    if o == nil then return end
-
     local m = gMarioStates[0]
     if m.actionArg == 6 then -- END_PEACH_CUTSCENE_DIALOG_1
         local lip_sync = gPeachCutsceneDialog1[m.actionTimer]
@@ -51,9 +49,6 @@ function geo_switch_peach_lip(node, matStackIndex)
 end
 
 function geo_switch_peach_right_hand(node, matStackIndex)
-    local o = geo_get_current_object()
-    if o == nil then return end
-
     local m = gMarioStates[0]
     if m.actionArg == 3 or m.actionArg == 4 or m.actionArg == 5 then -- END_PEACH_CUTSCENE_SPAWN_PEACH END_PEACH_CUTSCENE_DESCEND_PEACH END_PEACH_CUTSCENE_RUN_TO_PEACH
         cast_graph_node(node).selectedCase = 1

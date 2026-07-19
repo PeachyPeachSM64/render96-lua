@@ -124,6 +124,7 @@ local function bhv_blargg_render96_backup(o)
 end
 
 ---@param o Object
+---@param collisionFlags integer
 local function bhv_blargg_render96_backup_check(o, collisionFlags)
     if (collisionFlags & OBJ_COL_FLAG_NO_Y_VEL) == 0 and o.oAction ~= BLARGG_MODE_KNOCKBACK then
         o.oPosX = o.oBullyPrevX

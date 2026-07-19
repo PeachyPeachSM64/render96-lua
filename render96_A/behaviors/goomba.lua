@@ -11,7 +11,7 @@ local GOOMBA_OPTS = {
     enemy = true
 }
 
-local sGoombaWarioDeath = {
+local GOOMBA_DEATH_WARIO_ACTIONS = {
     [ACT_WARIO_GROUND_POUND] = true,
     [ACT_GROUND_POUND_LAND] = true,
     [ACT_WARIO_PILE_DRIVER] = true,
@@ -49,7 +49,7 @@ local function bhv_goomba_render96_loop(o)
 
     if get_character(m).type == CT_WARIO then
         if o.oAction == OBJ_ACT_SQUISHED then
-            if not sGoombaWarioDeath[m.action] then
+            if not GOOMBA_DEATH_WARIO_ACTIONS[m.action] then
                 set_mario_particle_flags(m, PARTICLE_HORIZONTAL_STAR, 0)
                 o.oInteractType = INTERACT_GRABBABLE
                 o.oAction = GOOMBA_ACT_STUN
@@ -57,14 +57,14 @@ local function bhv_goomba_render96_loop(o)
                 o.oSwitchState1 = 2
                 o.oTimer = 0
                 cur_obj_init_animation_with_accel_and_sound(0, 0)
-            elseif sGoombaWarioDeath[m.action] then
+            elseif GOOMBA_DEATH_WARIO_ACTIONS[m.action] then
                 bhv_goomba_render96_death(o)
             end
         end
 
         --Stunned from wario's jump, checks if going to be grabbed
         if (o.oHeldState == HELD_FREE and o.oAction == GOOMBA_ACT_STUN and o.oTimer <= 150) then
-            if sGoombaWarioDeath[m.action] and dist_between_objects(o, m.marioObj) <= 150 then
+            if GOOMBA_DEATH_WARIO_ACTIONS[m.action] and dist_between_objects(o, m.marioObj) <= 150 then
                 bhv_goomba_render96_death(o)
             end
             o.oGoombaTargetYaw = o.oGoombaTargetYaw + 0x1000
@@ -103,10 +103,12 @@ id_bhvRender96Goomba = hook_render96_behavior(id_bhvGoomba, false, bhv_goomba_re
 -- Geo functions --
 -------------------
 
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_switch_kug(node, matStackIndex)
     local o = geo_get_current_object()
     if o == nil then return end
-    cast_graph_node(node).selectedCase = (geo_get_current_object().oTimer // 4) % 4
+    cast_graph_node(node).selectedCase = (o.oTimer // 4) % 4
 end
 
 ---------------

@@ -4,12 +4,12 @@ require("/constants")
 -- Behavior functions --
 ------------------------
 
-local sChainChompBiteFrames = { 0, 1, 2, 4, 6, 8, 6, 4, 2, 0, 2, 4, 6, 8, 6, 4, 2, 1, 0 }
+local CHAIN_CHOMP_BITE_FRAMES = { 0, 1, 2, 4, 6, 8, 6, 4, 2, 0, 2, 4, 6, 8, 6, 4, 2, 1, 0 }
 
 ---@param o Object
 local function bhv_chain_chomp_render96_loop(o)
     local frame = o.header.gfx.animInfo.animFrame
-    o.oSwitchState2 = sChainChompBiteFrames[frame] or 0
+    o.oSwitchState2 = CHAIN_CHOMP_BITE_FRAMES[frame] or 0
 end
 
 id_bhvRender96ChainChomp = hook_render96_behavior(id_bhvChainChomp, false, nil, bhv_chain_chomp_render96_loop)

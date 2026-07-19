@@ -9,6 +9,7 @@ local function bhv_bubba_render96_init(o)
     smlua_anim_util_set_animation(o, "bubba_swim")
 end
 
+---@param o Object
 local function bhv_bubba_render96_loop(o)
     o.oSwitchState1 = o.oAnimState
 end

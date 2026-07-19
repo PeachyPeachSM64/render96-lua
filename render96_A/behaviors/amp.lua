@@ -11,7 +11,7 @@ local function bhv_amp_render96_loop(o)
     if o.oAction == AMP_ACT_ATTACK_COOLDOWN and o.oTimer < 31 then
         if o.oTimer % 2 == 0 then
             o.oSwitchState2 = _random(1, 2)
-            if o.oSwitchState2 == 2 then o.oSwitchState1 = 0 else o.oSwitchState1 = 0 end
+            o.oSwitchState1 = 0
         end
     elseif o.oAction == AMP_ACT_ATTACK_COOLDOWN and o.oTimer < 90 then
         o.oSwitchState2 = 1

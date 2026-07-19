@@ -5,7 +5,7 @@ require("/constants")
 -- Behavior functions --
 ------------------------
 
-local COLORS_SCUTTLE = {
+local SCUTTLEBUG_COLORS = {
     {r = 0x40, g = 0x21, b = 0x3B},
     {r = 0x44, g = 0x35, b = 0x00},
     {r = 0x00, g = 0x00, b = 0x00},
@@ -13,7 +13,7 @@ local COLORS_SCUTTLE = {
 
 ---@param o Object
 local function bhv_scuttlebug_render96_loop(o)
-    r96lib.pulse_cycle(o, COLORS_SCUTTLE, 50)
+    r96lib.pulse_cycle(o, SCUTTLEBUG_COLORS, 50)
 end
 
 id_bhvRender96Scuttlebug = hook_render96_behavior(id_bhvScuttlebug, false, nil, bhv_scuttlebug_render96_loop)
@@ -22,6 +22,8 @@ id_bhvRender96Scuttlebug = hook_render96_behavior(id_bhvScuttlebug, false, nil, 
 -- Geo functions --
 -------------------
 
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_function_scuttle_body(node, matStackIndex)
     local o = geo_get_current_object()
     if o == nil then return end
@@ -32,6 +34,8 @@ function geo_function_scuttle_body(node, matStackIndex)
     rotN.rotation.z = rot
 end
 
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_function_scuttle_body_color(node, matStackIndex)
     r96lib.gfx_color_patch(node, {
         prefix    = "scuttle",

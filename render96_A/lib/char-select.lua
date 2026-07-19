@@ -12,7 +12,7 @@ for i = 0, MAX_PLAYERS - 1 do
     gPlayerSyncTable[i].charNum = gNetworkPlayers[i].modelIndex
 end
 
-local sCharacterMovesetHooksGetCharType = {
+local CHARACTER_MOVESET_HOOKS_GET_CHAR_TYPE = {
     [HOOK_MARIO_UPDATE] =                           function (m) return m.character.type end,
     [HOOK_BEFORE_MARIO_UPDATE] =                    function (m) return m.character.type end,
     [HOOK_BEFORE_PHYS_STEP] =                       function (m) return m.character.type end,
@@ -34,9 +34,12 @@ local sCharacterMovesetHooksGetCharType = {
     [HOOK_ON_PLAY_SOUND] =                          function () return gMarioStates[0].character.type end,
 }
 
+---@param charNum integer
+---@param hookEventType LuaHookedEventType
+---@param func function
 local function character_hook_moveset(charNum, hookEventType, func)
     hook_event(hookEventType, function (...)
-        local get_char_type = sCharacterMovesetHooksGetCharType[hookEventType]
+        local get_char_type = CHARACTER_MOVESET_HOOKS_GET_CHAR_TYPE[hookEventType]
         local charType = get_char_type and get_char_type(...) or nil
         if charType == nil or charType == charNum then
             return func(...)
@@ -50,6 +53,10 @@ local function check_unlocked(unlockCondition)
     return unlockCondition
 end
 
+---@param charNum integer
+---@param unlockCondition function|boolean
+---@param notify boolean
+---@param name string
 local function character_set_locked(charNum, unlockCondition, notify, name)
     sCharacterSetLocked[charNum] = {
         unlockCondition = unlockCondition,
@@ -59,15 +66,19 @@ local function character_set_locked(charNum, unlockCondition, notify, name)
     }
 end
 
-local function character_get_current_number()
-    return gMarioStates[0].character.type
+---@param localIndex? integer
+local function character_get_current_number(localIndex)
+    return gMarioStates[localIndex or 0].character.type
 end
 
+---@param charNum integer
+---@param charAlt integer
 local function character_set_current_number(charNum, charAlt)
     gNetworkPlayers[0].overrideModelIndex = charNum
     gPlayerSyncTable[0].charNum = charNum
 end
 
+---@param func function
 local function hook_allow_menu_open(func)
     -- unused
 end

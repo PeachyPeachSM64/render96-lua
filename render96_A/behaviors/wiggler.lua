@@ -1,9 +1,12 @@
 require("/constants")
 
+local _clamp = math.clamp
+
 ------------------------
 -- Behavior functions --
 ------------------------
 
+---@param o Object
 local function check_wiggler_boss_fight_started(o)
     for i = 0, MAX_PLAYERS - 1 do
         local m = gMarioStates[i]
@@ -23,7 +26,7 @@ local function bhv_wiggler_head_render96_loop(o)
     end
 
     if o.oWigglerUnused == 1 then
-        o.oSwitchState1 = math.clamp(5 - o.oHealth + (o.oAction == WIGGLER_ACT_JUMPED_ON and 1 or 0), 1, 4)
+        o.oSwitchState1 = _clamp(5 - o.oHealth + (o.oAction == WIGGLER_ACT_JUMPED_ON and 1 or 0), 1, 4)
     else
         o.oSwitchState1 = 0
     end
@@ -35,6 +38,8 @@ id_bhvRender96WigglerHead = hook_render96_behavior(id_bhvWigglerHead, false, nil
 -- Geo functions --
 -------------------
 
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_function_wiggler_rotate(node, matStackIndex)
     local o = geo_get_current_object()
     if o == nil then return end
@@ -45,6 +50,8 @@ function geo_function_wiggler_rotate(node, matStackIndex)
     rot.z = (((id >> 11) % 4) + 1) * 0x1500
 end
 
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_switch_wiggler_color(node, matStackIndex)
     local o = geo_get_current_object()
     if o == nil then return end

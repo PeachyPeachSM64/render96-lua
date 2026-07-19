@@ -9,6 +9,7 @@ local function in_cutscene()
         or act == ACT_INTRO_CUTSCENE
 end
 
+---@param y number
 local function render_hud_keys(y)
     if in_cutscene() then return y end
     if obj_get_first_with_behavior_id(id_bhvActSelector) then return y end
@@ -23,6 +24,7 @@ local function render_hud_keys(y)
     return y + 20
 end
 
+---@param y number
 local function render_hud_wario_coins(y)
     if in_cutscene() then return y end
     if obj_get_first_with_behavior_id(id_bhvActSelector) then return y end
@@ -43,6 +45,7 @@ local function render_hud()
     y = render_hud_wario_coins(y)
 end
 
+---@param msg string
 local function toggle_hud(msg)
     if msg == '0' then
         hud_hide()

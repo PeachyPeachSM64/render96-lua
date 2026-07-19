@@ -18,7 +18,7 @@ local _pi     = math.pi
 -- Object fields --
 -------------------
 
-local sBehaviorsCustomObjectFields = {
+local BEHAVIORS_CUSTOM_OBJECT_FIELDS = {
 
     -- Geo switches
     oSwitchState1 = 's32',
@@ -75,13 +75,13 @@ if not version.GLOBAL_OBJECT_FIELDS then
     -- Need to fill custom object fields with as much dummy fields as defined in r96lib to preserve indexing
     -- Since object fields are sorted alphabetically, we must make sure they are defined first
     local i = 0
-    for _ in pairs(r96lib.customObjectFields) do
-        sBehaviorsCustomObjectFields[string.format("o%u", i)] = "u32"
+    for _ in pairs(r96lib.CUSTOM_OBJECT_FIELDS) do
+        BEHAVIORS_CUSTOM_OBJECT_FIELDS[string.format("o%u", i)] = "u32"
         i = i + 1
     end
 end
 
-define_custom_obj_fields(sBehaviorsCustomObjectFields)
+define_custom_obj_fields(BEHAVIORS_CUSTOM_OBJECT_FIELDS)
 
 --- For VSCode autocompletion
 --- @class Object
@@ -189,12 +189,17 @@ local SURFACE_TYPE_DEADLY = {
     [SURFACE_VERTICAL_WIND] = true,
 }
 
+---@param o Object
 function obj_is_on_deadly_floor(o)
     return o.oFloor ~= nil and
            o.oFloorHeight >= o.oPosY and
            SURFACE_TYPE_DEADLY[o.oFloor.type]
 end
 
+---@param o Object
+---@param x number
+---@param y number
+---@param z number
 function obj_set_home(o, x, y, z)
     o.oHomeX = x
     o.oHomeY = y
@@ -202,6 +207,8 @@ function obj_set_home(o, x, y, z)
 end
 
 local _obj_set_hitbox = obj_set_hitbox
+---@param o Object
+---@param hitbox table|ObjectHitbox
 function obj_set_hitbox(o, hitbox)
     if type(hitbox) == "table" then
         local objHitbox = get_temp_object_hitbox()
@@ -220,12 +227,18 @@ function obj_set_hitbox(o, hitbox)
     end
 end
 
+---@param o Object
 function obj_drop_to_floor(o)
     o.oPosY, o.oFloor = find_floor(o.oPosX, o.oPosY, o.oPosZ)
     o.oMoveFlags = o.oMoveFlags | OBJ_MOVE_ON_GROUND
 end
 
-function obj_squish_on_action_enter(o, triggerAction, x, y, z)
+---@param o Object
+---@param triggerAction integer
+---@param intensityX number
+---@param intensityY number
+---@param intensityZ number
+function obj_squish_on_action_enter(o, triggerAction, intensityX, intensityY, intensityZ)
     local prev = o.oThwompPrevAction or o.oAction
     if prev ~= triggerAction and o.oAction == triggerAction then
         o.oThwompSquishTimer = 0
@@ -233,12 +246,13 @@ function obj_squish_on_action_enter(o, triggerAction, x, y, z)
         o.oThwompBaseScale   = o.header.gfx.scale.x
     end
     if (o.oThwompSquishDur or 0) > 0 and (o.oThwompSquishTimer or 0) <= o.oThwompSquishDur then
-        r96lib.squish_apply(o, o.oThwompSquishTimer, o.oThwompSquishDur, x, y, z, o.oThwompBaseScale, nil)
+        r96lib.squish_apply(o, o.oThwompSquishTimer, o.oThwompSquishDur, intensityX, intensityY, intensityZ, o.oThwompBaseScale, nil)
         o.oThwompSquishTimer = o.oThwompSquishTimer + 1
     end
     o.oThwompPrevAction = o.oAction
 end
 
+---@param o Object
 function obj_kill_common(o)
     spawn_mist_particles_variable(0, 0, 100.0)
     spawn_triangle_break_particles(20, 138, 3.0, 4)
@@ -246,6 +260,18 @@ function obj_kill_common(o)
     obj_mark_for_deletion(o)
 end
 
+---@param o Object
+---@param numCoins integer
+function obj_spawn_blue_coins(o, numCoins)
+    o.oNumLootCoins = numCoins
+    obj_spawn_loot_blue_coins(o, numCoins, 20, 150)
+end
+
+---@param o Object
+---@param closeMin integer
+---@param closeMax integer
+---@param openMin integer
+---@param openMax integer
 function obj_update_eye_blink(o, closeMin, closeMax, openMin, openMax)
     o.oSwitchTimer1 = o.oSwitchTimer1 - 1
     if o.oSwitchTimer1 <= 0 then
@@ -294,6 +320,7 @@ function push_mario_out_of_object(m, o, padding)
     end
 end
 
+---@param o Object
 function nearest_tangible_mario_state_to_object(o)
     local nearestDist = 0
     local nearestMario = nil
@@ -310,33 +337,43 @@ function nearest_tangible_mario_state_to_object(o)
     return nearestMario
 end
 
--- returns integer instead of bool to match signature of `is_player_in_local_area`
-function is_other_player_in_local_area()
+-- !!! Use this function only for code that runs for every player !!!
+-- How it works is simple: if the local Mario's age is greater than everyone
+-- else in the level, it means it's the one that entered the level first
+-- (assuming nothing changes Mario's object oTimer).
+function should_spawn_sync_objects()
+    local marioAge = gMarioStates[0].marioObj.oTimer
     for i = 1, MAX_PLAYERS - 1 do
         local m = gMarioStates[i]
-        if is_player_in_local_area(m) == 1 then
-            return 1
+        if is_player_in_local_area(m) == 1 and m.marioObj.oTimer > marioAge then
+            return false
         end
     end
-    return 0
+    return true
 end
 
 -------------------
 -- Geo functions --
 -------------------
 
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_switch_state_1(node, matStackIndex)
     local o = geo_get_current_object()
     if o == nil then return end
     cast_graph_node(node).selectedCase = o.oSwitchState1
 end
 
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_switch_state_2(node, matStackIndex)
     local o = geo_get_current_object()
     if o == nil then return end
     cast_graph_node(node).selectedCase = o.oSwitchState2
 end
 
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_function_disable_billboard(node, matStackIndex)
     local o = geo_get_current_object()
     if o == nil then return end
@@ -392,8 +429,10 @@ end
 
 ---@param id BehaviorId|number|nil
 ---@param override boolean
----@param init function?
----@param loop function?
+---@param init? function
+---@param loop? function
+---@param list? ObjectList
+---@param name? string
 function hook_render96_behavior(id, override, init, loop, list, name)
     if id ~= nil then
         list = list or get_object_list_from_behavior(get_behavior_from_id(id))
@@ -426,6 +465,7 @@ require("/behaviors/golden-coin")
 require("/behaviors/goomba")
 require("/behaviors/heave-ho")
 require("/behaviors/king-bobomb")
+require("/behaviors/koopa")
 require("/behaviors/koopa-shell")
 require("/behaviors/koopa-the-quick")
 require("/behaviors/luigi-key")

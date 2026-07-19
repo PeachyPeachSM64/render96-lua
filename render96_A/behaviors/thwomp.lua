@@ -7,7 +7,6 @@ require("/constants")
 
 ---@param o Object
 local function bhv_thwomp_render96_init(o)
-    network_init_object(o, false, {'oHealth'})
     o.oSwitchState2 = 0
     o.oThwompShakeTicks = 18
     o.oThwompPosMag = 25.0
@@ -23,6 +22,8 @@ local function bhv_thwomp_render96_init(o)
     o.collisionData = smlua_collision_util_get("thwomp_collision")
     o.oNumLootCoins = 5
     obj_set_home(o, o.oPosX, o.oPosY, o.oPosZ)
+
+    network_init_object(o, false, {'oHealth'})
 end
 
 ---@param o Object

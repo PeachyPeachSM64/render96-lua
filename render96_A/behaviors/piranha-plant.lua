@@ -6,7 +6,7 @@ local _min = math.min
 -- Behavior functions --
 ------------------------
 
-local sPiranhaPlantBiteFrames = { 12, 28, 50, 64 }
+local PIRANHA_PLANT_BITE_FRAMES = { 12, 28, 50, 64 }
 
 ---@param o Object
 local function bhv_piranha_plant_render96_init(o)
@@ -18,7 +18,7 @@ local function bhv_piranha_plant_render96_loop(o)
     local frame = o.header.gfx.animInfo.animFrame
     if o.oAction == PIRANHA_PLANT_ACT_BITING then
         local faceState = 0
-        for _, biteFrame in ipairs(sPiranhaPlantBiteFrames) do
+        for _, biteFrame in ipairs(PIRANHA_PLANT_BITE_FRAMES) do
             local delta = frame - biteFrame
             if delta >= -9 and delta <= 9 then
                 if delta < 0 then

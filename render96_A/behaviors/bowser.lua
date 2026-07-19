@@ -27,7 +27,7 @@ id_bhvRender96Bowser = hook_render96_behavior(id_bhvBowser, false, nil, bhv_bows
 -- Geo functions --
 -------------------
 
-local sBowserColorMeshes = {
+local BOWSER_COLOR_MESHES = {
     "bowser_spine_mesh_layer_1",
     "bowser_head_mesh_layer_1",
     "bowser_left_foot_mesh_layer_1",
@@ -95,6 +95,7 @@ local function bowser_state(o, ...)
     return false
 end]]
 
+---@param node GraphNode
 local function bowser_eyelid_common(node)
     local o = geo_get_current_object()
     if o == nil then return end
@@ -112,6 +113,11 @@ local function bowser_eyelid_common(node)
     end
 end
 
+---@param node GraphNode
+---@param yawMin integer
+---@param yawMax integer
+---@param pitchMin integer
+---@param pitchMax integer
 local function bowser_eye_common(node, yawMin, yawMax, pitchMin, pitchMax)
     local o = geo_get_current_object()
     if o == nil then return end
@@ -131,12 +137,15 @@ local function bowser_eye_common(node, yawMin, yawMax, pitchMin, pitchMax)
     rotN.rotation.z = yaw & 0xFFFF
 end
 
+---@param node GraphNode
 local function bowser_hand_switch(node)
     local o = geo_get_current_object()
     if o == nil then return end
     cast_graph_node(node).selectedCase = (o.oAction == 15) and 1 or 0
 end
 
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_function_bowser_color(node, matStackIndex)
     local o = geo_get_current_object()
     if o == nil then return end
@@ -153,17 +162,37 @@ function geo_function_bowser_color(node, matStackIndex)
         o.oColorB = 0
     end
 
-    for i = 1, #sBowserColorMeshes do
+    for i = 1, #BOWSER_COLOR_MESHES do
         r96lib.gfx_color_patch_by_name(node, {
-            origDl = sBowserColorMeshes[i]
+            origDl = BOWSER_COLOR_MESHES[i]
         })
     end
 end
 
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_function_bowser_hair(node, matStackIndex) end
+
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_function_bowser_left_eye(node, matStackIndex) bowser_eye_common(node, 0x2000, 0x0500, 0x0500, 0x1500) end
+
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_function_bowser_left_eyelid(node, matStackIndex) bowser_eyelid_common(node) end
+
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_function_bowser_left_hand(node, matStackIndex)  bowser_hand_switch(node) end
+
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_function_bowser_right_eye(node, matStackIndex) bowser_eye_common(node, 0x0500, 0x2000, 0x0500, 0x1500) end
+
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_function_bowser_right_eyelid(node, matStackIndex) bowser_eyelid_common(node) end
+
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_function_bowser_right_hand(node, matStackIndex) bowser_hand_switch(node) end

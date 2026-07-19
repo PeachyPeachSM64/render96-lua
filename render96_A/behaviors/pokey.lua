@@ -13,8 +13,10 @@ end
 local function bhv_pokey_render96_loop(o)
     local player = nearest_player_to_object(o)
     local angleToPlayer = obj_angle_to_object(o, player)
-    o.oFaceAngleYaw =  angleToPlayer
-    if o.oPosX < -2000 then -- TODO: WTF? Only some pokeys get the boxart model?
+    o.oFaceAngleYaw = angleToPlayer
+
+    local np = gNetworkPlayers[0]
+    if np.currLevelNum == LEVEL_SSL and o.oPosX < -2000 then -- the pokeys behind the pyramid
         if o.oBehParams2ndByte == 0 then
             obj_set_model_extended(o, E_MODEL_POKEY_HEAD_BOXART)
         else

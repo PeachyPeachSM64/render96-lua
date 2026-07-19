@@ -4,6 +4,7 @@ require("/constants")
 -- Behavior functions --
 ------------------------
 
+---@param o Object
 local function bhv_breakable_box_render96_loop(o)
     local dist = obj_has_behavior_id(o, id_bhvBreakableBox) == 1 and 240 or 120
     if obj_hit_by_wario_charge(o, dist) then
@@ -12,6 +13,7 @@ local function bhv_breakable_box_render96_loop(o)
     end
 end
 
+---@param o Object
 local function bhv_breakable_box_small_render96_loop(o)
     if obj_hit_by_wario_charge(o, 120) then
         o.oInteractStatus = (ATTACK_KICK_OR_TRIP | INT_STATUS_INTERACTED | INT_STATUS_WAS_ATTACKED | INT_STATUS_STOP_RIDING) -- break flags

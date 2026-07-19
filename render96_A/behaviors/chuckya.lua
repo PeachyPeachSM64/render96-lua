@@ -7,7 +7,7 @@ require("/constants")
 ---@param o Object
 function bhv_chuckya_heaveho_render96_loop(o)
     if obj_hit_by_wario_charge(o, 200) then
-        spawn_sync_object(id_bhvBlueCoinJumping, E_MODEL_BLUE_COIN, o.oPosX, o.oPosY, o.oPosZ, nil)
+        obj_spawn_blue_coins(o, 1)
         create_sound_spawner(SOUND_OBJ_CHUCKYA_DEATH)
         obj_kill_common(o)
     end
@@ -19,6 +19,8 @@ id_bhvRender96Chuckya = hook_render96_behavior(id_bhvChuckya, false, nil, bhv_ch
 -- Geo functions --
 -------------------
 
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_function_chuckya_spin(node, matStackIndex)
     local o = geo_get_current_object()
     if o == nil then return end

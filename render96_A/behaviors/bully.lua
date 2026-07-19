@@ -40,8 +40,8 @@ local function bhv_big_chill_bully_with_minions_render96_loop(o)
         bhv_big_bully_with_minions_loop()
 
         -- spawn minions
-        -- sync objects can't be spawned in init
-        if is_other_player_in_local_area() == 0 then
+        -- sync objects can't be spawned during init (not sync valid)
+        if should_spawn_sync_objects() then
             if o.oSubAction == 0 then
                 for _, pos in ipairs({
                     {x = 125, y = 1331, z = -4100},
@@ -77,6 +77,11 @@ local function bhv_big_chill_bully_with_minions_render96_loop(o)
                 obj_mark_for_deletion(bully)
             end
             bully = obj_get_next_with_same_behavior_id(bully)
+        end
+
+        -- sync death (the game just seems to forget sometimes)
+        if o.oAction == BULLY_ACT_LAVA_DEATH then
+            network_send_object(o, true)
         end
     end
     bhv_bully_render96_loop(o)

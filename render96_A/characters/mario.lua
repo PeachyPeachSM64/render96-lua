@@ -9,6 +9,7 @@ require("/constants")
 -- Actions --
 -------------
 
+---@param m MarioState
 local function act_jump_no_control_height(m)
     if check_kick_or_dive_in_air(m) == 1 then
         return 1
@@ -27,6 +28,7 @@ end
 -- Hooks --
 -----------
 
+---@param m MarioState
 local function open_hands_during_jumbo_star_flying(m)
     if m.action == ACT_JUMBO_STAR_CUTSCENE and m.actionArg == 2 then -- JUMBO_STAR_CUTSCENE_FLYING
         m.marioBodyState.handState = MARIO_HAND_OPEN
@@ -65,10 +67,10 @@ local R96_FACE_HAPPY = 3
 local R96_FACE_ANGRY = 4
 local R96_FACE_OPEN = 5
 
-local sMarioBlinkAnimation = { 0, 1, 2, 1, 0, 1, 2, 1, 0 }
+local MARIO_BLINK_STATES = { 0, 1, 2, 1, 0, 1, 2, 1, 0 }
 
 -- blink twice then have half-shut eyes (see end_peach_cutscene_kiss_from_peach)
-local sMarioBlinkEnding = {
+local MARIO_BLINK_ENDING = {
     [90]  = R96_EYES_HALF_CLOSED,
     [92]  = R96_EYES_CLOSED,
     [94]  = R96_EYES_HALF_CLOSED,
@@ -81,6 +83,8 @@ local sMarioBlinkEnding = {
     [108] = R96_EYES_CLOSED,
 }
 
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_switch_mario_eye_custom(node, matStackIndex)
     local switchCase = cast_graph_node(node) ---@type GraphNodeSwitchCase
     local m = geo_get_mario_state()
@@ -89,7 +93,7 @@ function geo_switch_mario_eye_custom(node, matStackIndex)
     local marioHealth = m.health
 
     if m.actionArg == 8 then -- END_PEACH_CUTSCENE_KISS_FROM_PEACH
-        local eye_sync = sMarioBlinkEnding[m.actionTimer]
+        local eye_sync = MARIO_BLINK_ENDING[m.actionTimer]
         if eye_sync then switchCase.selectedCase = eye_sync end
         if m.actionTimer == 75  then switchCase.selectedCase = R96_EYES_HALF_CLOSED end
         if m.actionTimer == 76  then switchCase.selectedCase = R96_EYES_CLOSED end
@@ -119,7 +123,7 @@ function geo_switch_mario_eye_custom(node, matStackIndex)
         end
 
         if gMarioEyeBlinkable[marioAction] then
-            switchCase.selectedCase = sMarioBlinkAnimation[m.marioObj.oMarioBlinkFrame + 1]
+            switchCase.selectedCase = MARIO_BLINK_STATES[m.marioObj.oMarioBlinkFrame + 1]
         else
             m.marioObj.oMarioBlinkFrame = 1
             m.marioObj.oMarioBlinkTimer = 0
@@ -169,6 +173,8 @@ function geo_switch_mario_eye_custom(node, matStackIndex)
     end
 end
 
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_switch_mario_face(node, matStackIndex)
     local switchCase = cast_graph_node(node) ---@type GraphNodeSwitchCase
     local m = geo_get_mario_state()

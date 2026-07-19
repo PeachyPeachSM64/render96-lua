@@ -2,6 +2,8 @@
 -- Define here features that require a specific sm64coopdx version --
 ---------------------------------------------------------------------
 
+---@param major integer
+---@param minor integer
 local function require_version(major, minor)
     return (
         (VERSION_NUMBER > major) or

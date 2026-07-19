@@ -5,7 +5,7 @@ TEX_MARIO_CAKE  = get_texture_info("cake")
 TEX_LUIGI_CAKE  = get_texture_info("cake_luigi")
 TEX_WARIO_CAKE  = get_texture_info("cake_wario")
 
-local sCakeScreen = {
+local CAKE_SCREEN_TEXTURES = {
     [CT_MARIO] = TEX_MARIO_CAKE,
     [CT_LUIGI] = TEX_LUIGI_CAKE,
     [CT_WARIO] = TEX_WARIO_CAKE
@@ -17,7 +17,7 @@ local function get_current_character_cake_texture()
     end
 
     local charNum = charSelect.character_get_current_number()
-    return sCakeScreen[charNum]
+    return CAKE_SCREEN_TEXTURES[charNum]
 end
 
 local function render_character_end_screen()

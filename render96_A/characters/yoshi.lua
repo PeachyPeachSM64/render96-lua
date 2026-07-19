@@ -5,11 +5,11 @@ local _max  = math.max
 local _min  = math.min
 local _sqrt = math.sqrt
 
-local sYoshiFlutterJumpActions = {
+local YOSHI_FLUTTER_JUMP_ACTIONS = {
     [ACT_YOSHI_RIDE_JUMP] = true,
 }
 
-local sYoshiRideActions = {
+local YOSHI_RIDE_ACTIONS = {
     [ACT_YOSHI_RIDE_IDLE] = true,
     [ACT_YOSHI_RIDE_WALK] = true,
     [ACT_YOSHI_RIDE_JUMP] = true,
@@ -17,7 +17,7 @@ local sYoshiRideActions = {
     [ACT_YOSHI_RIDE_FALL] = true,
 }
 
-local sYoshiTongueBehaviors = {
+local YOSHI_TONGUE_BEHAVIORS = {
     [id_bhvRender96Goomba] = true,
     [id_bhvBobomb] = true,
 }
@@ -83,13 +83,13 @@ local function yoshi_walk_speed(m)
 end
 
 ---@param m MarioState
-local function tongue_find_target(m)
+local function yoshi_tongue_find_target(m)
     local bestObj, bestDist = nil, TONGUE_RADIUS
     local o = obj_get_first(OBJ_LIST_GENACTOR)
 
     while o ~= nil do
         local isEnemy = false
-        for behId in pairs(sYoshiTongueBehaviors) do
+        for behId in pairs(YOSHI_TONGUE_BEHAVIORS) do
            -- obj_get_nearest_object_with_behavior_id()
             if obj_has_behavior_id(o, behId) == 1 and dist_between_objects(o, m.marioObj) <= 200 then break end
         end
@@ -110,7 +110,7 @@ end
 
 ---@param m MarioState
 local function yoshi_tongue_attack(m)
-    local target = tongue_find_target(m)
+    local target = yoshi_tongue_find_target(m)
     local tongue = spawn_non_sync_object(id_bhvRender96YoshiTongue, E_MODEL_YOSHI_TONGUE,
         m.marioObj.oPosX, m.marioObj.oPosY + 60.0, m.marioObj.oPosZ, nil)
 
@@ -130,6 +130,7 @@ end
 -- Actions --
 -------------
 
+---@param m MarioState
 local function act_yoshi_ride_idle(m)
     if yoshi_dismount(m) then
         return 1
@@ -151,6 +152,7 @@ local function act_yoshi_ride_idle(m)
     mario_set_forward_vel(m, 0)
 end
 
+---@param m MarioState
 local function act_yoshi_ride_walk(m)
     if yoshi_dismount(m) then
         return 1
@@ -179,6 +181,7 @@ local function act_yoshi_ride_walk(m)
     if (m.input & INPUT_NONZERO_ANALOG) ~= 0 and m.forwardVel <= 5 then mario_set_forward_vel(m, 5) end
 end
 
+---@param m MarioState
 local function act_yoshi_ride_jump(m)
     if yoshi_dismount(m) then
         return 1
@@ -258,8 +261,9 @@ end
 -- Hooks --
 -----------
 
+---@param m MarioState
 local function yoshi_check_flutter_jump(m)
-    if (sYoshiFlutterJumpActions[m.action] and
+    if (YOSHI_FLUTTER_JUMP_ACTIONS[m.action] and
         m.prevAction & ACT_FLAG_AIR == 0 and
         m.input & INPUT_A_DOWN ~= 0 and
         m.vel.y < 0) then
@@ -269,7 +273,7 @@ end
 
 ---@param m MarioState
 local function yoshi_update(m)
-    if sYoshiRideActions[m.action] and (m.input & INPUT_B_PRESSED) ~= 0 then
+    if YOSHI_RIDE_ACTIONS[m.action] and (m.input & INPUT_B_PRESSED) ~= 0 then
         yoshi_tongue_attack(m)
     end
 end

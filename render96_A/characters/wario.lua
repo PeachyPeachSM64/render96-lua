@@ -11,7 +11,7 @@ local _floor = math.floor
 local _max   = math.max
 local _min   = math.min
 
-local sBehaviorsNoCoin = {
+local BEHAVIORS_NO_GREEN_COIN = {
     id_bhvMips,
     id_bhvUkiki,
     id_bhvBreakableBoxSmall,
@@ -142,7 +142,7 @@ end
 
 ---@param o Object
 local function wario_swing_fling_spin_should_spawn_coins(o)
-    for _, bhv in ipairs(sBehaviorsNoCoin) do
+    for _, bhv in ipairs(BEHAVIORS_NO_GREEN_COIN) do
         if obj_has_behavior_id(o, bhv) == 1 then return false end
     end
     return true
@@ -887,6 +887,16 @@ local function wario_update(m)
     if (m.action == ACT_WALKING) and m.forwardVel >= 29 and m.floor ~= nil then
         set_mario_particle_flags(m, PARTICLE_DUST, 0)
     end
+
+    -- Grab animation
+    local o = m.marioObj
+    local lightGrabAnim = gWarioGrabLightAnims[o.header.gfx.animInfo.animID]
+    if lightGrabAnim then
+        smlua_anim_util_set_animation(o, lightGrabAnim)
+        o.oSwitchState1 = 1
+    else
+        o.oSwitchState1 = 0
+    end
 end
 
 hook_event(HOOK_ON_MODS_LOADED, function ()
@@ -916,6 +926,8 @@ hook_mario_action(ACT_WARIO_GROUND_POUND,       act_wario_ground_pound, INT_GROU
 -- Behavior functions --
 ------------------------
 
+---@param o Object
+---@param dist number
 function obj_hit_by_wario_charge(o, dist)
     for i = 0, MAX_PLAYERS - 1 do
         local m = gMarioStates[i]
@@ -926,10 +938,11 @@ function obj_hit_by_wario_charge(o, dist)
     return false
 end
 
+---@param o Object
 function obj_ground_pounded_by_wario(o)
     for i = 0, MAX_PLAYERS - 1 do
         local m = gMarioStates[i]
-        if m.character.type == CT_WARIO and is_player_active(m) == 1 and obj_is_mario_ground_pounding_platform(m, o) == 1 then
+        if charSelect.character_get_current_number(i) == CT_WARIO and is_player_active(m) == 1 and obj_is_mario_ground_pounding_platform(m, o) == 1 then
             return true
         end
     end
@@ -940,14 +953,10 @@ end
 -- Geo functions --
 -------------------
 
+---@param node GraphNode
+---@param matStackIndex integer
 function geo_switch_held_obj(node, matStackIndex)
     local o = geo_get_current_object()
     if o == nil then return end
     cast_graph_node(node).selectedCase = o.oSwitchState1
-    if gWarioGrabLightAnims[o.header.gfx.animInfo.animID] then
-        smlua_anim_util_set_animation(o, gWarioGrabLightAnims[o.header.gfx.animInfo.animID])
-        o.oSwitchState1 = 1
-    else
-        o.oSwitchState1 = 0
-    end
 end

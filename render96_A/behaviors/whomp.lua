@@ -1,8 +1,18 @@
 require("/constants")
 
+local _clamp = math.clamp
+
 ------------------------
 -- Behavior functions --
 ------------------------
+
+---@param o Object
+local function bhv_whomp_render96_init(o)
+    o.oThwompPrevAction = o.oAction or 0
+    o.oThwompSquishTimer = 0
+    o.oThwompSquishDur = 0
+    o.oThwompBaseScale = o.header.gfx.scale.x
+end
 
 ---@param o Object
 local function bhv_whomp_render96_loop(o)
@@ -17,20 +27,10 @@ local function bhv_whomp_render96_loop(o)
 end
 
 ---@param o Object
-local function bhv_whomp_render96_init(o)
-    o.oThwompPrevAction = o.oAction or 0
-    o.oThwompSquishTimer = 0
-    o.oThwompSquishDur = 0
-    o.oThwompBaseScale = o.header.gfx.scale.x
-end
-
----@param o Object
 local function bhv_whomp_king_render96_loop(o)
     obj_squish_on_action_enter(o, 5, 0.15, 0.15, -0.3)  -- bugfix: now correctly resets on re-entry
 
-    if o.oHealth == 3 then o.oSwitchState1 = 0 end
-    if o.oHealth == 2 then o.oSwitchState1 = 1 end
-    if o.oHealth == 1 then o.oSwitchState1 = 2 end
+    o.oSwitchState1 = _clamp(3 - o.oHealth, 0, 2)
     o.oThwompPrevAction = o.oAction
 end
 

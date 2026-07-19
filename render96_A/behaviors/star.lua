@@ -1,6 +1,8 @@
 local r96lib = require("/lib/r96lib")
 require("/constants")
 
+local _floor = math.floor
+
 ------------------------
 -- Behavior functions --
 ------------------------
@@ -9,14 +11,13 @@ require("/constants")
 local function is_star_collected(o)
     local starId = o.oBehParams >> 24
     local currentLevelStarFlags = save_file_get_star_flags(get_current_save_file_num() - 1,
-    (gLevelValues.useGlobalStarIds ~= 0 and (starId / 7) - 1 or gNetworkPlayers[0].currCourseNum - 1))
+    (gLevelValues.useGlobalStarIds ~= 0 and (_floor(starId / 7) - 1) or (gNetworkPlayers[0].currCourseNum - 1)))
     local starBit = gLevelValues.useGlobalStarIds and (starId % 7) or starId
     return currentLevelStarFlags & (1 << starBit) ~= 0
 end
 
 ---@param o Object
 local function bhv_star_render96_init(o)
-    --if o.oInteractType ~= INTERACT_STAR_OR_KEY then return end
     if not is_star_collected(o) or obj_has_behavior_id(o, id_bhvCelebrationStar) == 1 then
         spawn_non_sync_object(id_bhvRender96StarParticle, E_MODEL_STAR_PARTICLE, o.oPosX, o.oPosY, o.oPosZ, function(o2)
             o2.parentObj = o

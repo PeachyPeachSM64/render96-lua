@@ -10,7 +10,7 @@ local _pi     = math.pi
 
 r96lib = {}
 
-r96lib.customObjectFields = {
+r96lib.CUSTOM_OBJECT_FIELDS = {
     oColorR        = 's32',
     oColorG        = 's32',
     oColorB        = 's32',
@@ -19,7 +19,7 @@ r96lib.customObjectFields = {
     oShakeBasePosZ = 'f32',
 }
 
-define_custom_obj_fields(r96lib.customObjectFields)
+define_custom_obj_fields(r96lib.CUSTOM_OBJECT_FIELDS)
 
 --- For VSCode autocompletion
 --- @class Object
@@ -34,7 +34,7 @@ define_custom_obj_fields(r96lib.customObjectFields)
 -- Audio --
 -----------
 
-local objSoundData = {}
+local sObjSoundData = {}
 
 -- Emulates a ModAudio Stream being attached to an object, including doppler effects for non-music
 ---@param o Object The object the audio is from
@@ -54,8 +54,8 @@ function r96lib.audio_fade(o, audioStream, rangeMin, rangeMax, isMusic, loopingS
     local wallInterupt = collision_find_surface_on_ray(m.pos.x, m.pos.y + 70, m.pos.z, o.oPosX - m.pos.x, (o.oPosY + o.hitboxHeight*0.5) - (m.pos.y + 70), o.oPosZ - m.pos.z, 128).surface ~= nil
     local objDist = _sqrt((o.oPosX - m.pos.x)^2 + (o.oPosY - m.pos.y)^2 + (o.oPosZ - m.pos.z)^2) * (wallInterupt and 2 or 1)
 
-    if not objSoundData[audioStream._pointer] then
-        objSoundData[audioStream._pointer] = {
+    if not sObjSoundData[audioStream._pointer] then
+        sObjSoundData[audioStream._pointer] = {
             audioStream = audioStream,
             volume = 0,
             nearestObj = nil,
@@ -73,7 +73,7 @@ function r96lib.audio_fade(o, audioStream, rangeMin, rangeMax, isMusic, loopingS
     rangeMin = rangeMin or hitbox*5
     rangeMax = rangeMax or hitbox*25
 
-    local audioData = objSoundData[audioStream._pointer]
+    local audioData = sObjSoundData[audioStream._pointer]
     if audioData.nearestObj == nil or (objDist < audioData.nearestDist) then
         audioData.nearestObj = o
         audioData.nearestDist = objDist
@@ -83,7 +83,7 @@ function r96lib.audio_fade(o, audioStream, rangeMin, rangeMax, isMusic, loopingS
 end
 
 local function update_obj_audio()
-    for _, audioData in pairs(objSoundData) do
+    for _, audioData in pairs(sObjSoundData) do
         if audioData.isMusic then
             if not audio_stream_get_looping(audioData.audioStream) then
                 audio_stream_set_looping(audioData.audioStream, true)
@@ -333,6 +333,7 @@ local function spawn_objects()
     local area   = gNetworkPlayers[0].currAreaIndex
     local actNum = gNetworkPlayers[0].currActNum
     local entries = sSpawnTable[level] and sSpawnTable[level][area]
+    local spawnSyncObjects = should_spawn_sync_objects()
     if not entries then return end
     for i, entry in ipairs(entries) do
         if act_matches(entry.actMask, actNum) then
@@ -342,7 +343,7 @@ local function spawn_objects()
                 local spawnFn
                 if not entry.isSync then
                     spawnFn = spawn_non_sync_object
-                elseif is_other_player_in_local_area() == 0 then -- do not spawn a sync object again in an already loaded level
+                elseif spawnSyncObjects then
                     spawnFn = spawn_sync_object
                 end
                 if spawnFn then

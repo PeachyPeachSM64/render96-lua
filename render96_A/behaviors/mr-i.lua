@@ -15,7 +15,7 @@ local MR_I_DEATH_THRESHOLD = 4 * _pi
 local MR_I_FOV_THRESHOLD = degrees_to_sm64(30)
 local MR_I_CIRCLE_MIN_DELTA = 200
 
-local sMrIBlinkStates = { 0, 1, 2, 3, 4, 3, 2, 1, 0 }
+local MR_I_BLINK_STATES = { 0, 1, 2, 3, 4, 3, 2, 1, 0 }
 
 ---@param o Object
 local function bhv_mr_i_render96_init(o)
@@ -75,8 +75,7 @@ local function bhv_mr_i_render96_init(o)
 end
 
 ---@param o Object
----@param player Object
-local function bhv_mr_i_render96_fire(o, player)
+local function bhv_mr_i_render96_fire(o)
     local yaw   = o.oFaceAngleYaw
     local pitch = o.oFaceAnglePitch
     local speed = 25.0
@@ -102,11 +101,10 @@ local function bhv_mr_i_render96_fire(o, player)
 end
 
 ---@param o Object
----@param player Object
 ---@param dist number
 ---@param angleToPlayer integer
 ---@param angleDiff integer
-local function bhv_mr_i_render96_track(o, player, dist, angleToPlayer, angleDiff)
+local function bhv_mr_i_render96_track(o, dist, angleToPlayer, angleDiff)
     if dist > o.oMrIDetectRadius or angleDiff > MR_I_FOV_THRESHOLD then
         o.oMrITracking = 0
         o.oMrILastAngle = angleToPlayer
@@ -137,20 +135,20 @@ local function bhv_mr_i_render96_attack(o, player, dist, angleToPlayer, angleDif
         o.oSwitchTimer1 = o.oSwitchTimer1 - 1
         if o.oSwitchTimer1 <= 0 then
             o.oMrIBlinkIndex = o.oMrIBlinkIndex + 1
-            if o.oMrIBlinkIndex > #sMrIBlinkStates then
+            if o.oMrIBlinkIndex > #MR_I_BLINK_STATES then
                 o.oMrIBlinkIndex = 1
                 o.oMrIFireTimer = 0
             else
-                o.oSwitchState2 = sMrIBlinkStates[o.oMrIBlinkIndex]
+                o.oSwitchState2 = MR_I_BLINK_STATES[o.oMrIBlinkIndex]
             end
             if o.oSwitchState2 == 4 then
-                bhv_mr_i_render96_fire(o, player)
+                bhv_mr_i_render96_fire(o)
             end
             o.oSwitchTimer1 = 2
         end
     end
 
-    bhv_mr_i_render96_track(o, player, dist, angleToPlayer, angleDiff)
+    bhv_mr_i_render96_track(o, dist, angleToPlayer, angleDiff)
     if o.oMrITracking >= MR_I_DEATH_THRESHOLD then
         o.oAction = MR_I_DIZZY
         o.oMrIDizzyTimer = 0
@@ -183,7 +181,8 @@ end
 local function bhv_mr_i_render96_dead(o)
     spawn_mist_particles()
     if o.oBehParams2ndByte == 0x01 then
-        spawn_default_star(1370, 2000.0, -320.0)
+        local starPos = gLevelValues.starPositions.MrIStarPos
+        spawn_default_star(starPos.x, starPos.y, starPos.z)
     else
         cur_obj_spawn_loot_blue_coin()
     end
@@ -202,11 +201,11 @@ local function bhv_mr_i_render96_idle(o, player, dist, angleToPlayer, angleDiff)
     o.oSwitchTimer1 = o.oSwitchTimer1 - 1
     if o.oSwitchTimer1 <= 0 then
         o.oMrIBlinkIndex = o.oMrIBlinkIndex + 1
-        if o.oMrIBlinkIndex > #sMrIBlinkStates then
+        if o.oMrIBlinkIndex > #MR_I_BLINK_STATES then
             o.oMrIBlinkIndex = 1
             o.oSwitchTimer1 = _random(30, 100)
         else
-            o.oSwitchState2 = sMrIBlinkStates[o.oMrIBlinkIndex]
+            o.oSwitchState2 = MR_I_BLINK_STATES[o.oMrIBlinkIndex]
             o.oSwitchTimer1 = 2
         end
     end
@@ -265,16 +264,15 @@ end
 local function bhv_mr_i_render96_fire_particle_loop(o)
     cur_obj_move_using_fvel_and_gravity()
     cur_obj_update_floor_and_walls()
-    o.oAnimState = _floor(_random() * 10)
+
     if (o.oInteractStatus & INT_STATUS_INTERACTED) ~= 0
         or o.oTimer >= 101
-        or (o.oMoveFlags & OBJ_MOVE_LANDED) ~= 0
-        or (o.oMoveFlags & OBJ_MOVE_HIT_WALL) ~= 0
-        or (o.oMoveFlags & OBJ_MOVE_MASK_IN_WATER) ~= 0
+        or (o.oMoveFlags & (OBJ_MOVE_LANDED | OBJ_MOVE_HIT_WALL | OBJ_MOVE_MASK_IN_WATER)) ~= 0
         or (o.activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM) ~= 0 then
         spawn_mist_particles()
         obj_mark_for_deletion(o)
     end
+    o.oAnimState = _floor(_random() * 10)
     o.oInteractStatus = 0
 end
 
@@ -308,9 +306,7 @@ local function bhv_mr_i_render96_particle_loop(o)
 
     if (o.oInteractStatus & INT_STATUS_INTERACTED) ~= 0
         or o.oTimer >= 101
-        or (o.oMoveFlags & OBJ_MOVE_LANDED) ~= 0
-        or (o.oMoveFlags & OBJ_MOVE_HIT_WALL) ~= 0
-        or (o.oMoveFlags & OBJ_MOVE_MASK_IN_WATER) ~= 0
+        or (o.oMoveFlags & (OBJ_MOVE_LANDED | OBJ_MOVE_HIT_WALL | OBJ_MOVE_MASK_IN_WATER)) ~= 0
         or (o.activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM) ~= 0 then
         spawn_mist_particles()
         obj_mark_for_deletion(o)

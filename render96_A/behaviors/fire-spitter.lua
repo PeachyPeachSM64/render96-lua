@@ -18,7 +18,10 @@ local function bhv_fire_spitter_render96_loop(o)
     local angleToPlayer = obj_angle_to_object(o, player)
     o.oFaceAngleYaw = angleToPlayer
     if o.oAction == FIRE_SPITTER_ACT_IDLE then
-        if o.oTimer < 20 then o.oSwitchState1 = 2 o.header.gfx.scale.x = 0.15 end
+        if o.oTimer < 20 then
+            o.oSwitchState1 = 2
+            o.header.gfx.scale.x = 0.15
+        end
         if o.oTimer > 20 and o.oTimer < 50 then
             o.oSwitchState1 = 3
             if o.oTimer % 5 == 0 then

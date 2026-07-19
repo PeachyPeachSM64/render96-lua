@@ -3,18 +3,25 @@ local r96lib = require("/lib/r96lib")
 -- Luigi keys and Wario coins are shared between all players
 -- But only the host actually saves them to their save file
 
+---@param name string
+---@param index integer
 local function check_collectible(name, index)
     return r96lib.check_data(gGlobalSyncTable[name], index)
 end
 
+---@param name string
 local function count_collectible(name)
     return r96lib.count_data(gGlobalSyncTable[name])
 end
 
+---@param name string
 local function load_collectible(name)
     gGlobalSyncTable[name] = r96lib.load_data(name)
 end
 
+---@param name string
+---@param index integer
+---@param value string
 local function update_collectible(name, index, value)
     if network_is_server() or gServerSettings.maxPlayers == 1 then
         gGlobalSyncTable[name] = r96lib.update_data(gGlobalSyncTable[name], index, value)
@@ -29,6 +36,7 @@ local function update_collectible(name, index, value)
     end
 end
 
+---@param name string
 local function create_collectible_entry(name)
     gGlobalSyncTable[name] = r96lib.DATA_DEFAULT
 

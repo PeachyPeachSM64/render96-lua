@@ -4,6 +4,9 @@ require("/constants")
 -- Behavior functions --
 ------------------------
 
+local BOO_SCARED_STATES = { 0, 1, 2, 3, 4, 4, 4 }
+local BOO_HUNT_STATES   = { 4, 4, 4, 3, 2, 1, 0 }
+
 ---@param o Object
 local function bhv_boo_render96_init(o)
     o.oOpacity = 255
@@ -15,14 +18,12 @@ end
 local function bhv_boo_render96_loop(o)
     obj_squish_on_action_enter(o, 2, 0.15, 0.15, -0.3)
 
-    local sBooScared = { 0, 1, 2, 3, 4, 4, 4}
-    local sBooHunt = { 4, 4, 4, 3, 2, 1, 0}
     if o.oOpacity < 255 and o.oSwitchTimer2 < 7 then
         o.oOpacity = 254 - (o.oSwitchTimer2 * 15)
-        o.oSwitchState2 = sBooScared[o.oSwitchTimer2]
+        o.oSwitchState2 = BOO_SCARED_STATES[o.oSwitchTimer2]
         o.oSwitchTimer2 = o.oSwitchTimer2 + 1
     elseif o.oOpacity >= 150 and o.oSwitchTimer2 >= 7 and o.oSwitchTimer2 < 14 then
-        o.oSwitchState2 = sBooHunt[o.oSwitchTimer2 - 6]
+        o.oSwitchState2 = BOO_HUNT_STATES[o.oSwitchTimer2 - 6]
         o.oSwitchTimer2 = o.oSwitchTimer2 + 1
     elseif o.oOpacity == 255 and o.oSwitchTimer2 == 14 then
         o.oSwitchState2 = 0

@@ -337,21 +337,6 @@ function nearest_tangible_mario_state_to_object(o)
     return nearestMario
 end
 
--- !!! Use this function only for code that runs for every player !!!
--- How it works is simple: if the local Mario's age is greater than everyone
--- else in the level, it means it's the one that entered the level first
--- (assuming nothing changes Mario's object oTimer).
-function should_spawn_sync_objects()
-    local marioAge = gMarioStates[0].marioObj.oTimer
-    for i = 1, MAX_PLAYERS - 1 do
-        local m = gMarioStates[i]
-        if is_player_in_local_area(m) == 1 and m.marioObj.oTimer > marioAge then
-            return false
-        end
-    end
-    return true
-end
-
 -------------------
 -- Geo functions --
 -------------------

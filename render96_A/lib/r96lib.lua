@@ -1,4 +1,5 @@
 local version = require("version")
+local osync = require("osync")
 
 local _floor  = math.floor
 local _max    = math.max
@@ -329,34 +330,30 @@ local function make_key(level, area, actNum, index)
 end
 
 local function spawn_objects()
-    local level  = gNetworkPlayers[0].currLevelNum
-    local area   = gNetworkPlayers[0].currAreaIndex
-    local actNum = gNetworkPlayers[0].currActNum
-    local entries = sSpawnTable[level] and sSpawnTable[level][area]
-    local spawnSyncObjects = should_spawn_sync_objects()
-    if not entries then return end
-    for i, entry in ipairs(entries) do
-        if act_matches(entry.actMask, actNum) then
-            local key = make_key(level, area, actNum, i)
-            if not sSpawnedObjects[key] then
-                sSpawnedObjects[key] = true
-                local spawnFn
-                if not entry.isSync then
-                    spawnFn = spawn_non_sync_object
-                elseif spawnSyncObjects then
-                    spawnFn = spawn_sync_object
-                end
-                if spawnFn then
-                    spawnFn(entry.bhv, entry.model,
-                        entry.x, entry.y, entry.z,
-                        function(o)
-                            obj_set_angle(o, entry.rx, entry.ry, entry.rz)
-                            if entry.spawnFunc then entry.spawnFunc(o) end
-                        end)
+    osync.spawn_sync_objects("spawn_objects", function ()
+        local level  = gNetworkPlayers[0].currLevelNum
+        local area   = gNetworkPlayers[0].currAreaIndex
+        local actNum = gNetworkPlayers[0].currActNum
+        local entries = sSpawnTable[level] and sSpawnTable[level][area]
+        if not entries then return end
+        for i, entry in ipairs(entries) do
+            if act_matches(entry.actMask, actNum) then
+                local key = make_key(level, area, actNum, i)
+                if not sSpawnedObjects[key] then
+                    sSpawnedObjects[key] = true
+                    local spawnFn = entry.isSync and osync.spawn_sync_object or spawn_non_sync_object
+                    if spawnFn then
+                        spawnFn(entry.bhv, entry.model,
+                            entry.x, entry.y, entry.z,
+                            function(o)
+                                obj_set_angle(o, entry.rx, entry.ry, entry.rz)
+                                if entry.spawnFunc then entry.spawnFunc(o) end
+                            end)
+                    end
                 end
             end
         end
-    end
+    end)
 end
 
 local function clear_spawned_objects_and_gfx_data()

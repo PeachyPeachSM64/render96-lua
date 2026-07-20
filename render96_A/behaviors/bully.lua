@@ -1,3 +1,4 @@
+local osync = require("/lib/osync")
 require("/constants")
 
 ------------------------
@@ -30,41 +31,30 @@ local function bhv_big_chill_bully_with_minions_render96_init(o)
     cur_obj_hide()
     cur_obj_become_intangible()
     o.oAction = BULLY_ACT_INACTIVE
-    o.oSubAction = 0
     o.oBullySubtype = BULLY_STYPE_CHILL
+
+    -- spawn minions
+    osync.spawn_sync_objects("bhv_big_chill_bully_with_minions_render96_init", function ()
+        for _, pos in ipairs({
+            {x = 125, y = 1331, z = -4100},
+            {x = 600, y = 1331, z = -4485},
+            {x = 200, y = 1331, z = -4900},
+        }) do
+            osync.spawn_sync_object(id_bhvSmallBully, E_MODEL_CHILL_BULLY, pos.x, pos.y, pos.z, function (bully)
+                obj_set_home(bully, bully.oPosX, bully.oPosY, bully.oPosZ)
+                bully.oGravity = 8
+                bully.parentObj = o
+                bully.oBullySubtype = BULLY_STYPE_MINION
+                bully.oBehParams2ndByte = BULLY_BP_SIZE_SMALL
+            end)
+        end
+    end)
 end
 
 ---@param o Object
 local function bhv_big_chill_bully_with_minions_render96_loop(o)
-    if o.oAction == BULLY_ACT_INACTIVE then
+    if o.oAction == BULLY_ACT_INACTIVE or o.oAction == BULLY_ACT_ACTIVATE_AND_FALL then
         bhv_big_bully_with_minions_loop()
-
-        -- spawn minions
-        -- sync objects can't be spawned during init (not sync valid)
-        if should_spawn_sync_objects() then
-            if o.oSubAction == 0 then
-                for _, pos in ipairs({
-                    {x = 125, y = 1331, z = -4100},
-                    {x = 600, y = 1331, z = -4485},
-                    {x = 200, y = 1331, z = -4900},
-                }) do
-                    local bully = spawn_sync_object(id_bhvSmallBully, E_MODEL_CHILL_BULLY, pos.x, pos.y, pos.z)
-                    if not bully then return end
-                    obj_set_home(bully, bully.oPosX, bully.oPosY, bully.oPosZ)
-                    bully.oGravity = 8
-                    bully.parentObj = o
-                    bully.oBullySubtype = BULLY_STYPE_MINION
-                    bully.oBehParams2ndByte = BULLY_BP_SIZE_SMALL
-                end
-                o.oSubAction = 1
-            end
-        else
-            o.oSubAction = 1
-        end
-
-    elseif o.oAction == BULLY_ACT_ACTIVATE_AND_FALL then
-        bhv_big_bully_with_minions_loop()
-
     else
         o.oIntangibleTimer = 0
         bhv_bully_loop()

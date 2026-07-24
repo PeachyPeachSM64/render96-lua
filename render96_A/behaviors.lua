@@ -208,7 +208,7 @@ end
 ---@param numCoins integer
 function obj_spawn_blue_coins(o, numCoins)
     o.oNumLootCoins = numCoins
-    obj_spawn_loot_blue_coins(o, numCoins, 20, 150)
+    obj_spawn_loot_coins(o, numCoins, 20, get_behavior_from_id(id_bhvMrIBlueCoin), 150, 0x76)
 end
 
 ---@param x number

@@ -10,17 +10,15 @@ local _abs = math.abs
 ------------------------
 
 local KOOPA_SHELL_INTERACTIONS = o2oint.Interactions({
-    objectLists = {
-        OBJ_LIST_GENACTOR, -- Common enemies
-        OBJ_LIST_PUSHABLE, -- Goombas, Koopas, Lakitus
-        OBJ_LIST_DESTRUCTIVE, -- Bob-ombs, breakable boxes
-        OBJ_LIST_SURFACE, -- Boxes
-        OBJ_LIST_LEVEL, -- Koopa shells
-    },
     interactions = {
 
-        -- Default behavior for most of the enemies . attack enemy
+        -- Default behavior for most of the enemies -> attack enemy
         {
+            objectLists = {
+                OBJ_LIST_GENACTOR, -- Common enemies
+                OBJ_LIST_PUSHABLE, -- Goombas, Koopas, Lakitus
+                OBJ_LIST_SURFACE, -- Boxes
+            },
             targets = {
                 id_bhvBobomb,
                 obj_is_attackable,
@@ -32,8 +30,12 @@ local KOOPA_SHELL_INTERACTIONS = o2oint.Interactions({
             ignoreIntangible = false
         },
 
-        -- Behavior for breakable boxes . break the box
+        -- Behavior for breakable boxes -> break the box
         {
+            objectLists = {
+                OBJ_LIST_DESTRUCTIVE, -- Bob-ombs, breakable boxes
+                OBJ_LIST_SURFACE, -- Boxes
+            },
             targets = {
                 obj_is_breakable_object
             },
@@ -43,8 +45,11 @@ local KOOPA_SHELL_INTERACTIONS = o2oint.Interactions({
             ignoreIntangible = false
         },
 
-        -- Behavior for bullies . repel the bully
+        -- Behavior for bullies -> repel the bully
         {
+            objectLists = {
+                OBJ_LIST_GENACTOR, -- Common enemies
+            },
             targets = {
                 obj_is_bully,
             },
@@ -56,7 +61,7 @@ local KOOPA_SHELL_INTERACTIONS = o2oint.Interactions({
             ignoreIntangible = false
         },
 
-        -- Behavior for koopa shells . bounce on the interactor
+        -- Behavior for koopa shells -> bounce on the interactor
         {
             targets = {
                 id_bhvKoopaShell,

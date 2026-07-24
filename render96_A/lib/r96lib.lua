@@ -1,5 +1,5 @@
-local version = require("version")
-local osync = require("osync")
+local version = require("/lib/version")
+local osync = require("/lib/osync")
 
 local _floor  = math.floor
 local _max    = math.max
@@ -325,10 +325,6 @@ function r96lib.clear_spawns(level, area)
     end
 end
 
-local function make_key(level, area, actNum, index)
-    return level .. "_" .. area .. "_" .. actNum .. "_" .. index
-end
-
 local function spawn_objects()
     osync.spawn_sync_objects("spawn_objects", function ()
         local level  = gNetworkPlayers[0].currLevelNum
@@ -338,7 +334,7 @@ local function spawn_objects()
         if not entries then return end
         for i, entry in ipairs(entries) do
             if act_matches(entry.actMask, actNum) then
-                local key = make_key(level, area, actNum, i)
+                local key = table.concat({level, area, actNum, i}, "_")
                 if not sSpawnedObjects[key] then
                     sSpawnedObjects[key] = true
                     local spawnFn = entry.isSync and osync.spawn_sync_object or spawn_non_sync_object
@@ -607,113 +603,110 @@ hook_event(HOOK_ON_OBJECT_UNLOAD, delete_object_gfx_data)
 -- Held object --
 -----------------
 
+-- TOOD:
+-- Keep this code for now
+-- I will need it for goomba
+
+-- ---@param o Object
+-- ---@param opts table
+-- local function obj_thrown_death(o, opts)
+--     spawn_mist_particles()
+--     obj_spawn_yellow_coins(o, o.oNumLootCoins)
+--     create_sound_spawner(SOUND_OBJ_STOMPED)
+--     if opts.audio then
+--         audio_stream_stop(opts.audio)
+--     end
+--     obj_mark_for_deletion(o)
+-- end
+
+-- ---@param o Object
+-- ---@param opts table
+-- local function obj_thrown_update(o, opts)
+--     cur_obj_update_floor_and_walls()
+--     cur_obj_move_standard(-78)
+
+--     local interactions = opts.interactions or nil
+--     if interactions ~= nil then
+--         interactions:process_interactions(o)
+--     end
+
+--     if opts.enemy then
+--         o.oGravity    = opts.gravity    or -2.5
+--         o.oFriction   = opts.friction   or 0.99
+--         o.oBuoyancy   = opts.buoyancy   or 1.4
+--         o.oForwardVel = opts.forwardVel or 40.0
+
+--         if o.oMoveFlags & (OBJ_MOVE_LANDED | OBJ_MOVE_HIT_WALL | OBJ_MOVE_MASK_IN_WATER | OBJ_MOVE_ABOVE_LAVA) ~= 0 then
+--             obj_thrown_death(o, opts)
+--             return
+--         end
+
+--         if opts.audio then
+--             r96lib.audio_fade(o, opts.audio, nil, nil, false)
+--         end
+--     else
+--         spawn_non_sync_object(id_bhvSparkleSpawn, E_MODEL_NONE, o.oPosX, o.oPosY, o.oPosZ, nil)
+--         o.oFaceAngleYaw = o.oFaceAngleYaw + 0x1000
+--         o.oGravity = -2.5
+--         o.oFriction = 0.99
+--         o.oBuoyancy = 1.4
+--         o.oForwardVel = math.remap(210, 300, 50, 0, math.clamp(o.oTimer, 210, 300))
+
+--         if o.oMoveFlags & OBJ_MOVE_HIT_WALL ~= 0 then
+--             o.oMoveAngleYaw = cur_obj_reflect_move_angle_off_wall()
+--             o.oPosX = o.oPosX + o.oWallHitboxRadius * sins(o.oMoveAngleYaw)
+--             o.oPosZ = o.oPosZ + o.oWallHitboxRadius * coss(o.oMoveAngleYaw)
+--         end
+
+--         if opts.audio and o.oForwardVel > 5 then
+--             r96lib.audio_fade(o, opts.audio, nil, nil, false)
+--         end
+--     end
+-- end
+
 ---@param o Object
----@param opts table
-local function obj_thrown_death(o, opts)
-    spawn_mist_particles()
-    obj_spawn_yellow_coins(o, o.oNumLootCoins)
-    create_sound_spawner(SOUND_OBJ_STOMPED)
-    if opts.audio then
-        audio_stream_stop(opts.audio)
-    end
-    obj_mark_for_deletion(o)
+function r96lib.init_held_object(o, opts)
+    local m = gMarioStates[0]
+    o.oHeldState = HELD_HELD
+    o.oAction = opts.action
+    o.heldByPlayerIndex = m.playerIndex
+    m.heldObj = o
+    network_send_object(o, true)
 end
 
 ---@param o Object
 ---@param opts table
-local function obj_thrown_update(o, opts)
-    cur_obj_update_floor_and_walls()
-    cur_obj_move_standard(-78)
+function r96lib.update_held_object(o, opts)
+    local m = gMarioStates[o.heldByPlayerIndex]
+    if m ~= nil then
 
-    local interactions = opts.interactions or nil
-    if interactions ~= nil then
-        interactions:process_interactions(o)
-    end
-
-    local enemy = opts.enemy or false
-    if enemy == true then
-        o.oGravity    = opts.gravity    or -2.5
-        o.oFriction   = opts.friction   or 0.99
-        o.oBuoyancy   = opts.buoyancy   or 1.4
-        o.oForwardVel = opts.forwardVel or 40.0
-
-        if (o.oMoveFlags & OBJ_MOVE_LANDED)        ~= 0
-        or (o.oMoveFlags & OBJ_MOVE_HIT_WALL)      ~= 0
-        or (o.oMoveFlags & OBJ_MOVE_MASK_IN_WATER) ~= 0 then
-            obj_thrown_death(o, opts)
+        -- Force held state as long as Mario is holding the object
+        -- and sync position with Mario's HOLP for convenience (particles and stuff)
+        if m.heldObj == o then
+            local holp = m.marioBodyState.heldObjLastPosition
+            o.oHeldState = HELD_HELD
+            o.oAction = opts.action
+            cur_obj_disable_rendering_and_become_intangible(o)
+            obj_set_pos(o, holp.x, holp.y, holp.z)
+            call_func(opts.update_held, m, o, opts)
             return
         end
 
-        if (o.oMoveFlags & OBJ_MOVE_ABOVE_LAVA) ~= 0 then
-            obj_mark_for_deletion(o)
-            return
-        end
-        if opts.audio then
-            r96lib.audio_fade(o, opts.audio, nil, nil, false)
-        end
-    end
+        -- Custom held actions
+        if o.oAction == opts.action then
 
-    if enemy == false then
-        spawn_non_sync_object(id_bhvSparkleSpawn, E_MODEL_NONE, o.oPosX, o.oPosY, o.oPosZ, nil)
-        o.oFaceAngleYaw = o.oFaceAngleYaw + 0x1000
-        o.oGravity = -2.5
-        o.oFriction = 0.99
-        o.oBuoyancy = 1.4
+            -- Mario no longer holds the object: throw it
+            if o.oHeldState == HELD_HELD then
+                o.oHeldState = HELD_FREE
+                call_func(opts.throw, m, o, opts)
+            end
 
-        if o.oTimer < 150 then o.oForwardVel = 50.0
-        elseif o.oTimer < 300 and o.oTimer > 150 then o.oForwardVel = 35.0
-        elseif o.oTimer < 450 and o.oTimer > 300 then o.oForwardVel = 20.0
-        elseif o.oTimer >= 550 then o.oForwardVel = 0.0 end
-
-        if (o.oMoveFlags & OBJ_MOVE_HIT_EDGE) ~= 0 or o.oMoveFlags & OBJ_MOVE_HIT_WALL ~= 0 then
-            o.oMoveAngleYaw = obj_angle_to_object(o, nearest_player_to_object(o))
-            return
-        end
-
-        if opts.audio and o.oForwardVel > 5 then
-            r96lib.audio_fade(o, opts.audio, nil, nil, false)
+            cur_obj_enable_rendering_and_become_tangible(o)
+            call_func(opts.update_thrown, m, o, opts)
         end
     end
-end
 
----@param o Object
-local function obj_update_held_state(o)
-    if o.oHeldState == HELD_HELD then
-        o.header.gfx.node.flags = o.header.gfx.node.flags | GRAPH_RENDER_INVISIBLE
-        cur_obj_become_intangible()
-    elseif o.oHeldState == HELD_THROWN then
-        cur_obj_become_tangible()
-        o.header.gfx.node.flags = o.header.gfx.node.flags & ~GRAPH_RENDER_INVISIBLE
-        o.oVelY = 20.0
-        o.oHeldState = HELD_FREE
-    end
-end
-
----@param m MarioState
----@param o Object
----@param opts table
-function r96lib.update_held_object(m, o, opts)
-    obj_update_held_state(o)
-
-    if m.heldObj == o then
-        o.oHeldState = HELD_HELD
-        o.oAction = 50
-    end
-
-    if m.heldObj ~= o and o.oAction == 50 and o.oHeldState == HELD_HELD then
-        o.oHeldState = HELD_THROWN
-        o.oTimer = 0
-    end
-
-    if m.heldObj ~= o and o.oAction == 50 and o.oHeldState == HELD_FREE then
-        obj_thrown_update(o, opts)
-        return
-    end
-
-    if (m.action == ACT_HOLD_WATER_IDLE or m.action == ACT_HOLD_WATER_ACTION_END)
-    and m.heldObj == o then
-        mario_drop_held_object(m)
-    end
+    o.oHeldState = HELD_FREE
 end
 
 return r96lib

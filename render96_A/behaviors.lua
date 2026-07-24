@@ -1,5 +1,4 @@
 local version = require("/lib/version")
-local o2oint = require("/lib/o2oint")
 local r96lib = require("/lib/r96lib")
 require("/constants")
 
@@ -122,61 +121,6 @@ define_custom_obj_fields(BEHAVIORS_CUSTOM_OBJECT_FIELDS)
 --- @field oWallZ number
 --- @field oCelebrationStar integer
 
-------------------
--- Interactions --
-------------------
-
-gThrownInteractions = o2oint.Interactions({
-    objectLists = {
-        OBJ_LIST_GENACTOR, -- Common enemies
-        OBJ_LIST_PUSHABLE, -- Goombas, Koopas, Lakitus
-        OBJ_LIST_DESTRUCTIVE, -- Bob-ombs, breakable boxes
-        OBJ_LIST_SURFACE, -- Boxes
-    },
-    interactions = {
-
-        -- Default behavior for most of the enemies -> attack enemy
-        {
-            targets = {
-                id_bhvBobomb,
-                obj_is_attackable,
-                obj_is_exclamation_box,
-            },
-            interact = function (interactor, interactee, context)
-                interactee.oInteractStatus = interactee.oInteractStatus | ATTACK_PUNCH | INT_STATUS_WAS_ATTACKED | INT_STATUS_INTERACTED | INT_STATUS_TOUCHED_BOB_OMB
-                interactor.oMoveFlags = OBJ_MOVE_HIT_WALL -- Kill the goomba
-            end,
-            ignoreIntangible = false
-        },
-
-        -- Behavior for breakable boxes -> break the box
-        {
-            targets = {
-                obj_is_breakable_object
-            },
-            interact = function (interactor, interactee, context)
-                interactee.oInteractStatus = interactee.oInteractStatus | ATTACK_KICK_OR_TRIP | INT_STATUS_INTERACTED | INT_STATUS_WAS_ATTACKED | INT_STATUS_STOP_RIDING -- "broken" status, specific to breakable boxes
-                interactor.oMoveFlags = OBJ_MOVE_HIT_WALL -- Kill the goomba
-            end,
-            ignoreIntangible = false
-        },
-
-        -- Behavior for bullies -> repel the bully
-        {
-            targets = {
-                obj_is_bully,
-            },
-            interact = function (interactor, interactee, context)
-                interactee.oMoveAngleYaw = obj_angle_to_object(interactor, interactee)
-                interactee.oForwardVel = 3392.0 / interactee.hitboxRadius
-                interactee.oInteractStatus = interactee.oInteractStatus | ATTACK_PUNCH | INT_STATUS_WAS_ATTACKED | INT_STATUS_INTERACTED
-                interactor.oMoveFlags = OBJ_MOVE_HIT_WALL -- Kill the goomba
-            end,
-            ignoreIntangible = false
-        }
-    }
-})
-
 ------------------------
 -- Behavior functions --
 ------------------------
@@ -267,6 +211,31 @@ function obj_spawn_blue_coins(o, numCoins)
     obj_spawn_loot_blue_coins(o, numCoins, 20, 150)
 end
 
+---@param x number
+---@param y number
+---@param z number
+---@param count integer
+---@param modelId ModelExtendedId | integer
+---@param size number
+---@param animState integer
+---@param vel number
+---@param duration integer
+function obj_spawn_particles(x, y, z, count, modelId, size, animState, vel, duration)
+    for _ = 1, count do
+        spawn_non_sync_object(id_bhvRender96Particle, modelId, x, y, z, function (obj)
+            obj.oAnimState = animState
+            obj.oMoveAngleYaw = random_u16()
+            obj.oAngleVelYaw = 0x500
+            obj.oFaceAnglePitch = random_u16()
+            obj.oAngleVelPitch = 0xF00
+            obj.oForwardVel = random_f32_around_zero(2 * vel)
+            obj.oVelY = random_f32_around_zero(2 * vel)
+            obj.oAction = duration
+            obj_scale(obj, size)
+        end)
+    end
+end
+
 ---@param o Object
 ---@param closeMin integer
 ---@param closeMax integer
@@ -335,6 +304,22 @@ function nearest_tangible_mario_state_to_object(o)
         end
     end
     return nearestMario
+end
+
+---@param o Object
+function get_mario_state_from_ridden_object(o)
+    for i = 0, MAX_PLAYERS - 1 do
+        local m = gMarioStates[i]
+        if is_player_active(m) == 1 and m.riddenObj == o then
+            return m
+        end
+    end
+    return nil
+end
+
+---@param func function
+function call_func(func, ...)
+    return func and func(...) or nil
 end
 
 -------------------
@@ -456,6 +441,7 @@ require("/behaviors/koopa-the-quick")
 require("/behaviors/luigi-key")
 require("/behaviors/mr-i")
 require("/behaviors/mushroom-1up")
+require("/behaviors/particles")
 require("/behaviors/peach")
 require("/behaviors/piranha-plant")
 require("/behaviors/pokey")

@@ -8,14 +8,34 @@ require("/constants")
 ---@param o Object
 local function bhv_koopa_render96_loop(o)
 
-    -- koopa instantly dies if attacked by Wario
-    if o.oKoopaMovementType == KOOPA_BP_UNSHELLED and o.oAction == KOOPA_UNSHELLED_ACT_LYING and o.oTimer < 3 then
-        local m = nearest_mario_state_to_object(o)
-        if charSelect.character_get_current_number(m.playerIndex) == CT_WARIO then
-            create_sound_spawner(SOUND_OBJ_STOMPED)
-            o.oAction = OBJ_ACT_SQUISHED
-        end
+    -- Poof, he's gone!
+    if o.oAction == 999 then
+        spawn_mist_particles_with_sound(SOUND_OBJ_STOMPED)
+        spawn_mist_particles_with_sound(SOUND_OBJ_KOOPA_FLYGUY_DEATH)
+        obj_mark_for_deletion(o)
     end
 end
 
 id_bhvRender96Koopa = hook_render96_behavior(id_bhvKoopa, false, nil, bhv_koopa_render96_loop)
+
+-----------
+-- Hooks --
+-----------
+
+local function koopa_on_attack(m, o)
+    if (o.oInteractStatus & INT_STATUS_WAS_ATTACKED ~= 0 and      -- Attacked
+        obj_has_behavior_id(o, id_bhvKoopa) == 1 and              -- Koopa
+        o.oKoopaMovementType < KOOPA_BP_KOOPA_THE_QUICK_BASE and  -- Not quick
+        m.playerIndex == 0 and                                    -- Local
+        charSelect.character_get_current_number() == CT_WARIO)    -- Wario
+    then
+
+        -- Breaking news: local Wario vaporizes koopa
+        o.oAction = 999
+        spawn_sync_object(id_bhvKoopaShell, E_MODEL_KOOPA_SHELL, o.oPosX, o.oPosY, o.oPosZ, nil)
+        spawn_sync_object(id_bhvMrIBlueCoin, E_MODEL_BLUE_COIN, o.oPosX, o.oPosY, o.oPosZ, nil)
+        network_send_object(o, true)
+    end
+end
+
+hook_event(HOOK_ON_ATTACK_OBJECT, koopa_on_attack)

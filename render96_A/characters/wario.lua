@@ -928,14 +928,21 @@ hook_mario_action(ACT_WARIO_GROUND_POUND,       act_wario_ground_pound, INT_GROU
 
 ---@param o Object
 ---@param dist number
-function obj_hit_by_wario_charge(o, dist)
+---@param actions table
+function obj_hit_by_wario_action(o, dist, actions)
     for i = 0, MAX_PLAYERS - 1 do
         local m = gMarioStates[i]
-        if m.action == ACT_WARIO_CHARGE and m.marioObj and is_player_active(m) == 1 and dist_between_objects(o, m.marioObj) <= dist then
-            return true
+        if actions[m.action] and m.marioObj and charSelect.character_get_current_number(i) == CT_WARIO and is_player_active(m) == 1 and dist_between_objects(o, m.marioObj) <= dist then
+            return true, m
         end
     end
-    return false
+    return false, nil
+end
+
+---@param o Object
+---@param dist number
+function obj_hit_by_wario_charge(o, dist)
+    return obj_hit_by_wario_action(o, dist, { [ACT_WARIO_CHARGE] = true })
 end
 
 ---@param o Object
@@ -943,10 +950,10 @@ function obj_ground_pounded_by_wario(o)
     for i = 0, MAX_PLAYERS - 1 do
         local m = gMarioStates[i]
         if charSelect.character_get_current_number(i) == CT_WARIO and is_player_active(m) == 1 and obj_is_mario_ground_pounding_platform(m, o) == 1 then
-            return true
+            return true, m
         end
     end
-    return false
+    return false, nil
 end
 
 -------------------

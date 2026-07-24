@@ -51,19 +51,22 @@ end
 local function bhv_blargg_friendly_render96_loop(o)
     cur_obj_init_animation(BLARGG_ANIM_SWIM)
 
+    -- Waiting for Mario
     if o.oAction == 0 then
         cur_obj_update_floor_and_walls()
         cur_obj_if_hit_wall_bounce_away()
+        cur_obj_move_standard(-20)
 
+        -- Mario started riding
         if (o.oInteractStatus & INT_STATUS_INTERACTED) ~= 0 then
-            local m = nearest_mario_state_to_object(o)
+            local m = get_mario_state_from_ridden_object(o) or nearest_mario_state_to_object(o)
             if m ~= nil then
                 o.oAction = 1
                 o.heldByPlayerIndex = m.playerIndex
             end
         end
-        cur_obj_move_standard(-20)
 
+    -- Mario riding
     elseif o.oAction == 1 then
         local m = gMarioStates[o.heldByPlayerIndex]
         if m ~= nil then
@@ -71,6 +74,8 @@ local function bhv_blargg_friendly_render96_loop(o)
             obj_copy_pos(o, m.marioObj)
             o.oFaceAngleYaw = m.marioObj.oMoveAngleYaw
             local floor = cur_obj_update_floor_height_and_get_floor()
+
+            -- Spawn particles and shrink blargg if not on lava
             if _abs(o.oPosY - o.oFloorHeight) < 5.0 then
                 if floor ~= nil and floor.type == SURFACE_BURNING then
                     spawn_non_sync_object(id_bhvKoopaShellFlame, E_MODEL_RED_FLAME, o.oPosX, o.oPosY, o.oPosZ, nil)
@@ -87,6 +92,8 @@ local function bhv_blargg_friendly_render96_loop(o)
                 end
                 cur_obj_scale(o.oMrISize)
             end
+
+            -- Stop riding + failsafe
             if o.oInteractStatus & INT_STATUS_STOP_RIDING ~= 0 or m.action & ACT_FLAG_RIDING_SHELL == 0 then
                 bhv_blargg_friendly_render96_explode(o)
             end
@@ -94,6 +101,7 @@ local function bhv_blargg_friendly_render96_loop(o)
             o.oAction = 0
         end
     end
+
     o.oInteractStatus = 0
 end
 

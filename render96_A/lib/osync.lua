@@ -5,7 +5,7 @@
     filename: osync.lua
     version: v1.0
     author: PeachyPeach
-    required: sm64coopdx v1.4 or later
+    required: sm64coopdx v1.5.1 or later
 
     A small library to handle reliable sync objects spawning
     without duplication in code run by all clients.

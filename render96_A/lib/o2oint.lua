@@ -17,7 +17,7 @@ local ipairs = ipairs
 local unpack = table.unpack
 local obj_get_first = obj_get_first
 local obj_get_next = obj_get_next
-local get_id_from_behavior = get_id_from_behavior
+local obj_has_behavior_id = obj_has_behavior_id
 local obj_is_valid_for_interaction = obj_is_valid_for_interaction
 local obj_check_hitbox_overlap = obj_check_hitbox_overlap
 local obj_check_overlap_with_hitbox_params = obj_check_overlap_with_hitbox_params
@@ -78,15 +78,22 @@ local function process_interactions(interactions, interactor, context)
         while obj do
             local interaction
 
+            -- Don't interact on itself
+            if obj == interactor then
+                goto next_obj
+            end
+
             -- Check hitbox overlap
             if not check_hitbox_overlap(obj, unpack(args)) then
                 goto next_obj
             end
 
             -- Check behavior id
-            interaction = behaviorIds[get_id_from_behavior(obj.behavior)]
-            if interaction then
-                goto process_interaction
+            for behaviorId, behavior in pairs(behaviorIds) do
+                if obj_has_behavior_id(obj, behaviorId) == 1 then
+                    interaction = behavior
+                    goto process_interaction
+                end
             end
 
             -- Check "obj is..." functions
